@@ -1,0 +1,32 @@
+# .NET Core
+bin/
+obj/
+
+# User-specific files
+.vs/
+.idea/
+
+# ASP.NET Core Settings
+appsettings.Development.json
+appsettings.Production.json
+
+# User secrets
+secrets.json
+
+# Microsoft Visual Studio for Mac
+.vscode/
+
+# ASP.NET Core publish directory
+publish/
+
+# JetBrains Rider
+.idea/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Mac system files
+.DS_Store
