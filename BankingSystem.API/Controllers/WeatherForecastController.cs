@@ -1,5 +1,6 @@
 using BankingSystem.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 
 namespace BankingSystem.API.Controllers
 {
@@ -22,7 +23,7 @@ namespace BankingSystem.API.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            var class = new Class1();
+            Class1 class1 = new Class1();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

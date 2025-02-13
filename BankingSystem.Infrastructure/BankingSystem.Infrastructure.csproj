@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BankingSystem.Application\BankingSystem.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Identity\DbContexts\" />
+    <Folder Include="Identity\Migrations\" />
+    <Folder Include="DataAccess\Repositories\" />
+    <Folder Include="Identity\" />
+  </ItemGroup>
+
 </Project>
