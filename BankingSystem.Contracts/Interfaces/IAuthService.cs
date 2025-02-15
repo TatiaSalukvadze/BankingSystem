@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankingSystem.Infrastructure.Authentication
+namespace BankingSystem.Contracts.Interfaces
 {
-    internal class JWTService
+    public interface IAuthService
     {
+        string GenerateToken<T>(T entity, string role);
     }
 }

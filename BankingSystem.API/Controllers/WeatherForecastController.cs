@@ -1,4 +1,8 @@
 using BankingSystem.Contracts;
+using BankingSystem.Contracts.DTOs;
+using BankingSystem.Contracts.Interfaces;
+using BankingSystem.Contracts.Interfaces.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 
@@ -6,7 +10,7 @@ namespace BankingSystem.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class WeatherForecastController : WrapperController
     {
         private static readonly string[] Summaries = new[]
         {
@@ -14,16 +18,26 @@ namespace BankingSystem.API.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IPersonService _personService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IPersonService personService)
         {
             _logger = logger;
+            _personService = personService;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpPost]
+        [Route("register")]
+        public async Task<IActionResult> Register([FromForm] RegisterDTO registerDto)
+        {
+            var (success, Message, data) = await _personService.RegisterPersonAsync(registerDto);
+            return Ok(new { Message, data });
+        }
+            [HttpGet(Name = "GetWeatherForecast")]
+        [Authorize(policy:"UserOnly")]
         public IEnumerable<WeatherForecast> Get()
         {
-            Class1 class1 = new Class1();
+          
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

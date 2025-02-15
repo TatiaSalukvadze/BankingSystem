@@ -8,13 +8,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BankingSystem.Application\BankingSystem.Application.csproj" />
+    <ProjectReference Include="..\BankingSystem.Contracts\BankingSystem.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Identity\DbContexts\" />
-    <Folder Include="Identity\Migrations\" />
-    <Folder Include="DataAccess\Repositories\" />
-    <Folder Include="Identity\" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.13">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.13" />
   </ItemGroup>
 
 </Project>
