@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.DTOs
 {
-    public class RegisterDTO
+    public class RegisterPersonDTO
     {
 
         [Required]

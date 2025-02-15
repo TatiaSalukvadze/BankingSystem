@@ -28,6 +28,7 @@ namespace BankingSystem.Application.Services
             _signInManager = signInManager;
         }
 
+
         public async Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto)
         {
             try
@@ -59,7 +60,7 @@ namespace BankingSystem.Application.Services
             }
         }
 
-        public async Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterDTO registerDto)
+        public async Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto)
         {
             try
             {
@@ -116,6 +117,22 @@ namespace BankingSystem.Application.Services
 
             }
             catch (Exception ex) { return (false, ex.Message, null); }
+        }
+
+        public async Task<(bool Success, string Message, object? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto)
+        {
+            try
+            {
+                int personId = await _unitOfWork.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber);
+
+                if (personId > 0)
+                {
+                    return (false, "Such person doesn't exist in our system!", null);
+                }
+
+                    return (false, "dummy", null);//dummy
+            }
+            catch(Exception ex) { return (false, ex.Message, null); }
         }
     }
 }

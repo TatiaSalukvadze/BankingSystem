@@ -9,6 +9,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Dapper.SqlMapper;
 
 namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
@@ -34,6 +35,18 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return null;
         }
 
+        public async Task<int> FindIdByIDNumberAsync(string IDNumber)
+        {
+            int id;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT Id FROM Person WHERE IDNumber = @IDNumber";
+                id = await _connection.ExecuteScalarAsync<int>(sql, new { IDNumber }, _transaction);
+            }
+
+            return id = 0;
+        }
+
         public async Task<int> RegisterPersonAsync(Person person)
         {
             int addedUserId = 0;
@@ -46,5 +59,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return addedUserId;
         }
+
+
     }
 }

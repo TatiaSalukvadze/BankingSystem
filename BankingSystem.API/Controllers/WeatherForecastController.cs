@@ -28,7 +28,7 @@ namespace BankingSystem.API.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromForm] RegisterDTO registerDto)
+        public async Task<IActionResult> Register([FromForm] RegisterPersonDTO registerDto)
         {
             var (success, Message, data) = await _personService.RegisterPersonAsync(registerDto);
             return Ok(new { Message, data });
