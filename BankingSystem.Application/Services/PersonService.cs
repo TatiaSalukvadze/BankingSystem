@@ -72,20 +72,47 @@ namespace BankingSystem.Application.Services
                     UserName = registerDto.Email,
                     Email = registerDto.Email,
                 };
-
-                var person = new Person
+                var createdUser = await _userManager.CreateAsync(user, registerDto.Password);
+                if (createdUser.Succeeded)
                 {
-                    UserId = "",
-                    Name = registerDto.Name,
-                    Surname = registerDto.Surname,
-                    Email = registerDto.Email,
-                    CreatedAt = DateTime.Now
+                    var roleResult = await _userManager.AddToRoleAsync(user, "User");
+                    if (roleResult.Succeeded)
+                    {
+                        var person = new Person
+                        {
+                            IdentityUserId = user.Id,
+                            Name = registerDto.Name,
+                            Surname = registerDto.Surname,
+                            IDNumber = registerDto.IDNumber,
+                            Birthdate = registerDto.Birthdate,
+                            Email = registerDto.Email,
+                            CreatedAt = DateTime.Now
 
-                };
-                await _unitOfWork.PersonRepository.RegisterPersonAsync(person);
-                var token = _authService.GenerateToken(person, "User");
-                return (true, "User registered successfully!", token);
-                //    return Ok(new { token });
+                        };
+
+                        var userId = await _unitOfWork.PersonRepository.RegisterPersonAsync(person);
+                        if (userId > 0)
+                        {
+                            _unitOfWork.SaveChanges();
+                            return (true, "User was registered successfully!",new { IdentityUserId = user.Id, CustomUserId = userId });
+                        }
+                        else
+                        {
+                            return (false, "Adding user in physical person system failed!", null);
+                        }
+                    }
+                    else
+                    {
+                        return (false, "Adding user corresponding role  in system failed!", null);
+                    }
+                }
+                else
+                {
+                    return (false, "Adding user in identity system failed!", null);
+                }
+
+
+
             }
             catch (Exception ex) { return (false, ex.Message, null); }
         }
