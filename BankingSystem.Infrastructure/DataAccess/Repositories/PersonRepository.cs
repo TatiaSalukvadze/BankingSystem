@@ -22,6 +22,18 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             _connection = connection;
             _transaction = transaction;
         }
+
+        public async Task<Person?> FindByIdentityIdAsync(string identityId)
+        {
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT * FROM Persons WHERE IdentityUserId = @identityId";
+                return await _connection.QueryFirstOrDefaultAsync<Person>(sql, new { identityId });
+            }
+
+            return null;
+        }
+
         public async Task RegisterPersonAsync(Person person)
         {
 

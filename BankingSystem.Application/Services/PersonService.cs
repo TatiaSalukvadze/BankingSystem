@@ -3,6 +3,8 @@ using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +17,47 @@ namespace BankingSystem.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthService _authService;
-
         private readonly UserManager<IdentityUser> _userManager;
-        public PersonService(IUnitOfWork unitOfWork,IAuthService authService, UserManager<IdentityUser> userManager) {
+        private readonly SignInManager<IdentityUser> _signInManager;
+
+        public PersonService(IUnitOfWork unitOfWork,IAuthService authService, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        {
             _unitOfWork = unitOfWork;
             _authService = authService;
-
             _userManager = userManager;
+            _signInManager = signInManager;
         }
+
+        public async Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto)
+        {
+            try
+            {
+                var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username!.ToLower());
+                if (user == null)
+                {
+                    return (false, "Invalid username!", null);
+                }
+
+                var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password!, false);
+                if (!result.Succeeded)
+                {
+                    return (false, "Invalid username or password!", null);
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.FirstOrDefault() ?? ""; 
+
+                var customUser = await _unitOfWork.PersonRepository.FindByIdentityIdAsync(user.Id);
+                var token = _authService.GenerateToken(user, role);
+
+                return (true, "Login successful!", new { token, customUser });
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message, null);
+            }
+        }
+
         public async Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterDTO registerDto)
         {
             try
