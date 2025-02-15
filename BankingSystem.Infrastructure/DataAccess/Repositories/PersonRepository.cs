@@ -27,8 +27,8 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         {
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT * FROM Persons WHERE IdentityUserId = @identityId";
-                return await _connection.QueryFirstOrDefaultAsync<Person>(sql, new { identityId });
+                var sql = "SELECT * FROM Person WHERE IdentityUserId = @identityId";
+                return await _connection.QueryFirstOrDefaultAsync<Person>(sql, new { identityId }, _transaction);
             }
 
             return null;

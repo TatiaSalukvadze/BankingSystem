@@ -49,7 +49,8 @@ namespace BankingSystem.Application.Services
 
                 var customUser = await _unitOfWork.PersonRepository.FindByIdentityIdAsync(user.Id);
                 var token = _authService.GenerateToken(user, role);
-
+                
+                _unitOfWork.SaveChanges();
                 return (true, "Login successful!", new { token, customUser });
             }
             catch (Exception ex)
