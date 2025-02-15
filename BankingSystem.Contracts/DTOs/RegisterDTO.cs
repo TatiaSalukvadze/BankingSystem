@@ -17,6 +17,12 @@ namespace BankingSystem.Contracts.DTOs
         public string Surname { get; set; }
 
         [Required]
+        public string IDNumber { get; set; }
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime Birthdate { get; set; }
+
+        [Required]
         [EmailAddress]
         public string Email { get; set; }
 
