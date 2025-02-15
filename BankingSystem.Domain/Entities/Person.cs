@@ -12,6 +12,7 @@ namespace BankingSystem.Domain.Entities
         public string UserId { get; set; } // Foreign key to AspNetUsers (GUID as string)
         public string Name { get; set; }
         public string Surname { get; set; }
+        public string IDNumber { get; set; }
         public string Email { get; set; }
         public DateTime CreatedAt { get; set; }
     }
