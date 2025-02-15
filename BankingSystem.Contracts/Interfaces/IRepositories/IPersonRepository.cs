@@ -12,6 +12,6 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
     public interface IPersonRepository : IRepository
     {
   
-        Task RegisterPersonAsync(Person person);
+        Task<int> RegisterPersonAsync(Person person);
     }
 }

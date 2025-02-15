@@ -13,14 +13,14 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             _personService = personService;
         }
-        [HttpPost]  
+        [HttpPost("RegisterPerson")]
         public async Task<IActionResult> RegisterPerson([FromForm] RegisterDTO registerDto)
         {
-            var (success, Message, data) = await _personService.RegisterPersonAsync(registerDto);
+            var (success, message, data) = await _personService.RegisterPersonAsync(registerDto);
             if (!success) {
-                return BadRequest(Message);
+                return BadRequest(message);
             }
-            return Ok(new {Message, data});
+            return Ok(new {message, data});
         }
     }
 }

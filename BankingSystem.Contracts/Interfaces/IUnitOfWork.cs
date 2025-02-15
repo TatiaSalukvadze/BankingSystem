@@ -16,7 +16,7 @@ namespace BankingSystem.Contracts.Interfaces
         //IDbConnection Connection();
         IDbCommand CreateCommand();
         //void BeginTransaction();
-        //void SaveChanges();
+        void SaveChanges();
 
     }
 }

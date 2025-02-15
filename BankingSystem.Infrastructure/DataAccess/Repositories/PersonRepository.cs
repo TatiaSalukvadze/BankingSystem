@@ -22,16 +22,17 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             _connection = connection;
             _transaction = transaction;
         }
-        public async Task RegisterPersonAsync(Person person)
+        public async Task<int> RegisterPersonAsync(Person person)
         {
-
+            int addedUserId = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = "INSERT INTO Books(Title,Author,YearPublished) VALUES (@Title,@Author,@YearPublished)";
-                _connection.Execute(sql, new {Title = "tit"}, _transaction);
-                
-
+                var sql = "INSERT INTO Person(IdentityUserId, [Name], Surname, IDNumber, Birthdate, Email)" +
+                    " OUTPUT INSERTED.Id" +
+                    " VALUES (@IdentityUserId,@Name, @Surname, @IDNumber, @Birthdate, @Email)";
+                addedUserId =  await _connection.ExecuteScalarAsync<int>(sql, person, _transaction);
             }
+            return addedUserId;
         }
     }
 }
