@@ -1,14 +1,8 @@
-﻿using BankingSystem.Contracts.Interfaces;
-using BankingSystem.Contracts.Interfaces.IRepositories;
+﻿using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Dapper.SqlMapper;
 
 namespace BankingSystem.Infrastructure.DataAccess.Repositories

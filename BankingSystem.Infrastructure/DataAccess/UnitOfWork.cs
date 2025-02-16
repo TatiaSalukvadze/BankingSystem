@@ -1,16 +1,9 @@
 ﻿using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IRepositories;
-using BankingSystem.Domain.Entities;
-using BankingSystem.Infrastructure.DataAccess.Repositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankingSystem.Infrastructure.DataAccess
 {
@@ -23,7 +16,7 @@ namespace BankingSystem.Infrastructure.DataAccess
         public IDbConnection Connection() => _connection;//no need
 
         public UnitOfWork(IConfiguration configuration, IPersonRepository personRepository, IAccountRepository accountRepository,
-            ITransactionDetailsRepository transactionDetailsRepository)
+            ICardRepository cardRepository, ITransactionDetailsRepository transactionDetailsRepository)
         {
             
             _connectionString = configuration.GetConnectionString("default") ??
@@ -31,19 +24,22 @@ namespace BankingSystem.Infrastructure.DataAccess
             _connection = new SqlConnection(_connectionString);
             _connection.Open();
             _transaction = (SqlTransaction)_connection.BeginTransaction();
-            RepoSetUp(personRepository, accountRepository, transactionDetailsRepository);
+            RepoSetUp(personRepository, accountRepository, cardRepository, transactionDetailsRepository);
             //PersonRepository = personRepository;
         }
         private void RepoSetUp(IPersonRepository personRepository, IAccountRepository accountRepository,
-           ITransactionDetailsRepository transactionDetailsRepository)
+           ICardRepository cardRepository,ITransactionDetailsRepository transactionDetailsRepository)
         {
             PersonRepository = personRepository;
             PersonRepository.GiveCommandData(_connection, _transaction);
             AccountRepository = accountRepository;
             AccountRepository.GiveCommandData(_connection, _transaction);
+            CardRepository = cardRepository;
+            CardRepository.GiveCommandData(_connection, _transaction);
             TransactionDetailsRepository = transactionDetailsRepository;    
             TransactionDetailsRepository.GiveCommandData(_connection, _transaction);
         }
+
         private IPersonRepository _personRepository;
         public IPersonRepository PersonRepository
         {
@@ -64,7 +60,7 @@ namespace BankingSystem.Infrastructure.DataAccess
             }
         }
 
-            private IAccountRepository _accountRepository;
+        private IAccountRepository _accountRepository;
         public IAccountRepository AccountRepository
         {
             get
@@ -84,7 +80,27 @@ namespace BankingSystem.Infrastructure.DataAccess
             }
         }
 
-        ITransactionDetailsRepository _transactionDetailsRepository;
+        private ICardRepository _cardRepository;
+        public ICardRepository CardRepository
+        {
+            get
+            {
+                return _cardRepository;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("There is no card repository present");
+                }
+                else
+                {
+                    _cardRepository = value;
+                }
+            }
+        }
+
+        private ITransactionDetailsRepository _transactionDetailsRepository;
         public ITransactionDetailsRepository TransactionDetailsRepository
         {
             get
