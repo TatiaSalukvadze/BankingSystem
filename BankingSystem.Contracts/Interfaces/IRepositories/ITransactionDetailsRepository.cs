@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.Interfaces.IRepositories
 {
-    public interface ITransactionDetailsRepository : IRepository
+    public interface ITransactionDetailsRepository 
     {
     }
 }

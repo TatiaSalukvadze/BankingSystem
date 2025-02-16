@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.Interfaces.IRepositories
 {
-    public interface IAccountRepository : IRepository
+    public interface IAccountRepository 
     {
         Task<bool> IBANExists(string IBAN);
         Task<int> CreateAccountAsync(Account account);

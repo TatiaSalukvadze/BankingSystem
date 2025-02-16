@@ -9,36 +9,40 @@ namespace BankingSystem.Infrastructure.DataAccess
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
-        private string _connectionString;
+        //private string _connectionString;
         private IDbConnection _connection;
-        private SqlTransaction _transaction;
-        public SqlTransaction Transaction() => _transaction;//no nned
-        public IDbConnection Connection() => _connection;//no need
+        private IDbTransaction _transaction;
+        //public SqlTransaction Transaction() => _transaction;//no nned
+        //public IDbConnection Connection() => _connection;//no need
 
-        public UnitOfWork(IConfiguration configuration, IPersonRepository personRepository, IAccountRepository accountRepository,
+        public UnitOfWork(IDbTransaction dbTransaction, IPersonRepository personRepository, IAccountRepository accountRepository,
             ICardRepository cardRepository, ITransactionDetailsRepository transactionDetailsRepository)
         {
-            
-            _connectionString = configuration.GetConnectionString("default") ??
-                throw new ArgumentNullException("There is no default connection string present");
-            _connection = new SqlConnection(_connectionString);
-            _connection.Open();
-            _transaction = (SqlTransaction)_connection.BeginTransaction();
-            RepoSetUp(personRepository, accountRepository, cardRepository, transactionDetailsRepository);
-            //PersonRepository = personRepository;
-        }
-        private void RepoSetUp(IPersonRepository personRepository, IAccountRepository accountRepository,
-           ICardRepository cardRepository,ITransactionDetailsRepository transactionDetailsRepository)
-        {
+
+            //_connectionString = configuration.GetConnectionString("default") ??
+            //    throw new ArgumentNullException("There is no default connection string present");
+            //_connection = new SqlConnection(_connectionString);
+            //_connection.Open();
+            _transaction = dbTransaction;
+            _connection = _transaction.Connection;
+            //RepoSetUp(personRepository, accountRepository, cardRepository, transactionDetailsRepository);
             PersonRepository = personRepository;
-            PersonRepository.GiveCommandData(_connection, _transaction);
             AccountRepository = accountRepository;
-            AccountRepository.GiveCommandData(_connection, _transaction);
             CardRepository = cardRepository;
-            CardRepository.GiveCommandData(_connection, _transaction);
-            TransactionDetailsRepository = transactionDetailsRepository;    
-            TransactionDetailsRepository.GiveCommandData(_connection, _transaction);
+            TransactionDetailsRepository = transactionDetailsRepository;
         }
+        //private void RepoSetUp(IPersonRepository personRepository, IAccountRepository accountRepository,
+        //   ICardRepository cardRepository,ITransactionDetailsRepository transactionDetailsRepository)
+        //{
+        //    PersonRepository = personRepository;
+        //    PersonRepository.GiveCommandData(_connection, _transaction);
+        //    AccountRepository = accountRepository;
+        //    AccountRepository.GiveCommandData(_connection, _transaction);
+        //    CardRepository = cardRepository;
+        //    CardRepository.GiveCommandData(_connection, _transaction);
+        //    TransactionDetailsRepository = transactionDetailsRepository;    
+        //    TransactionDetailsRepository.GiveCommandData(_connection, _transaction);
+        //}
 
         private IPersonRepository _personRepository;
         public IPersonRepository PersonRepository
@@ -138,12 +142,12 @@ namespace BankingSystem.Infrastructure.DataAccess
         //    _connection?.Close();
         //}
 
-        public IDbCommand CreateCommand()
-        {
-            var command = _connection.CreateCommand();
-            command.Transaction = _transaction;
-            return command;
-        }
+        //public IDbCommand CreateCommand()
+        //{
+        //    var command = _connection.CreateCommand();
+        //    command.Transaction = _transaction;
+        //    return command;
+        //}
 
         public void SaveChanges()
         {

@@ -1,6 +1,6 @@
 ﻿namespace BankingSystem.Contracts.Interfaces.IRepositories
 {
-    public interface ICardRepository : IRepository
+    public interface ICardRepository 
     {
     }
 }

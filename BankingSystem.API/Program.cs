@@ -8,9 +8,12 @@ using BankingSystem.Infrastructure.DataAccess.Repositories;
 using BankingSystem.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Data;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -58,6 +61,14 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(securityRequirement);
 });
 
+//for db operations(unitofwork and repos)
+builder.Services.AddScoped((s) => new SqlConnection(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddScoped<IDbTransaction>(s =>
+{
+    SqlConnection conn = s.GetRequiredService<SqlConnection>();
+    conn.Open();
+    return conn.BeginTransaction();
+});
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
@@ -105,6 +116,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     options.Password.RequiredLength = 8;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddTransient<DataSeeder>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
