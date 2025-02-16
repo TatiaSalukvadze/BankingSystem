@@ -48,5 +48,16 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return exists;
 
         }
+
+        public async Task<Account> FindAccountByIBANAsync(string IBAN)
+        {
+            Account account = null;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT * FROM Account WHERE IBAN = @IBAN";
+                account = await _connection.QueryFirstOrDefaultAsync<Account>(sql, new { IBAN }, _transaction);
+            }
+            return account;
+        }
     }
 }

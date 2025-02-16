@@ -14,6 +14,47 @@ namespace BankingSystem.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        
+        public async Task<(bool success, string? message, object? data)> CreateCardAsync(CreateCardDTO createCardDto)
+        {
+            try
+            {
+                var account = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN);
+                if (account == null)
+                {
+                    return (false, "Account does not exist in the system!", null);
+                }
+
+                bool cardNumberExists = await _unitOfWork.CardRepository.CardNumberExists(createCardDto.CardNumber);
+                if (cardNumberExists)
+                {
+                    return (false, "Card number already exists!", null);
+                }
+
+                var card = new Card
+                {
+                    AccountId = account.Id,
+                    CardNumber = createCardDto.CardNumber,
+                    ExpirationDate = createCardDto.ExpirationDate,
+                    CVV = createCardDto.CVV,
+                    PIN = createCardDto.PIN
+                };
+
+                int insertedId = await _unitOfWork.CardRepository.CreateCardAsync(card);
+                if (insertedId <= 0)
+                {
+                    return (false, "Card could not be created, something went wrong!", null);
+                }
+
+                card.Id = insertedId;
+                _unitOfWork.SaveChanges();
+
+                return (true, "Card was created successfully!", card);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message, null);
+            }
+        }
+
     }
 }

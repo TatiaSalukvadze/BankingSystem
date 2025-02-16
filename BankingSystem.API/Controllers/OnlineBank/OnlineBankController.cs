@@ -37,5 +37,16 @@ namespace BankingSystem.API.Controllers.OnlineBank
             }
             return Ok(new { message, data });
         }
+
+        [HttpPost("CreateCard")]
+        public async Task<IActionResult> CreateCard([FromForm] CreateCardDTO createCardDto)
+        {
+            var (success, message, data) = await _cardService.CreateCardAsync(createCardDto);
+            if (!success)
+            {
+                return BadRequest(message);
+            }
+            return Ok(new { message, data });
+        }
     }
 }

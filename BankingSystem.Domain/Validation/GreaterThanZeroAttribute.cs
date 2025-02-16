@@ -13,7 +13,7 @@ namespace BankingSystem.Domain.Validation
 
             if (value is decimal decimalValue)
             {
-                return decimalValue > 0;
+                return decimalValue >= 0;
             }
 
             return false;
