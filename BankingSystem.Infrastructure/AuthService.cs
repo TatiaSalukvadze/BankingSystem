@@ -1,5 +1,6 @@
 ﻿using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -41,7 +42,7 @@ namespace BankingSystem.Infrastructure
         private static ClaimsIdentity GenerateClaims<T>(T entity, string role)
         {
             var claims = new ClaimsIdentity();
-            if (entity is Person user)//aq unda iyos IdentityUser
+            if (entity is IdentityUser user)//aq unda iyos IdentityUser
             {
                 claims.AddClaim(new Claim(ClaimTypes.Name, user.Email));
                 claims.AddClaim(new Claim(ClaimTypes.Role, role));

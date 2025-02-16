@@ -1,5 +1,6 @@
 ﻿using BankingSystem.Contracts.DTOs;
 using BankingSystem.Contracts.Interfaces.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -19,12 +20,12 @@ namespace BankingSystem.API.Controllers.OnlineBank
             _cardService = cardService;
         }
 
-
+        [Authorize(policy:"UserOnly")]
         [HttpPost("Cards")]
-        public async Task<IActionResult> SeeCards([FromForm] RegisterPersonDTO registerDto)
+        public async Task<IActionResult> SeeCards()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _personService.RegisterPersonAsync(registerDto);
+            var (success, message, data) = await _cardService.SeeCardsAsync(userEmail);
             if (!success)
             {
                 return BadRequest(message);
