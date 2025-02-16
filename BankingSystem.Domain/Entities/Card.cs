@@ -9,7 +9,7 @@ namespace BankingSystem.Domain.Entities
         [Required]
         public int AccountId { get; set; }
 
-        [Required, StringLength(16)]
+        [Required, StringLength(16, MinimumLength = 16)]
         [RegularExpression("^[0-9]{16}$", ErrorMessage = "ბარათის ნომერი უნდა იყოს 16 ციფრისგან შემდგარი.")]
         public string CardNumber { get; set; }
 
