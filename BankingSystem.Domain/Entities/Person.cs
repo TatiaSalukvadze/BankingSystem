@@ -10,16 +10,17 @@ namespace BankingSystem.Domain.Entities
         public string IdentityUserId { get; set; }
 
         [Required, StringLength(50, MinimumLength = 2)]
-        [RegularExpression(@"^([\p{IsGeorgian}]+|[a-zA-Z\s]+)$", ErrorMessage = "სახელი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
-        //[RegularExpression(@"^[ა-ჰ]+$|^[A-Za-z]+$", ErrorMessage = "სახელი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
+        [RegularExpression(@"^[ა-ჰ]+$|^[A-Za-z]+$", ErrorMessage = "სახელი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
+        //[RegularExpression(@"^([\p{IsGeorgian}]+|[a-zA-Z\s]+)$", ErrorMessage = "სახელი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
         public string Name { get; set; }
 
         [Required, StringLength(50, MinimumLength = 2)]
-        [RegularExpression(@"^([\p{IsGeorgian}]+|[a-zA-Z\s]+)$", ErrorMessage = "გვარი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
+        [RegularExpression(@"^[ა-ჰ]+$|^[A-Za-z]+$", ErrorMessage = "სახელი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
+        //[RegularExpression(@"^([\p{IsGeorgian}]+|[a-zA-Z\s]+)$", ErrorMessage = "გვარი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
         public string Surname { get; set; }
 
         [Required, StringLength(11, MinimumLength = 11)]
-        [RegularExpression("^[0-9]{11}$", ErrorMessage = "პირადი ნომერი უნდა შეიცავდეს 11 ციფრს!")]
+        [RegularExpression("^[0-9]{11}$", ErrorMessage = "პირადი ნომერი უნდა შეიცავდეს 11 ციფრს.")]
         public string IDNumber { get; set; }
 
         [Required, DataType(DataType.Date)]

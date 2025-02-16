@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BankingSystem.Domain.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Domain.Entities
 {
@@ -13,8 +14,8 @@ namespace BankingSystem.Domain.Entities
         [RegularExpression("^GE[0-9]{2}CD[0-9]{14}$", ErrorMessage = "არასწორი IBAN ფორმატი.")]
         public string IBAN { get; set; }
 
-        [Required, Range(0, double.MaxValue)]
-        //[RegularExpression(@"^\d{1,3}(,\d{3})*(\.\d{2})?$", ErrorMessage = "თანხის ფორმატი არასწორია (მაგ: 1,234.56 ან 1234.56).")]
+        [Required]
+        [GreaterThanZero(ErrorMessage = "თანხა უნდა იყოს 0-ზე მეტი.")]
         public decimal Amount { get; set; }
 
         [Required]

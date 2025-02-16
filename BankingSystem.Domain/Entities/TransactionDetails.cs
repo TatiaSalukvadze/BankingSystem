@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BankingSystem.Domain.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Domain.Entities
 {
@@ -6,10 +7,12 @@ namespace BankingSystem.Domain.Entities
     {
         public int Id { get; set; }
 
-        [Required, Range(0, double.MaxValue)]
+        [Required]
+        [GreaterThanZero(ErrorMessage = "ბანკის მოგება უნდა იყოს 0-ზე მეტი.")] //მოგებააა????????
         public decimal BankProfit { get; set; }
 
-        [Required, Range(0, double.MaxValue)]
+        [Required]
+        [GreaterThanZero(ErrorMessage = "თანხა უნდა იყოს 0-ზე მეტი.")]
         public decimal Amount { get; set; }
 
         [Required]
