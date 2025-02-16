@@ -69,6 +69,16 @@ builder.Services.AddScoped<IDbTransaction>(s =>
     conn.Open();
     return conn.BeginTransaction();
 });
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 8;
+}).AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddTransient<DataSeeder>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
@@ -111,16 +121,7 @@ builder.Services.AddAuthorization(
     }
 );
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequiredLength = 8;
-}).AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddTransient<DataSeeder>();
+
 
 
 var app = builder.Build();

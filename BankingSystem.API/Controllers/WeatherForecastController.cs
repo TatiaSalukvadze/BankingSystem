@@ -9,8 +9,8 @@ using System.Linq.Expressions;
 namespace BankingSystem.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecastController : WrapperController
+    [Route("api/[controller]")]
+    public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
         {
@@ -18,26 +18,20 @@ namespace BankingSystem.API.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly IPersonService _personService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IPersonService personService)
+
+        public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
-            _personService = personService;
+
         }
 
-        [HttpPost]
-        [Route("register")]
-        public async Task<IActionResult> Register([FromForm] RegisterPersonDTO registerDto)
-        {
-            var (success, Message, data) = await _personService.RegisterPersonAsync(registerDto);
-            return Ok(new { Message, data });
-        }
-            [HttpGet(Name = "GetWeatherForecast")]
-        [Authorize(policy:"UserOnly")]
+
+        [HttpGet(Name = "GetWeatherForecast")]
+        [Authorize]
         public IEnumerable<WeatherForecast> Get()
         {
-          
+
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
