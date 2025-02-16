@@ -11,6 +11,11 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
     {
         Task<Account?> FindAccountByIBANAsync(string IBAN);
         Task<bool> IBANExists(string IBAN);
+        Task<bool> AccountExistForEmail(string email);
         Task<int> CreateAccountAsync(Account account);
+
+        Task<List<(int,string)>> SeeAccountsByEmail(string email);  
+
+        
     }
 }

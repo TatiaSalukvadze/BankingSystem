@@ -2,6 +2,7 @@
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
+using System.Security.Claims;
 
 namespace BankingSystem.Application.Services
 {
@@ -14,6 +15,32 @@ namespace BankingSystem.Application.Services
             _unitOfWork = unitOfWork;
         }
 
+
+        public async Task<(bool success, string? message, List<CardWithIBANDTO> data)> SeeCardsAsync(string email)
+        {
+            try
+            {
+                bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
+
+                if (!accountsExist)
+                {
+                    return (true, "you don't have accounts!", null);
+                }
+                var cards = await _unitOfWork.CardRepository.SeeCardsAsync(email);
+
+                if (cards == null || cards.Count == 0)
+                {
+                    return (true, "you don't have cards!", null);
+                }
+                return (true, "Cards For Account (IBAN) were found!", cards);
+
+
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message, null);
+            }
+        }
         public async Task<(bool success, string? message, object? data)> CreateCardAsync(CreateCardDTO createCardDto)
         {
             try

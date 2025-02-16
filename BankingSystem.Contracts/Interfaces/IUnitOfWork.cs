@@ -15,6 +15,8 @@ namespace BankingSystem.Contracts.Interfaces
         IAccountRepository AccountRepository { get; set; }
         ICardRepository CardRepository { get; set; }
 
+        ICardRepository CardRepository { get; set; }
+
         //SqlTransaction Transaction();
         //IDbConnection Connection();
         //IDbCommand CreateCommand();
