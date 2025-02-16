@@ -1,4 +1,5 @@
 ﻿using BankingSystem.Contracts.DTOs;
+using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,15 @@ namespace BankingSystem.API.Controllers.OnlineBank
         private readonly IPersonService _personService;
         private readonly IAccountService _accountService;
         private readonly ICardService _cardService;
+        private readonly ICurrencyService _currencyService;
 
-        public PersonController(IPersonService personService, IAccountService accountService, ICardService cardService)
+        public PersonController(IPersonService personService, IAccountService accountService, ICardService cardService,
+            ICurrencyService currencyService)
         {
             _personService = personService;
             _accountService = accountService;
             _cardService = cardService;
+            _currencyService = currencyService;
         }
 
         [Authorize(policy: "UserOnly")]
@@ -38,7 +42,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
 
 
         [Authorize(policy:"UserOnly")]
-        [HttpPost("Cards")]
+        [HttpGet("Cards")]
         public async Task<IActionResult> SeeCards()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
@@ -49,5 +53,15 @@ namespace BankingSystem.API.Controllers.OnlineBank
             }
             return Ok(new { message, data });
         }
+
+        //[Authorize(policy: "UserOnly")]
+        [HttpPost("TransferToOwnAccount")]
+        public async Task<IActionResult> TransferToOwnAccount()
+        {
+            var result = await _currencyService.GetCurrencyRate("USD", "GEL");
+            
+            return Ok(new {result});
+        }
+
     }
 }

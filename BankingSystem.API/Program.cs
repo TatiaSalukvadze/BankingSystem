@@ -1,10 +1,12 @@
 using BankingSystem.Application.Services;
 using BankingSystem.Contracts.Interfaces;
+using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Infrastructure;
 using BankingSystem.Infrastructure.DataAccess;
 using BankingSystem.Infrastructure.DataAccess.Repositories;
+using BankingSystem.Infrastructure.ExternalServices;
 using BankingSystem.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -90,6 +92,7 @@ builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>(); 
 builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<ITransactionDetailsRepository, TransactionDetailsRepository>();
+builder.Services.AddHttpClient<ICurrencyService,CurrencyService>();
 
 builder.Services
     .AddAuthentication(x =>
