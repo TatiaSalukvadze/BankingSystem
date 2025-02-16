@@ -31,14 +31,14 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
         public async Task<int> FindIdByIDNumberAsync(string IDNumber)
         {
-            int id;
+            int id = 0;
             if (_connection != null && _transaction != null)
             {
                 var sql = "SELECT Id FROM Person WHERE IDNumber = @IDNumber";
                 id = await _connection.ExecuteScalarAsync<int>(sql, new { IDNumber }, _transaction);
             }
 
-            return id = 0;
+            return id;
         }
 
         public async Task<int> RegisterPersonAsync(Person person)

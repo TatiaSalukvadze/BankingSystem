@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 namespace BankingSystem.Domain.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum CurrenctType { GEL, USD, EUR };
+    public enum CurrenctType { GEL = 1, USD, EUR };
 }

@@ -12,6 +12,8 @@ namespace BankingSystem.Contracts.Interfaces
     public interface IUnitOfWork
     {
         IPersonRepository PersonRepository { get; set; }
+        IAccountRepository AccountRepository { get; set; }
+
         //SqlTransaction Transaction();
         //IDbConnection Connection();
         IDbCommand CreateCommand();
