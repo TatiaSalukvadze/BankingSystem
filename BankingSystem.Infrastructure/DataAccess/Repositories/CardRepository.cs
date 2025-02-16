@@ -8,10 +8,10 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
     public class CardRepository : ICardRepository
     {
-        private IDbConnection _connection;
-        private SqlTransaction _transaction;
+        private SqlConnection _connection;
+        private IDbTransaction _transaction;
 
-        public void GiveCommandData(IDbConnection connection, SqlTransaction transaction)
+        public CardRepository(SqlConnection connection, IDbTransaction transaction)
         {
             _connection = connection;
             _transaction = transaction;

@@ -11,10 +11,10 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
     public class TransactionDetailsRepository : ITransactionDetailsRepository
     {
-        private IDbConnection _connection;
-        private SqlTransaction _transaction;
+        private SqlConnection _connection;
+        private IDbTransaction _transaction;
 
-        public void GiveCommandData(IDbConnection connection, SqlTransaction transaction)
+        public TransactionDetailsRepository(SqlConnection connection, IDbTransaction transaction)
         {
             _connection = connection;
             _transaction = transaction;
