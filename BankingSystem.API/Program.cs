@@ -78,20 +78,14 @@ builder.Services
             ValidateAudience = false
         };
     });
-builder.Services.AddAuthorization(
-    options =>
-{
-    options.AddPolicy("ManagerOnly", policy =>
-    policy.RequireClaim(ClaimTypes.Role, "Manager"));
 
-    options.AddPolicy("OperatorOnly", policy =>
-        policy.RequireClaim(ClaimTypes.Role, "Operator"));
-
-    options.AddPolicy("UserOnly", policy =>
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("ManagerOnly", policy =>
+        policy.RequireClaim(ClaimTypes.Role, "Manager"))
+    .AddPolicy("OperatorOnly", policy =>
+        policy.RequireClaim(ClaimTypes.Role, "Operator"))
+    .AddPolicy("UserOnly", policy =>
         policy.RequireClaim(ClaimTypes.Role, "User"));
-
-}
-);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
