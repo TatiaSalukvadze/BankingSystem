@@ -22,6 +22,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             _transaction = transaction;
         }
 
+
         public async Task<int> CreateAccountAsync(Account account)
         {
             int insertedId = 0;
@@ -47,6 +48,32 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
             return exists;
 
+        }
+
+        public async Task<bool> AccountExistForEmail(string email)
+        {
+            bool exists = false;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT CASE WHEN EXISTS (SELECT 1 FROM Account as a WHERE @email = " +
+                    "(SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId)) THEN 1 ELSE 0 END AS AccountExists";
+                exists = await _connection.ExecuteScalarAsync<bool>(sql, new { email }, _transaction);
+            }
+
+            return exists;
+        }
+
+        public async Task<List<(int, string)>> SeeAccountsByEmail(string email)
+        {
+            var result = new List<(int, string)>{};
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT Id, IBAN FROM Account AS a WHERE " +
+                    "@email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId);";
+                result = (await _connection.QueryAsync<(int,string)>(sql, new { email }, _transaction)).ToList();
+            }
+
+            return result;
         }
     }
 }

@@ -10,6 +10,11 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
     public interface IAccountRepository 
     {
         Task<bool> IBANExists(string IBAN);
+        Task<bool> AccountExistForEmail(string email);
         Task<int> CreateAccountAsync(Account account);
+
+        Task<List<(int,string)>> SeeAccountsByEmail(string email);  
+
+        
     }
 }
