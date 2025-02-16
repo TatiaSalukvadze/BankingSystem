@@ -9,7 +9,7 @@ namespace BankingSystem.Domain.Entities
         [Required]
         public int PersonId { get; set; }
 
-        [Required, StringLength(22)]
+        [Required, StringLength(22, MinimumLength = 22)]
         [RegularExpression("^GE[0-9]{2}CD[0-9]{14}$", ErrorMessage = "არასწორი IBAN ფორმატი.")]
         public string IBAN { get; set; }
 

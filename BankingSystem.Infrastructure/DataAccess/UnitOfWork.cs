@@ -22,7 +22,8 @@ namespace BankingSystem.Infrastructure.DataAccess
         public SqlTransaction Transaction() => _transaction;//no nned
         public IDbConnection Connection() => _connection;//no need
 
-        public UnitOfWork(IConfiguration configuration, IPersonRepository personRepository)
+        public UnitOfWork(IConfiguration configuration, IPersonRepository personRepository, IAccountRepository accountRepository,
+            ITransactionDetailsRepository transactionDetailsRepository)
         {
             
             _connectionString = configuration.GetConnectionString("default") ??
@@ -30,13 +31,18 @@ namespace BankingSystem.Infrastructure.DataAccess
             _connection = new SqlConnection(_connectionString);
             _connection.Open();
             _transaction = (SqlTransaction)_connection.BeginTransaction();
-            RepoSetUp(personRepository);
+            RepoSetUp(personRepository, accountRepository, transactionDetailsRepository);
             //PersonRepository = personRepository;
         }
-        private void RepoSetUp(IPersonRepository personRepository)
+        private void RepoSetUp(IPersonRepository personRepository, IAccountRepository accountRepository,
+           ITransactionDetailsRepository transactionDetailsRepository)
         {
             PersonRepository = personRepository;
             PersonRepository.GiveCommandData(_connection, _transaction);
+            AccountRepository = accountRepository;
+            AccountRepository.GiveCommandData(_connection, _transaction);
+            TransactionDetailsRepository = transactionDetailsRepository;    
+            TransactionDetailsRepository.GiveCommandData(_connection, _transaction);
         }
         private IPersonRepository _personRepository;
         public IPersonRepository PersonRepository
@@ -54,6 +60,46 @@ namespace BankingSystem.Infrastructure.DataAccess
                 else
                 {
                     _personRepository = value;
+                }
+            }
+        }
+
+            private IAccountRepository _accountRepository;
+        public IAccountRepository AccountRepository
+        {
+            get
+            {
+                return _accountRepository;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("There is no account repository present");
+                }
+                else
+                {
+                    _accountRepository = value;
+                }
+            }
+        }
+
+        ITransactionDetailsRepository _transactionDetailsRepository;
+        public ITransactionDetailsRepository TransactionDetailsRepository
+        {
+            get
+            {
+                return _transactionDetailsRepository;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("There is no transactionDetails repository present");
+                }
+                else
+                {
+                    _transactionDetailsRepository = value;
                 }
             }
         }
