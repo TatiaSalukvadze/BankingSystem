@@ -8,10 +8,12 @@ namespace BankingSystem.API.Controllers.OnlineBank
     public class OnlineBankController : WrapperController
     {
         private readonly IPersonService _personService;
+        private readonly IAccountService _accountService;
 
-        public OnlineBankController(IPersonService personService)
+        public OnlineBankController(IPersonService personService, IAccountService accountService)
         {
             _personService = personService;
+            _accountService = accountService;
         }
         [HttpPost("RegisterPerson")]
         public async Task<IActionResult> RegisterPerson([FromForm] RegisterPersonDTO registerDto)
@@ -25,7 +27,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateAccount([FromForm] CreateAccountDTO createAccountDto)
         {
-            var (success, message, data) = await _personService.CreateAccountAsync(createAccountDto);
+            var (success, message, data) = await _accountService.CreateAccountAsync(createAccountDto);
             if (!success)
             {
                 return BadRequest(message);
