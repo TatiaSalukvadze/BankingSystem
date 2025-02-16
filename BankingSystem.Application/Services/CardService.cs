@@ -15,6 +15,44 @@ namespace BankingSystem.Application.Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<(bool success, string? message, List<AccountDTO>? data)> SeeAccountsAsync(string email)
+        {
+            try
+            {
+                var accounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email);
+
+                if (accounts == null || accounts.Count == 0)
+                {
+                    return (true, "You don't have any accounts!", null);
+                }
+
+                var accountDTOs = new List<AccountDTO>();
+
+                foreach (var (id, iban) in accounts)
+                {
+                    var account = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(iban);
+                    if (account != null)
+                    {
+                        string currencyName = await _unitOfWork.AccountRepository.GetCurrencyNameById(account.CurrencyId);
+
+                        accountDTOs.Add(new AccountDTO
+                        {
+                            IBAN = account.IBAN,
+                            Amount = account.Amount,
+                            Currency = currencyName
+                        });
+                    }
+                }
+
+                return (true, "Accounts retrieved successfully!", accountDTOs);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message, null);
+            }
+        }
+
+
 
         public async Task<(bool success, string? message, List<CardWithIBANDTO> data)> SeeCardsAsync(string email)
         {

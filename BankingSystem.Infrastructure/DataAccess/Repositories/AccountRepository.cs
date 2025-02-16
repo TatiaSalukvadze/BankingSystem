@@ -76,6 +76,18 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result;
         }
 
+        public async Task<string> GetCurrencyNameById(int currencyId)
+        {
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT Type FROM CurrencyType WHERE Id = @currencyId";
+                return await _connection.ExecuteScalarAsync<string>(sql, new { currencyId }, _transaction);
+            }
+
+            return "Unknown";
+        }
+
+
         public async Task<Account> FindAccountByIBANAsync(string IBAN)
         {
             Account account = null;

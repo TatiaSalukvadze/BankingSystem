@@ -13,7 +13,7 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<bool> IBANExists(string IBAN);
         Task<bool> AccountExistForEmail(string email);
         Task<int> CreateAccountAsync(Account account);
-
+        Task<string> GetCurrencyNameById(int currencyId);
         Task<List<(int,string)>> SeeAccountsByEmail(string email);  
 
         

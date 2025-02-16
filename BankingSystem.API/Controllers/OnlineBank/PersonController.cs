@@ -20,6 +20,23 @@ namespace BankingSystem.API.Controllers.OnlineBank
             _cardService = cardService;
         }
 
+        [Authorize(policy: "UserOnly")]
+        [HttpGet("Accounts")]
+        public async Task<IActionResult> SeeAccounts()
+        {
+            //string email = User.Identity.Name; 
+            var userEmail = User.FindFirstValue(ClaimTypes.Name);
+            var (success, message, data) = await _cardService.SeeAccountsAsync(userEmail);
+
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message, data });
+        }
+
+
         [Authorize(policy:"UserOnly")]
         [HttpPost("Cards")]
         public async Task<IActionResult> SeeCards()
