@@ -1,4 +1,5 @@
-﻿using BankingSystem.Domain.Entities;
+﻿using BankingSystem.Contracts.DTOs;
+using BankingSystem.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,9 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<bool> IBANExists(string IBAN);
         Task<bool> AccountExistForEmail(string email);
         Task<int> CreateAccountAsync(Account account);
-        Task<string> GetCurrencyNameById(int currencyId);
-        Task<List<(int,string)>> SeeAccountsByEmail(string email);
-
+        Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email);
+        //Task<string> GetCurrencyNameById(int currencyId);
+        //Task<List<(int,string)>> SeeAccountsByEmail(string email);
         Task<bool> UpdateAccountAmountAsync(int id,decimal amount);
-
-
     }
 }

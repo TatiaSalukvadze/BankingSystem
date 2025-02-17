@@ -18,6 +18,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             _accountService = accountService;
             _cardService = cardService;
         }
+
         [HttpPost("RegisterPerson")]
         public async Task<IActionResult> RegisterPerson([FromForm] RegisterPersonDTO registerDto)
         {
@@ -27,6 +28,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             }
             return Ok(new {message, data});
         }
+
         [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateAccount([FromForm] CreateAccountDTO createAccountDto)
         {

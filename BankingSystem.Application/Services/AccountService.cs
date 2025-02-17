@@ -20,12 +20,12 @@ namespace BankingSystem.Application.Services
             _unitOfWork = unitOfWork;
 
         }
+
         public async Task<(bool Success, string Message, object? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto)
         {
             try
             {
                 int personId = await _unitOfWork.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber);
-
                 if (personId <= 0)
                 {
                     return (false, "Such person doesn't exist in our system!", null);
@@ -36,6 +36,7 @@ namespace BankingSystem.Application.Services
                 {
                     return (false, "Such IBAN already exist in our system!", null);
                 }
+
                 var account = new Account
                 {
                     PersonId = personId,
@@ -43,17 +44,44 @@ namespace BankingSystem.Application.Services
                     Amount = createAccountDto.Amount,
                     CurrencyId = (int)createAccountDto.Currency
                 };
-                 int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);
+
+                int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);
                 if (insertedId <= 0)
                 {
                     return (false, "Account could not be created, something happened!", null);
                 }
-
                 account.Id = insertedId;
+
                 _unitOfWork.SaveChanges();
                 return (true, "Account was created successfully!", account);
             }
             catch (Exception ex) { return (false, ex.Message, null); }
+        }
+
+        public async Task<(bool success, string message, List<SeeAccountsDTO>? data)> SeeAccountsAsync(string email)
+        {
+            try
+            {
+                bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
+
+                if (!accountsExist)
+                {
+                    return (true, "You don't have any accounts!", null);
+                }
+
+                var accounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email);
+
+                if (accounts == null || accounts.Count == 0)
+                {
+                    return (true, "No accounts found!", null);
+                }
+
+                return (true, "Accounts retrieved successfully!", accounts);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message, null);
+            }
         }
     }
 }

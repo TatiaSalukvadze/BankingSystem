@@ -1,13 +1,9 @@
-﻿using BankingSystem.Contracts.Interfaces.IRepositories;
+﻿using BankingSystem.Contracts.DTOs;
+using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
@@ -21,7 +17,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             _connection = connection;
             _transaction = transaction;
         }
-
 
         public async Task<int> CreateAccountAsync(Account account)
         {
@@ -63,30 +58,22 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return exists;
         }
 
-        public async Task<List<(int, string)>> SeeAccountsByEmail(string email)
+        public async Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email)
         {
-            var result = new List<(int, string)>{};
+            var result = new List<SeeAccountsDTO>();
+
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT Id, IBAN FROM Account AS a WHERE " +
-                    "@email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId);";
-                result = (await _connection.QueryAsync<(int,string)>(sql, new { email }, _transaction)).ToList();
+                var sql = @"
+                SELECT a.IBAN, a.CurrencyId AS Currency, a.Amount 
+                FROM Account AS a
+                WHERE @email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId);";
+
+                result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email }, _transaction)).ToList();
             }
 
             return result;
         }
-
-        public async Task<string> GetCurrencyNameById(int currencyId)
-        {
-            if (_connection != null && _transaction != null)
-            {
-                var sql = "SELECT Type FROM CurrencyType WHERE Id = @currencyId";
-                return await _connection.ExecuteScalarAsync<string>(sql, new { currencyId }, _transaction);
-            }
-
-            return "Unknown";
-        }
-
 
         public async Task<Account> FindAccountByIBANAsync(string IBAN)
         {
@@ -122,7 +109,5 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return updated;
         }
-
-    
     }
 }

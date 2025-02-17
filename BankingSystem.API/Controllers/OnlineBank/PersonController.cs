@@ -33,7 +33,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             //string email = User.Identity.Name; 
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _cardService.SeeAccountsAsync(userEmail);
+            var (success, message, data) = await _accountService.SeeAccountsAsync(userEmail);
 
             if (!success)
             {
