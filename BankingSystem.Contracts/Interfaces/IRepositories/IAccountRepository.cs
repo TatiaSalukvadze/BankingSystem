@@ -10,12 +10,15 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
     public interface IAccountRepository 
     {
         Task<Account?> FindAccountByIBANAsync(string IBAN);
+        Task<Account> FindAccountByIBANandEmailAsync(string IBAN, string email);
         Task<bool> IBANExists(string IBAN);
         Task<bool> AccountExistForEmail(string email);
         Task<int> CreateAccountAsync(Account account);
         Task<string> GetCurrencyNameById(int currencyId);
-        Task<List<(int,string)>> SeeAccountsByEmail(string email);  
+        Task<List<(int,string)>> SeeAccountsByEmail(string email);
 
-        
+        Task<bool> UpdateAccountAmountAsync(int id,decimal amount);
+
+
     }
 }

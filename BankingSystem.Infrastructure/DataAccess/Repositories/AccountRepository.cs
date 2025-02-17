@@ -98,5 +98,31 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return account;
         }
+
+        public async Task<Account> FindAccountByIBANandEmailAsync(string IBAN, string email)
+        {
+            Account account = null;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT TOP 1 * FROM Account WHERE PersonId = "+
+                    "(SELECT Id FROM Person WHERE Email = @email) AND IBAN = @IBAN";
+                account = await _connection.QueryFirstOrDefaultAsync<Account>(sql, new { email, IBAN }, _transaction);
+            }
+            return account;
+        }
+
+        public async Task<bool> UpdateAccountAmountAsync(int id, decimal amount)
+        {
+            bool updated = false;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "UPDATE Account SET Amount = Amount + @amount where Id = @id";
+                var rowsAffected = await _connection.ExecuteAsync(sql, new { id,amount }, _transaction);
+                updated = rowsAffected > 0;
+            }
+            return updated;
+        }
+
+    
     }
 }

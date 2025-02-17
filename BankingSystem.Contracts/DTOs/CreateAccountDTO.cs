@@ -18,6 +18,6 @@ namespace BankingSystem.Contracts.DTOs
         [GreaterThanZero(ErrorMessage = "თანხა უნდა იყოს 0-ზე მეტი.")]
         public decimal Amount { get; set; }
         [Required]
-        public CurrenctType Currency { get; set; }
+        public CurrencyType Currency { get; set; }
     }
 }
