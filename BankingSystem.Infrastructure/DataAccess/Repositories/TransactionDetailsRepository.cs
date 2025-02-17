@@ -27,9 +27,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             int insertedId = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = "INSERT INTO TransactionDetails (BankProfit, Amount, FromAccountId, ToAccountId, CurrencyId) " +
+                var sql = "INSERT INTO TransactionDetails (BankProfit, Amount, FromAccountId, ToAccountId, CurrencyId, IsATM) " +
                     "OUTPUT INSERTED.Id " +
-                    "VALUES (@BankProfit, @Amount, @FromAccountId, @ToAccountId, @CurrencyId)";
+                    "VALUES (@BankProfit, @Amount, @FromAccountId, @ToAccountId, @CurrencyId, @IsATM)";
                 insertedId = await _connection.ExecuteScalarAsync<int>(sql, transaction, _transaction);
             }
 

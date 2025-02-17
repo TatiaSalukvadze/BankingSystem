@@ -62,7 +62,20 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> TransferToOwnAccount([FromForm] CreateTransactionDTO createTransactionDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _transactionService.SelfTransactionAsync(createTransactionDto, userEmail);
+            var (success, message, data) = await _transactionService.SelfTransactionAsync(createTransactionDto, userEmail, true);
+            if (!success)
+            {
+                return BadRequest(message);
+            }
+            return Ok(new { message, data });
+        }
+
+        [Authorize(policy: "UserOnly")]
+        [HttpPost("TransferToOtherAccount")]
+        public async Task<IActionResult> TransferToOtherAccount([FromForm] CreateTransactionDTO createTransactionDto)
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Name);
+            var (success, message, data) = await _transactionService.SelfTransactionAsync(createTransactionDto, userEmail, false);
             if (!success)
             {
                 return BadRequest(message);
