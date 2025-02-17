@@ -19,7 +19,18 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             _transaction = transaction;
         }
 
-        public async Task<List<CardWithIBANDTO>> SeeCardsAsync(string email)
+        public async Task<Card> GetCardAsync(string cardNumber)
+        {
+            Card card = null;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT TOP 1 * FROM Card WHERE CardNumber = @cardNumber";
+                card = await _connection.QueryFirstOrDefaultAsync<Card>(sql, new { cardNumber }, _transaction);
+            }
+            return card;
+
+        }
+        public async Task<List<CardWithIBANDTO>> GetCardsForPersonAsync(string email)
         {
             var result = new List<CardWithIBANDTO> { };
             if (_connection != null && _transaction != null)
@@ -58,6 +69,19 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 insertedId = await _connection.ExecuteScalarAsync<int>(sql, card, _transaction);
             }
             return insertedId;
+        }
+
+
+        public async Task<bool> UpdateCardAsync(int cardId, string newPIN)
+        {
+            bool updated = false;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "UPDATE Card SET PIN = @newPIN WHERE Id = @cardId";
+                int rowsAffected = await _connection.ExecuteAsync(sql, new { cardId, newPIN }, _transaction);
+                if(rowsAffected > 0) { updated = true; }
+            }
+            return updated;
         }
     }
 }

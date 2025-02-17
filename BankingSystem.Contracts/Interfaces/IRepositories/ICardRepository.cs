@@ -5,9 +5,11 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
 {
     public interface ICardRepository 
     {
-
-        Task<List<CardWithIBANDTO>> SeeCardsAsync(string email);
+        Task<Card> GetCardAsync(string cardNumber);
+        Task<List<CardWithIBANDTO>> GetCardsForPersonAsync(string email);
         Task<bool> CardNumberExists(string cardNumber);
         Task<int> CreateCardAsync(Card card);
+
+        Task<bool> UpdateCardAsync(int cardId, string newPIN);
     }
 }

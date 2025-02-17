@@ -38,6 +38,10 @@ namespace BankingSystem.Application.Services
         {
             try
             {
+                if(createTransactionDto.Amount <= 0)
+                {
+                    return (false, "You need to enter more than 0 value!", null);
+                }
                 var (validated, message, fromAccount, toAccount) = await ValidateAccountsAsync(createTransactionDto.FromIBAN,
                     createTransactionDto.ToIBAN, email, createTransactionDto.Amount, isSelfTransfer);
                 if (!validated) return (validated, message, null);
@@ -87,7 +91,7 @@ namespace BankingSystem.Application.Services
             }
             if (fromAccount is null || toAccount is null)
             {
-                return (false, "There is no account for one or both provided IBANs, check well!", null,null);
+                return (false, "There is no account for one or both provided IBANs, check well!", null, null);
             }
 
             if (fromAccount.Amount < amountToTransfer)

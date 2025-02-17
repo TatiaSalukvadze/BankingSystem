@@ -1,16 +1,33 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BankingSystem.Application.Services;
+using BankingSystem.Contracts.DTOs;
+using BankingSystem.Contracts.Interfaces.IServices;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BankingSystem.API.Controllers.ATM
 {
     [Route("/ATM/[controller]")]
     public class CardController : WrapperController
     {
-        [HttpPost]
-        [Route("SeeBalance")]
-        public IActionResult Authenticate()
-        {
 
-            return Ok();
+        private readonly ICardService _cardService;
+
+        public CardController(ICardService cardService)
+        {
+            _cardService = cardService;
+        }
+        
+
+        [HttpPut("PIN")]
+        public async Task<IActionResult> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
+        {
+          
+            var (success, message) = await _cardService.ChangeCardPINAsync(changeCardDtp);
+            if (!success)
+            {
+                return BadRequest(message);
+            }
+            return Ok(new { message });
         }
     }
 }

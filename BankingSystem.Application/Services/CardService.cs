@@ -2,6 +2,7 @@
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.Application.Services
 {
@@ -14,6 +15,46 @@ namespace BankingSystem.Application.Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
+        {
+           Card card = await _unitOfWork.CardRepository.GetCardAsync(changeCardDtp.CardNumber);
+
+            if (card is null)
+            {
+                return (false, "Card was not found!");
+            }
+            if (CheckCardExpired(card.ExpirationDate))
+            {
+                return (false, "Card is expired!");
+            }
+
+            bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardDtp.NewPIN);
+            if (!updated)
+            {
+                return (false, "Card PIN could be updated!");
+            }
+            _unitOfWork.SaveChanges();
+            return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
+        }
+        public bool CheckCardExpired(string expirationDate)
+        {
+            var cardDate = expirationDate.Split('/');
+
+            var cardMonth = int.Parse(cardDate[0]);
+            var cardYear = int.Parse(cardDate[1]);
+            var monthNow = DateTime.Now.Month;
+            var yearNow = DateTime.Now.Year % 100;
+            if (yearNow < cardYear)
+            {
+                return false;
+            }
+            else if (yearNow == cardYear && monthNow > cardMonth)
+            {
+                return false;
+            }
+            return true;
+
+        }
         public async Task<(bool success, string message, object? data)> CreateCardAsync(CreateCardDTO createCardDto)
         {
             try
@@ -66,7 +107,7 @@ namespace BankingSystem.Application.Services
                     return (true, "You don't have accounts!", null);
                 }
 
-                var cards = await _unitOfWork.CardRepository.SeeCardsAsync(email);
+                var cards = await _unitOfWork.CardRepository.GetCardsForPersonAsync(email);
                 if (cards == null || cards.Count == 0)
                 {
                     return (true, "You don't have cards!", null);
