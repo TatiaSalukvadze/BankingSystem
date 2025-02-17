@@ -10,6 +10,6 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     public interface ITransactionService
     {
         Task<(bool Success, string Message, object Data)> SelfTransactionAsync(CreateTransactionDTO createTransactionDto,
-            string email);
+            string email, bool isSelfTransfer);
         }
 }

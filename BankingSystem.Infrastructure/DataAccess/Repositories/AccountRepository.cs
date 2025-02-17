@@ -80,7 +80,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             Account account = null;
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT * FROM Account WHERE IBAN = @IBAN";
+                var sql = "SELECT TOP 1 * FROM Account WHERE IBAN = @IBAN";
                 account = await _connection.QueryFirstOrDefaultAsync<Account>(sql, new { IBAN }, _transaction);
             }
             return account;
