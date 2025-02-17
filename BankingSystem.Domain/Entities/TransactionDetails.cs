@@ -24,8 +24,6 @@ namespace BankingSystem.Domain.Entities
         [Required]
         public int CurrencyId { get; set; }
 
-        [Required]
-        public int BankingTypeId { get; set; }
 
         public DateTime PerformedAt { get; set; }
     }

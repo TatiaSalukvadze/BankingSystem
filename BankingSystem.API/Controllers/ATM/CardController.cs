@@ -16,7 +16,27 @@ namespace BankingSystem.API.Controllers.ATM
         {
             _cardService = cardService;
         }
-        
+
+        //[HttpGet("balance")]
+        //public async Task<IActionResult> SeeBalance([FromQuery] string cardNumber)
+        //{
+        //    try
+        //    {
+        //        var (success, message, balance) = await _cardService.GetBalanceAsync(cardNumber);
+
+        //        if (!success)
+        //        {
+        //            return BadRequest(message);
+        //        }
+
+        //        return Ok(new { Balance = balance });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
+
 
         [HttpPut("PIN")]
         public async Task<IActionResult> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
