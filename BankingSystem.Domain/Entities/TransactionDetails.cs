@@ -8,11 +8,11 @@ namespace BankingSystem.Domain.Entities
         public int Id { get; set; }
 
         [Required]
-        [GreaterThanZero(ErrorMessage = "ბანკის მოგება უნდა იყოს 0-ზე მეტი.")] //მოგებააა????????
+        [GreaterThanOrEqualToZero(ErrorMessage = "ბანკის მოგება უნდა იყოს 0-ზე მეტი.")] //მოგებააა????????
         public decimal BankProfit { get; set; }
 
         [Required]
-        [GreaterThanZero(ErrorMessage = "თანხა უნდა იყოს 0-ზე მეტი.")]
+        [GreaterThanOrEqualToZero(ErrorMessage = "თანხა უნდა იყოს 0 ან 0-ზე მეტი.")]
         public decimal Amount { get; set; }
 
         [Required]
@@ -24,8 +24,8 @@ namespace BankingSystem.Domain.Entities
         [Required]
         public int CurrencyId { get; set; }
 
-        
-        public bool IsATM { get; set; }
+        [Required]
+        public int BankingTypeId { get; set; }
 
         public DateTime PerformedAt { get; set; }
     }

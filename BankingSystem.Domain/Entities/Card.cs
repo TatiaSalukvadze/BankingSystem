@@ -14,7 +14,7 @@ namespace BankingSystem.Domain.Entities
         public string CardNumber { get; set; }
 
         [Required]
-        [RegularExpression("^[0-9]{2}/[0-9]{2}$", ErrorMessage = "ვადის ამოწურვის თარიღი უნდა იყოს ფორმატში MM/YY.")]
+        [RegularExpression("^(0[1-9]|1[0-2])/[0-9]{2}$", ErrorMessage = "ვადის ამოწურვის თარიღი უნდა იყოს ფორმატში MM/YY")]
         public string ExpirationDate { get; set; }
 
         [Required, StringLength(3)]

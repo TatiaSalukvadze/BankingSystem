@@ -12,17 +12,8 @@ namespace BankingSystem.Contracts.DTOs
         [RegularExpression("^[0-9]{16}$", ErrorMessage = "ბარათის ნომერი უნდა იყოს 16 ციფრისგან შემდგარი.")]
         public string CardNumber { get; set; }
 
-        //[Required, StringLength(50, MinimumLength = 2)]
-        //[RegularExpression(@"^[ა-ჰ]+$|^[A-Za-z]+$", ErrorMessage = "სახელი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
-        ////[RegularExpression(@"^([\p{IsGeorgian}]+|[a-zA-Z\s]+)$", ErrorMessage = "სახელი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
-        //public string Name { get; set; }
-
-        //[Required, StringLength(50, MinimumLength = 2)]
-        //[RegularExpression(@"^[ა-ჰ]+$|^[A-Za-z]+$", ErrorMessage = "გვარი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
-        //public string Surname { get; set; }
-
         [Required]
-        [RegularExpression("^[0-9]{2}/[0-9]{2}$", ErrorMessage = "ვადის ამოწურვის თარიღი უნდა იყოს ფორმატში MM/YY.")]
+        [RegularExpression("^(0[1-9]|1[0-2])/[0-9]{2}$", ErrorMessage = "ვადის ამოწურვის თარიღი უნდა იყოს ფორმატში MM/YY")]
         public string ExpirationDate { get; set; }
 
         [Required, StringLength(3)]
