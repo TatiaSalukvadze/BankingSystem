@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BankingSystem.Application.Services;
+using BankingSystem.Contracts.Interfaces.IServices;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BankingSystem.API.Controllers.Reports
 {
@@ -6,12 +10,27 @@ namespace BankingSystem.API.Controllers.Reports
     public class PersonStatisticsController : WrapperController
     {
 
-        [HttpPost]
-        [Route("SeeBalance")]
-        public IActionResult Authenticate()
+        private readonly IPersonService _personService;
+
+        public PersonStatisticsController(IPersonService personService)
+        {
+            _personService = personService;
+        }
+
+
+        //[Authorize(policy: "ManagerOnly")]
+        [HttpGet]
+        public async Task<IActionResult> RegisteredPeopleStatistics()
         {
 
-            return Ok();
+            var (success, message, data) = await _personService.RegisteredPeopleStatisticsAsync();
+
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message, data });
         }
     }
 }

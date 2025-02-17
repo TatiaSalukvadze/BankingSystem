@@ -6,6 +6,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     {
         Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto);
         Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto);
-        
+        Task<(bool Success, string Message, Dictionary<string,int> statistics)> RegisteredPeopleStatisticsAsync();
+
     }
 }

@@ -2,6 +2,7 @@
 using BankingSystem.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using System;
 using System.Data;
 using static Dapper.SqlMapper;
 
@@ -41,6 +42,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return id;
         }
 
+
         public async Task<int> RegisterPersonAsync(Person person)
         {
             int addedUserId = 0;
@@ -52,6 +54,28 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 addedUserId =  await _connection.ExecuteScalarAsync<int>(sql, person, _transaction);
             }
             return addedUserId;
+        }
+
+        public async Task<int> PeopleRegisteredThisYear()
+        {
+            int count = 0;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT COUNT(*) FROM Person WHERE YEAR(CreatedAt) = YEAR(GETDATE())";
+                count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+            }
+            return count;
+        }
+
+        public async Task<int> PeopleRegisteredLast30Days()
+        {
+            int count = 0;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt > DATEADD(DAY, -30, GETDATE())";
+                count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+            }
+            return count;
         }
 
 

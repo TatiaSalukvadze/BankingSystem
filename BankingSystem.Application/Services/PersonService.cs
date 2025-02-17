@@ -60,6 +60,7 @@ namespace BankingSystem.Application.Services
             }
         }
 
+
         public async Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto)
         {
             try
@@ -119,6 +120,20 @@ namespace BankingSystem.Application.Services
             catch (Exception ex) { return (false, ex.Message, null); }
         }
 
-      
+        public async Task<(bool Success, string Message, Dictionary<string, int> statistics)> RegisteredPeopleStatisticsAsync()
+        {
+            try
+            {
+                var personStatistics = new Dictionary<string, int>();
+                int peopleRegisteredThisYear = await _unitOfWork.PersonRepository.PeopleRegisteredThisYear();
+                personStatistics.Add("People Registed This Year", peopleRegisteredThisYear);
+
+                int peopleRegisteredLast30Days = await _unitOfWork.PersonRepository.PeopleRegisteredLast30Days();
+                personStatistics.Add("People Registed Last 30 Days", peopleRegisteredThisYear);
+
+                return (true, "Statistics are retreived!", personStatistics);
+             }
+            catch (Exception ex) { return (false, ex.Message, null); }
+        }
     }
 }
