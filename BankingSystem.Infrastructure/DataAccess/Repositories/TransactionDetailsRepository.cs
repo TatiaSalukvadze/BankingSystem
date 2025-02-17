@@ -1,4 +1,5 @@
-﻿using BankingSystem.Contracts.Interfaces.IRepositories;
+﻿using BankingSystem.Contracts.DTOs;
+using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -8,6 +9,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
@@ -34,6 +36,21 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
 
             return insertedId;
+        }
+
+        public async Task<TransactionCountDTO> NumberOfTransactionsAsync()
+        {
+            var result = new TransactionCountDTO();
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT (SELECT COUNT(*) FROM TransactionDetails WHERE PerformedAt > DATEADD(MONTH, -1, GETDATE())) AS LastMonthCount,"+
+                    " (SELECT COUNT(*) FROM TransactionDetails WHERE PerformedAt > DATEADD(MONTH, -6, GETDATE())) AS LastSixMonthCount,"+
+                    " (SELECT COUNT(*) FROM TransactionDetails WHERE PerformedAt > DATEADD(YEAR, -1, GETDATE())) AS LastYearCount";
+                result = await _connection.QuerySingleAsync<TransactionCountDTO>(sql, transaction: _transaction);
+                
+            }
+
+            return result;
         }
     }
 }

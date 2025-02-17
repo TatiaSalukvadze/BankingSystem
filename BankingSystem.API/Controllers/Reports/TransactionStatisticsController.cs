@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BankingSystem.Contracts.Interfaces.IServices;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.Reports
 {
@@ -6,12 +7,28 @@ namespace BankingSystem.API.Controllers.Reports
     public class TransactionStatisticsController : WrapperController
     {
 
-        [HttpPost]
-        [Route("SeeBalance")]
-        public IActionResult Authenticate()
+
+        private readonly ITransactionService _transactionService;
+
+        public TransactionStatisticsController(ITransactionService transactionService)
+        {
+            _transactionService = transactionService;
+        }
+
+
+        //[Authorize(policy: "ManagerOnly")]
+        [HttpGet("Count")]
+        public async Task<IActionResult> TransactionsCount()
         {
 
-            return Ok();
+            var (success, message, data) = await _transactionService.NumberOfTransactionsAsync();
+
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message, data });
         }
     }
 }

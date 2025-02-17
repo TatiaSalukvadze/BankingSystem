@@ -33,7 +33,7 @@ namespace BankingSystem.Application.Services
             _accountRepository = accountRepository;
 
         }
-        public async Task<(bool Success, string Message, object Data)> SelfTransactionAsync(CreateTransactionDTO createTransactionDto,
+        public async Task<(bool Success, string Message, object Data)> OnlineTransactionAsync(CreateTransactionDTO createTransactionDto,
             string email, bool isSelfTransfer)
         {
             try
@@ -150,6 +150,12 @@ namespace BankingSystem.Application.Services
             }
             return true;
 
+        }
+
+        public async Task<(bool Success, string Message, object Data)> NumberOfTransactionsAsync()
+        {
+            var transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsAsync();
+            return (true, "Transaction Count retreived!", transactionCountDTO);
         }
     }
 }

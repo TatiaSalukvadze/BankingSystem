@@ -62,7 +62,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> TransferToOwnAccount([FromForm] CreateTransactionDTO createTransactionDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _transactionService.SelfTransactionAsync(createTransactionDto, userEmail, true);
+            var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, true);
             if (!success)
             {
                 return BadRequest(message);
@@ -75,7 +75,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> TransferToOtherAccount([FromForm] CreateTransactionDTO createTransactionDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _transactionService.SelfTransactionAsync(createTransactionDto, userEmail, false);
+            var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, false);
             if (!success)
             {
                 return BadRequest(message);

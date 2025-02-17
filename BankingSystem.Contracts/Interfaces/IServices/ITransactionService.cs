@@ -9,7 +9,8 @@ namespace BankingSystem.Contracts.Interfaces.IServices
 {
     public interface ITransactionService
     {
-        Task<(bool Success, string Message, object Data)> SelfTransactionAsync(CreateTransactionDTO createTransactionDto,
+        Task<(bool Success, string Message, object Data)> OnlineTransactionAsync(CreateTransactionDTO createTransactionDto,
             string email, bool isSelfTransfer);
-        }
+        Task<(bool Success, string Message, object Data)> NumberOfTransactionsAsync();
+    }
 }
