@@ -16,8 +16,6 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<bool> AccountExistForEmail(string email);
         Task<int> CreateAccountAsync(Account account);
         Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email);
-        //Task<string> GetCurrencyNameById(int currencyId);
-        //Task<List<(int,string)>> SeeAccountsByEmail(string email);
         Task<bool> UpdateAccountAmountAsync(int id,decimal amount);
     }
 }

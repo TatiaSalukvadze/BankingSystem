@@ -20,8 +20,6 @@ namespace BankingSystem.Contracts.DTOs
 
         [Required]
         public CurrencyType Currency { get; set; }
-        //public string Currency { get; set; }
-
     }
 
 }
