@@ -21,7 +21,7 @@ namespace BankingSystem.Domain.Entities
         [Required]
         public int ToAccountId { get; set; }
 
-        public bool IsATMA { get; set; }
+        public bool IsATM { get; set; }
 
 
         public DateTime PerformedAt { get; set; }
