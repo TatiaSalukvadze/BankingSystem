@@ -12,5 +12,6 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
     {
         Task<int> CreateTransactionAsync(TransactionDetails account);
         Task<TransactionCountDTO> NumberOfTransactionsAsync();
+        Task<Dictionary<string, decimal>>  AverageBankProfitAsyncAsync();
     }
 }

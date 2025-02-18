@@ -30,5 +30,19 @@ namespace BankingSystem.API.Controllers.Reports
 
             return Ok(new { message, data });
         }
+
+        [HttpGet("AverageProfit")]
+        public async Task<IActionResult> AverageProfit()
+        {
+
+            var (success, message, data) = await _transactionService.AverageBankProfitAsync();
+
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message, data });
+        }
     }
 }
