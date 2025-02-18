@@ -28,8 +28,8 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 card = await _connection.QueryFirstOrDefaultAsync<Card>(sql, new { cardNumber }, _transaction);
             }
             return card;
-
         }
+
         public async Task<List<CardWithIBANDTO>> GetCardsForPersonAsync(string email)
         {
             var result = new List<CardWithIBANDTO> { };
@@ -44,8 +44,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
             return result;
         }
-
-
 
         public async Task<bool> CardNumberExists(string cardNumber)
         {
@@ -71,7 +69,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return insertedId;
         }
 
-
         public async Task<bool> UpdateCardAsync(int cardId, string newPIN)
         {
             bool updated = false;
@@ -82,6 +79,32 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 if(rowsAffected > 0) { updated = true; }
             }
             return updated;
+        }
+
+        public async Task<(decimal Amount, int Currency)> GetBalanceAsync(string cardNumber, string pin)
+        {
+            var sql = @"
+            SELECT a.Amount, a.CurrencyId
+            FROM Card ca
+            JOIN Account a ON ca.AccountId = a.Id
+            WHERE ca.CardNumber = @cardNumber
+            AND ca.PIN = @pin";
+
+            var result = await _connection.QueryFirstOrDefaultAsync<(decimal, int)>(sql, new { cardNumber, pin }, _transaction);
+
+            return result == default ? (0, 0) : result;
+        }
+
+        public async Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct)
+        {
+            var sql = @"
+            UPDATE Account
+            SET Amount = Amount - @TotalAmountToDeduct
+            WHERE Id = @AccountId";
+
+            var result = await _connection.ExecuteAsync(sql, new { AccountId = accountId, TotalAmountToDeduct = totalAmountToDeduct }, _transaction);
+
+            return result > 0;
         }
     }
 }

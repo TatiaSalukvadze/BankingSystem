@@ -3,12 +3,7 @@ using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace BankingSystem.Infrastructure.DataAccess.Repositories
@@ -36,6 +31,19 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
 
             return insertedId;
+        }
+
+        public async Task<decimal> GetTotalWithdrawnAmountIn24Hours(int accountId)
+        {
+            var sql = @"
+            SELECT SUM(Amount) 
+            FROM TransactionDetails 
+            WHERE FromAccountId = @AccountId
+            AND IsATM = 1
+            AND PerformedAt >= DATEADD(HOUR, -24, GETDATE())";
+
+            var result = await _connection.ExecuteScalarAsync<decimal>(sql, new { AccountId = accountId }, _transaction);
+            return result;
         }
 
         public async Task<TransactionCountDTO> NumberOfTransactionsAsync()

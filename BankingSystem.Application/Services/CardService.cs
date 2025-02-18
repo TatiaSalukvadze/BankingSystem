@@ -14,47 +14,6 @@ namespace BankingSystem.Application.Services
         {
             _unitOfWork = unitOfWork;
         }
-
-        public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
-        {
-           Card card = await _unitOfWork.CardRepository.GetCardAsync(changeCardDtp.CardNumber);
-
-            if (card is null)
-            {
-                return (false, "Card was not found!");
-            }
-            if (CheckCardExpired(card.ExpirationDate))
-            {
-                return (false, "Card is expired!");
-            }
-
-            bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardDtp.NewPIN);
-            if (!updated)
-            {
-                return (false, "Card PIN could be updated!");
-            }
-            _unitOfWork.SaveChanges();
-            return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
-        }
-        public bool CheckCardExpired(string expirationDate)
-        {
-            var cardDate = expirationDate.Split('/');
-
-            var cardMonth = int.Parse(cardDate[0]);
-            var cardYear = int.Parse(cardDate[1]);
-            var monthNow = DateTime.Now.Month;
-            var yearNow = DateTime.Now.Year % 100;
-            if (yearNow < cardYear)
-            {
-                return false;
-            }
-            else if (yearNow == cardYear && monthNow > cardMonth)
-            {
-                return false;
-            }
-            return true;
-
-        }
         public async Task<(bool success, string message, object? data)> CreateCardAsync(CreateCardDTO createCardDto)
         {
             try
@@ -119,6 +78,157 @@ namespace BankingSystem.Application.Services
             {
                 return (false, ex.Message, null);
             }
+        }
+
+        public async Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(string cardNumber, string pin)
+        {
+            var card = await _unitOfWork.CardRepository.GetCardAsync(cardNumber);
+
+            if (card is null)
+            {
+                return (false, "Card not found!", null);
+            }
+
+            if (CheckCardExpired(card.ExpirationDate))
+            {
+                return (false, "Card is expired!", null);
+            }
+
+            if (card.PIN != pin)
+            {
+                return (false, "Incorrect PIN!", null);
+            }
+
+            var (amount, currency) = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
+
+            if (amount == null || currency == 0)//?????
+            {
+                return (false, "Unable to retrieve balance.", null);
+            }
+
+            var result = new SeeBalanceDTO
+            {
+                Amount = amount,
+                Currency = (Domain.Enums.CurrencyType)currency
+            };
+
+            return (true, "Balance retrieved successfully.", result);
+        }
+
+        public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
+        {
+            var card = await _unitOfWork.CardRepository.GetCardAsync(withdrawalDto.CardNumber);
+
+            if (card == null)
+            {
+                return (false, "Card not found!");
+            }
+
+            if (CheckCardExpired(card.ExpirationDate))
+            {
+                return (false, "Card is expired!");
+            }
+
+            if (card.PIN != withdrawalDto.PIN)
+            {
+                return (false, "Incorrect PIN!");
+            }
+
+            if (withdrawalDto.Amount <= 0)
+            {
+                return (false, "Withdrawal amount must be greater than zero.");
+            }
+
+            var account = await _unitOfWork.CardRepository.GetBalanceAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
+            if (account.Currency == 0 || account.Amount == null) //??????????
+            {
+                return (false, "Unable to retrieve account balance.");
+            }
+
+            decimal withdrawnAmountIn24Hours = await _unitOfWork.TransactionDetailsRepository.GetTotalWithdrawnAmountIn24Hours(card.AccountId);
+            if (withdrawnAmountIn24Hours + withdrawalDto.Amount > 10000)
+            {
+                return (false, "You can't withdraw more than 10000 within 24 hours.");
+            }
+
+            decimal fee = withdrawalDto.Amount * 0.02m;
+            decimal totalAmountToDeduct = withdrawalDto.Amount + fee;
+
+            if (account.Amount < totalAmountToDeduct)
+            {
+                return (false, "Not enough money.");
+            }
+
+            bool isBalanceUpdated = await _unitOfWork.CardRepository.UpdateAccountBalanceAsync(card.AccountId, totalAmountToDeduct);
+            if (!isBalanceUpdated)
+            {
+                return (false, "Failed to update account balance.");
+            }
+
+            var transaction = new TransactionDetails
+            {
+                BankProfit = fee,
+                Amount = withdrawalDto.Amount,
+                FromAccountId = card.AccountId,
+                ToAccountId = card.AccountId,
+                CurrencyId = account.Currency,
+                IsATM = true
+            };
+
+            int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
+            if (insertedId <= 0)
+            {
+                return (false, "Transaction could not be created, something happened!");
+            }
+            transaction.Id = insertedId;
+
+            _unitOfWork.SaveChanges();
+            return (true, "Withdrawal successful.");
+        }
+
+        public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
+        {
+           Card card = await _unitOfWork.CardRepository.GetCardAsync(changeCardDtp.CardNumber);
+
+            if (card is null)
+            {
+                return (false, "Card was not found!");
+            }
+            if (CheckCardExpired(card.ExpirationDate))
+            {
+                return (false, "Card is expired!");
+            }
+            //if (card.PIN != changeCardDtp.OldPIN)
+            //{
+            //    return (false, "Incorrect PIN!");???????????
+            //}
+
+            bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardDtp.NewPIN);
+            if (!updated)
+            {
+                return (false, "Card PIN could be updated!");//??? not
+            }
+            _unitOfWork.SaveChanges();
+            return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
+        }
+
+        public bool CheckCardExpired(string expirationDate)
+        {
+            var cardDate = expirationDate.Split('/');
+            var cardMonth = int.Parse(cardDate[0]);
+            var cardYear = int.Parse(cardDate[1]);
+            var monthNow = DateTime.Now.Month;
+            var yearNow = DateTime.Now.Year % 100;
+
+            if (yearNow < cardYear)
+            {
+                return false;
+            }
+            else if (yearNow == cardYear && monthNow > cardMonth)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
