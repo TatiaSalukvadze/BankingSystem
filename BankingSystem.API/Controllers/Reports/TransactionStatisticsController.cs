@@ -31,6 +31,20 @@ namespace BankingSystem.API.Controllers.Reports
             return Ok(new { message, data });
         }
 
+        [HttpGet("CountChart")]
+        public async Task<IActionResult> TransactionsCountChart()
+        {
+
+            var (success, message, data) = await _transactionService.NumberOfTransactionsChartAsync();
+
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message, data });
+        }
+
         [HttpGet("AverageProfit")]
         public async Task<IActionResult> AverageProfit()
         {

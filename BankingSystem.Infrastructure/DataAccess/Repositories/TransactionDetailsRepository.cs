@@ -79,5 +79,30 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
             return result;
         }
+
+        public async Task<Dictionary<DateOnly, int>> NumberOfTransactionsLastMonthAsync()
+        {
+            var result = new Dictionary<DateOnly, int>();
+            if (_connection != null && _transaction != null)
+            {
+                var sql = @$"WITH LastMonthDays AS (
+                                SELECT CAST(DATEADD(MONTH, -1, GETDATE()) AS DATE) AS DayName
+
+                                UNION ALL
+
+                                SELECT DATEADD(DAY, 1, DayName) FROM LastMonthDays
+                                WHERE DayName < CAST(GETDATE() AS DATE)
+                            )
+
+                            SELECT lm.DayName,  COUNT(td.BankProfit) FROM TransactionDetails as td 
+                            right join LastMonthDays as lm on lm.DayName = CAST(PerformedAt AS DATE)
+                            Group by lm.DayName";
+                var sqlResult = await _connection.QueryAsync<(DateTime, int) >(sql, transaction: _transaction);
+                result = sqlResult.ToDictionary(row => DateOnly.FromDateTime(row.Item1), row => row.Item2);
+
+            }
+
+            return result;
+        }
     }
 }

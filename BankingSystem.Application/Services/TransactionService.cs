@@ -167,5 +167,13 @@ namespace BankingSystem.Application.Services
                 return (true, "Bank profit Count retreived!", averageBankProfits);
             else return (false, "Bank profit couldn't be retreived!", null);
         }
+
+        public async Task<(bool Success, string Message, object Data)> NumberOfTransactionsChartAsync()
+        {
+            var transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync();
+            if (transactionCountDTO is not null)
+                return (true, "Transaction Count retreived!", transactionCountDTO);
+            else return (false, "Transaction Count couldn't be retreived!", null);
+        }
     }
 }
