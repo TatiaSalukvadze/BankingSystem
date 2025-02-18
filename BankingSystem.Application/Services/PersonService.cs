@@ -128,10 +128,13 @@ namespace BankingSystem.Application.Services
                 int peopleRegisteredThisYear = await _unitOfWork.PersonRepository.PeopleRegisteredThisYear();
                 personStatistics.Add("People Registed This Year", peopleRegisteredThisYear);
 
-                int peopleRegisteredLast30Days = await _unitOfWork.PersonRepository.PeopleRegisteredLast30Days();
-                personStatistics.Add("People Registed Last 30 Days", peopleRegisteredThisYear);
+                int peopleRegisteredLast1Year = await _unitOfWork.PersonRepository.PeopleRegisteredLastOneYear();
+                personStatistics.Add("People Registered Last 1 Year", peopleRegisteredLast1Year);
 
-                return (true, "Statistics are retreived!", personStatistics);
+                int peopleRegisteredLast30Days = await _unitOfWork.PersonRepository.PeopleRegisteredLast30Days();
+                personStatistics.Add("People Registered Last 30 Days", peopleRegisteredLast30Days);
+
+                return (true, "Statistics are retrieved!", personStatistics);
              }
             catch (Exception ex) { return (false, ex.Message, null); }
         }

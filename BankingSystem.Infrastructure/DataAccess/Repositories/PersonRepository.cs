@@ -67,17 +67,26 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return count;
         }
 
-        public async Task<int> PeopleRegisteredLast30Days()
+        public async Task<int> PeopleRegisteredLastOneYear()
         {
-            int count = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt > DATEADD(DAY, -30, GETDATE())";
-                count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+                var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt >= DATEADD(YEAR, -1, GETDATE())";
+                var count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+                return count;
             }
-            return count;
+            return 0;
         }
 
-
+        public async Task<int> PeopleRegisteredLast30Days()
+        {
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt >= DATEADD(DAY, -30, GETDATE())";
+                var count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+                return count;
+            }
+            return 0;
+        }
     }
 }
