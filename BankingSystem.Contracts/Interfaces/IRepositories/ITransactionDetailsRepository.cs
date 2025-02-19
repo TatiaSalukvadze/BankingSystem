@@ -8,7 +8,7 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<int> CreateTransactionAsync(TransactionDetails account);
         Task<decimal> GetTotalWithdrawnAmountIn24Hours(int accountId);
         Task<TransactionCountDTO> NumberOfTransactionsAsync();
-        Task<Dictionary<DateOnly, int>> NumberOfTransactionsLastMonthAsync();
+        Task<List<TransactionCountChartDTO>> NumberOfTransactionsLastMonthAsync();
         Task<Dictionary<string, decimal>>  AverageBankProfitAsyncAsync();
     }
 }

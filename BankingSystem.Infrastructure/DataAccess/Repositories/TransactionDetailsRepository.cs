@@ -80,9 +80,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result;
         }
 
-        public async Task<Dictionary<DateOnly, int>> NumberOfTransactionsLastMonthAsync()
+        public async Task<List<TransactionCountChartDTO>> NumberOfTransactionsLastMonthAsync()
         {
-            var result = new Dictionary<DateOnly, int>();
+            var result = new List<TransactionCountChartDTO>();
             if (_connection != null && _transaction != null)
             {
                 var sql = @$"WITH LastMonthDays AS (
@@ -96,9 +96,13 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
                             SELECT lm.DayName,  COUNT(td.BankProfit) FROM TransactionDetails as td 
                             right join LastMonthDays as lm on lm.DayName = CAST(PerformedAt AS DATE)
-                            Group by lm.DayName";
-                var sqlResult = await _connection.QueryAsync<(DateTime, int) >(sql, transaction: _transaction);
-                result = sqlResult.ToDictionary(row => DateOnly.FromDateTime(row.Item1), row => row.Item2);
+                            Group by lm.DayName
+                            HAVING lm.DayName < CAST(GETDATE() AS DATE)";
+                var sqlResult = await _connection.QueryAsync<(DateTime,int)>(sql, transaction: _transaction);
+                result = sqlResult.Select(row => new TransactionCountChartDTO { Date = DateOnly.FromDateTime(row.Item1), 
+                    Count = row.Item2 })
+                    .ToList();
+                    //ToDictionary(row => DateOnly.FromDateTime(row.Item1), row => row.Item2);
 
             }
 
