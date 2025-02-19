@@ -1,8 +1,10 @@
 ﻿using BankingSystem.Contracts.Interfaces.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.Reports
 {
+    [Authorize(policy: "ManagerOnly")]
     [Route("/Report/[controller]")]
     public class TransactionStatisticsController : WrapperController
     {
@@ -15,8 +17,6 @@ namespace BankingSystem.API.Controllers.Reports
             _transactionService = transactionService;
         }
 
-
-        //[Authorize(policy: "ManagerOnly")]
         [HttpGet("Count")]
         public async Task<IActionResult> TransactionsCount()
         {

@@ -6,6 +6,7 @@ using System.Security.Claims;
 
 namespace BankingSystem.API.Controllers.Reports
 {
+    [Authorize(policy: "ManagerOnly")]
     [Route("/Report/[controller]")]
     public class PersonStatisticsController : WrapperController
     {
@@ -18,7 +19,6 @@ namespace BankingSystem.API.Controllers.Reports
         }
 
 
-        //[Authorize(policy: "ManagerOnly")]
         [HttpGet]
         public async Task<IActionResult> RegisteredPeopleStatistics()
         {

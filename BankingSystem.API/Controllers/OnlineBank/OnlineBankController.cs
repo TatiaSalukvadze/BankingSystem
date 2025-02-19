@@ -1,11 +1,13 @@
 ﻿using BankingSystem.Application.Services;
 using BankingSystem.Contracts.DTOs;
 using BankingSystem.Contracts.Interfaces.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.OnlineBank
 {
+    [Authorize(policy: "OperatorOnly")]
     public class OnlineBankController : WrapperController
     {
         private readonly IPersonService _personService;

@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace BankingSystem.API.Controllers.OnlineBank
 {
+    [Authorize(policy: "UserOnly")]
     [Route("/OnlineBank/[controller]")]
     public class PersonController : WrapperController
     {
@@ -27,7 +28,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             _transactionService = transactionService;
         }
 
-        [Authorize(policy: "UserOnly")]
         [HttpGet("Accounts")]
         public async Task<IActionResult> SeeAccounts()
         {
@@ -44,7 +44,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         }
 
 
-        [Authorize(policy:"UserOnly")]
         [HttpGet("Cards")]
         public async Task<IActionResult> SeeCards()
         {
@@ -57,7 +56,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             return Ok(new { message, data });
         }
 
-        [Authorize(policy: "UserOnly")]
+
         [HttpPost("TransferToOwnAccount")]
         public async Task<IActionResult> TransferToOwnAccount([FromForm] CreateTransactionDTO createTransactionDto)
         {
@@ -70,7 +69,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             return Ok(new { message, data });
         }
 
-        [Authorize(policy: "UserOnly")]
+
         [HttpPost("TransferToOtherAccount")]
         public async Task<IActionResult> TransferToOtherAccount([FromForm] CreateTransactionDTO createTransactionDto)
         {
