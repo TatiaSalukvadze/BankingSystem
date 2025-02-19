@@ -18,7 +18,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             _accountService = accountService;
             _cardService = cardService;
         }
-
+        //tatia
         [HttpPost("RegisterPerson")]
         public async Task<IActionResult> RegisterPerson([FromForm] RegisterPersonDTO registerDto)
         {
@@ -28,7 +28,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             }
             return Ok(new {message, data});
         }
-
+        //tatia
         [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateAccount([FromForm] CreateAccountDTO createAccountDto)
         {
@@ -39,7 +39,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             }
             return Ok(new { message, data });
         }
-
+        //tamar
         [HttpPost("CreateCard")]
         public async Task<IActionResult> CreateCard([FromForm] CreateCardDTO createCardDto)
         {

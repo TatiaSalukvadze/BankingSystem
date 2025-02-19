@@ -20,7 +20,7 @@ namespace BankingSystem.Application.Services
             _unitOfWork = unitOfWork;
 
         }
-
+        //tatia
         public async Task<(bool Success, string Message, object? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto)
         {
             try
@@ -57,7 +57,7 @@ namespace BankingSystem.Application.Services
             }
             catch (Exception ex) { return (false, ex.Message, null); }
         }
-
+        //tamar
         public async Task<(bool success, string message, List<SeeAccountsDTO>? data)> SeeAccountsAsync(string email)
         {
             try

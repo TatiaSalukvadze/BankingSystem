@@ -33,6 +33,7 @@ namespace BankingSystem.Application.Services
             _accountRepository = accountRepository;
 
         }
+        //tatia
         public async Task<(bool Success, string Message, object Data)> OnlineTransactionAsync(CreateTransactionDTO createTransactionDto,
             string email, bool isSelfTransfer)
         {
@@ -76,6 +77,7 @@ namespace BankingSystem.Application.Services
 
         }
         //helper methods
+        //tatia
         private async Task<(bool Validated, string Message, Account from, Account to)> ValidateAccountsAsync(string fromIBAN,
             string toIBAN, string email,decimal amountToTransfer, bool isSelfTransfer)
         {
@@ -100,7 +102,7 @@ namespace BankingSystem.Application.Services
             }
             return (true, "Accounts validated!", fromAccount, toAccount);
         }
-
+        //tatia
         private async Task<(decimal bankProfit, decimal amountFromAccount, decimal amountToAccount)> CalculateTransactionAmountAsync(
             int fromCurrencyId, int toCurrencyId, decimal amountToTransfer, bool isSelfTransfer)
         {
@@ -125,6 +127,7 @@ namespace BankingSystem.Application.Services
             return(bankProfit, amountFromAccount, amountToAccount);
 
         }
+        //tatia
         private async Task<decimal> CalculateCurrencyRateAsync(int fromCurrencyId, int toCurrencyId)
         {
             decimal currencyRate = 1;
@@ -137,7 +140,7 @@ namespace BankingSystem.Application.Services
             return currencyRate;
 
         }
-
+        //tatia
         private async Task<bool> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId, 
             decimal amountFromAccount, decimal amountToAccount)
         {
@@ -151,7 +154,7 @@ namespace BankingSystem.Application.Services
             return true;
 
         }
-
+        //tatia
         public async Task<(bool Success, string Message, object Data)> NumberOfTransactionsAsync()
         {
             var transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsAsync();
@@ -159,7 +162,7 @@ namespace BankingSystem.Application.Services
                 return (true, "Transaction Count retreived!", transactionCountDTO);
             else return (false, "Transaction Count couldn't be retreived!", null);
         }
-
+        //tatia
         public async Task<(bool Success, string Message, object Data)> AverageBankProfitAsync()
         {
             var averageBankProfits = await _unitOfWork.TransactionDetailsRepository.AverageBankProfitAsyncAsync();
@@ -167,7 +170,7 @@ namespace BankingSystem.Application.Services
                 return (true, "Bank profit Count retreived!", averageBankProfits);
             else return (false, "Bank profit couldn't be retreived!", null);
         }
-
+        //tatia
         public async Task<(bool Success, string Message, object Data)> NumberOfTransactionsChartAsync()
         {
             var transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync();

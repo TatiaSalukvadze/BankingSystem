@@ -8,7 +8,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     {
         Task<(bool success, string message, object? data)> CreateCardAsync(CreateCardDTO createCardDto);
         Task<(bool success, string message, List<CardWithIBANDTO> data)> SeeCardsAsync(string email);
-        bool CheckCardExpired(string expirationDate);
+        //bool CheckCardExpired(string expirationDate);
         Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(string cardNumber, string pin);
         Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto);
         Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp);

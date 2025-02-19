@@ -14,8 +14,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             _personService = personService;
         }
 
-        //[HttpPost]
-        //[Route("Login")]
+        //tamar
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromForm] LoginDTO loginDto)
         {

@@ -14,6 +14,7 @@ namespace BankingSystem.Application.Services
         {
             _unitOfWork = unitOfWork;
         }
+        //tamar
         public async Task<(bool success, string message, object? data)> CreateCardAsync(CreateCardDTO createCardDto)
         {
             try
@@ -55,7 +56,7 @@ namespace BankingSystem.Application.Services
                 return (false, ex.Message, null);
             }
         }
-
+        //tatia
         public async Task<(bool success, string message, List<CardWithIBANDTO> data)> SeeCardsAsync(string email)
         {
             try
@@ -79,25 +80,30 @@ namespace BankingSystem.Application.Services
                 return (false, ex.Message, null);
             }
         }
-
+        //tamar
         public async Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(string cardNumber, string pin)
         {
-            var card = await _unitOfWork.CardRepository.GetCardAsync(cardNumber);
-
-            if (card is null)
+            var (cardValidated, message, card) = await CheckCardAsync(cardNumber, pin);
+            if (!cardValidated)
             {
-                return (false, "Card not found!", null);
+                return (false, message, null);
             }
+            //var card = await _unitOfWork.CardRepository.GetCardAsync(cardNumber);
 
-            if (CheckCardExpired(card.ExpirationDate))
-            {
-                return (false, "Card is expired!", null);
-            }
+            //if (card is null)
+            //{
+            //    return (false, "Card not found!", null);
+            //}
 
-            if (card.PIN != pin)
-            {
-                return (false, "Incorrect PIN!", null);
-            }
+            //if (CheckCardExpired(card.ExpirationDate))
+            //{
+            //    return (false, "Card is expired!", null);
+            //}
+
+            //if (card.PIN != pin)
+            //{
+            //    return (false, "Incorrect PIN!", null);
+            //}
 
             var (amount, currency) = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
 
@@ -114,25 +120,30 @@ namespace BankingSystem.Application.Services
 
             return (true, "Balance retrieved successfully.", result);
         }
-
+        //tamar
         public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
         {
-            var card = await _unitOfWork.CardRepository.GetCardAsync(withdrawalDto.CardNumber);
-
-            if (card == null)
+            var (cardValidated, message, card) = await CheckCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
+            if (!cardValidated)
             {
-                return (false, "Card not found!");
+                return (false, message);
             }
+            //var card = await _unitOfWork.CardRepository.GetCardAsync(withdrawalDto.CardNumber);
 
-            if (CheckCardExpired(card.ExpirationDate))
-            {
-                return (false, "Card is expired!");
-            }
+            //if (card == null)
+            //{
+            //    return (false, "Card not found!");
+            //}
 
-            if (card.PIN != withdrawalDto.PIN)
-            {
-                return (false, "Incorrect PIN!");
-            }
+            //if (CheckCardExpired(card.ExpirationDate))
+            //{
+            //    return (false, "Card is expired!");
+            //}
+
+            //if (card.PIN != withdrawalDto.PIN)
+            //{
+            //    return (false, "Incorrect PIN!");
+            //}
 
             if (withdrawalDto.Amount <= 0)
             {
@@ -186,33 +197,58 @@ namespace BankingSystem.Application.Services
             return (true, "Withdrawal successful.");
         }
 
+        //tatia
         public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
         {
-           Card card = await _unitOfWork.CardRepository.GetCardAsync(changeCardDtp.CardNumber);
+            var (cardValidated, message, card) = await CheckCardAsync(changeCardDtp.CardNumber, changeCardDtp.OldPIN);
+            if (!cardValidated)
+            {
+                return (false, message);
+            }
+            //Card card = await _unitOfWork.CardRepository.GetCardAsync(changeCardDtp.CardNumber);
 
-            if (card is null)
-            {
-                return (false, "Card was not found!");
-            }
-            if (CheckCardExpired(card.ExpirationDate))
-            {
-                return (false, "Card is expired!");
-            }
-            //if (card.PIN != changeCardDtp.OldPIN)
+            //if (card is null)
             //{
-            //    return (false, "Incorrect PIN!");???????????
+            //    return (false, "Card was not found!");
+            //}
+            //if (card.PIN != changeCardDtp.OldPIN)//rato iyo commented
+            //{
+            //    return (false, "Incorrect PIN!");
+            //}
+            //if (CheckCardExpired(card.ExpirationDate))
+            //{
+            //    return (false, "Card is expired!");
             //}
 
             bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardDtp.NewPIN);
             if (!updated)
             {
-                return (false, "Card PIN could be updated!");//??? not
+                return (false, "Card PIN could not be updated!");
             }
             _unitOfWork.SaveChanges();
             return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
         }
+        //both
+        private async Task<(bool success, string message, Card card)> CheckCardAsync(string CardNumber, string PIN)
+        {
+            Card card = await _unitOfWork.CardRepository.GetCardAsync(CardNumber);
 
-        public bool CheckCardExpired(string expirationDate)
+            if (card is null)
+            {
+                return (false, "Card was not found!",null);
+            }
+            if (card.PIN != PIN)
+            {
+                return (false, "Incorrect PIN!", null);
+            }
+            if (CheckCardExpired(card.ExpirationDate))
+            {
+                return (false, "Card is expired!", null);
+            }
+            return (true, "Card validated", card);
+        }
+        //tatia
+        private bool CheckCardExpired(string expirationDate)
         {
             var cardDate = expirationDate.Split('/');
             var cardMonth = int.Parse(cardDate[0]);

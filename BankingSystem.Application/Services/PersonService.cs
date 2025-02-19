@@ -28,7 +28,7 @@ namespace BankingSystem.Application.Services
             _signInManager = signInManager;
         }
 
-
+        //tamar
         public async Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto)
         {
             try
@@ -60,7 +60,7 @@ namespace BankingSystem.Application.Services
             }
         }
 
-
+        //tatia
         public async Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto)
         {
             try
@@ -119,7 +119,7 @@ namespace BankingSystem.Application.Services
             }
             catch (Exception ex) { return (false, ex.Message, null); }
         }
-
+        //both
         public async Task<(bool Success, string Message, Dictionary<string, int> statistics)> RegisteredPeopleStatisticsAsync()
         {
             try

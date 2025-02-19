@@ -29,16 +29,16 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return card;
         }
-
+        //tatia
         public async Task<List<CardWithIBANDTO>> GetCardsForPersonAsync(string email)
         {
             var result = new List<CardWithIBANDTO> { };
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT a.IBAN, p.[Name], p.Surname, c.CardNumber, c.ExpirationDate, c.CVV, c.PIN " +
-                    "FROM Card AS c JOIN Account AS a ON c.AccountId = a.Id " +
-                    "JOIN Person AS p ON a.PersonId = p.Id " +
-                    "WHERE @email = p.Email";
+                var sql = @"SELECT a.IBAN, p.[Name], p.Surname, c.CardNumber, c.ExpirationDate, c.CVV, c.PIN 
+                    FROM Card AS c JOIN Account AS a ON c.AccountId = a.Id
+                    JOIN Person AS p ON a.PersonId = p.Id 
+                    WHERE @email = p.Email";
                 result = (await _connection.QueryAsync<CardWithIBANDTO>(sql, new { email }, _transaction)).ToList();
             }
 
@@ -80,7 +80,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return updated;
         }
-
+        //tamar
         public async Task<(decimal Amount, int Currency)> GetBalanceAsync(string cardNumber, string pin)
         {
             var sql = @"

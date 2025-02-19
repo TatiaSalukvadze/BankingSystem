@@ -42,20 +42,21 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return id;
         }
 
-
+        //tatia
         public async Task<int> RegisterPersonAsync(Person person)
         {
             int addedUserId = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = "INSERT INTO Person(IdentityUserId, [Name], Surname, IDNumber, Birthdate, Email)" +
-                    " OUTPUT INSERTED.Id" +
-                    " VALUES (@IdentityUserId,@Name, @Surname, @IDNumber, @Birthdate, @Email)";
+                var sql = @"INSERT INTO Person(IdentityUserId, [Name], Surname, IDNumber, Birthdate, Email)
+                     OUTPUT INSERTED.Id
+                     VALUES (@IdentityUserId,@Name, @Surname, @IDNumber, @Birthdate, @Email)";
                 addedUserId =  await _connection.ExecuteScalarAsync<int>(sql, person, _transaction);
             }
             return addedUserId;
         }
 
+        //tatia
         public async Task<int> PeopleRegisteredThisYear()
         {
             int count = 0;
@@ -66,7 +67,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return count;
         }
-
+        //tamar
         public async Task<int> PeopleRegisteredLastOneYear()
         {
             if (_connection != null && _transaction != null)
@@ -77,7 +78,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return 0;
         }
-
+        //tamar
         public async Task<int> PeopleRegisteredLast30Days()
         {
             if (_connection != null && _transaction != null)

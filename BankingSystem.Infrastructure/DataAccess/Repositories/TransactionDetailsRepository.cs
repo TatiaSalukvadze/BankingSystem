@@ -19,6 +19,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             _transaction = transaction;
         }
 
+        //tatia
         public async Task<int> CreateTransactionAsync(TransactionDetails transaction)
         {
             int insertedId = 0;
@@ -32,7 +33,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
             return insertedId;
         }
-
+        //tamar
         public async Task<decimal> GetTotalWithdrawnAmountIn24Hours(int accountId)
         {
             if (_connection != null && _transaction != null)
@@ -50,14 +51,15 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return 0;
         }
 
+        //tatia
         public async Task<TransactionCountDTO> NumberOfTransactionsAsync()
         {
             var result = new TransactionCountDTO();
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT (SELECT COUNT(*) FROM TransactionDetails WHERE PerformedAt > DATEADD(MONTH, -1, GETDATE())) AS LastMonthCount,"+
-                    " (SELECT COUNT(*) FROM TransactionDetails WHERE PerformedAt > DATEADD(MONTH, -6, GETDATE())) AS LastSixMonthCount,"+
-                    " (SELECT COUNT(*) FROM TransactionDetails WHERE PerformedAt > DATEADD(YEAR, -1, GETDATE())) AS LastYearCount";
+                var sql = @"SELECT (SELECT COUNT(*) FROM TransactionDetails WHERE PerformedAt > DATEADD(MONTH, -1, GETDATE())) AS LastMonthCount,
+                     (SELECT COUNT(*) FROM TransactionDetails WHERE PerformedAt > DATEADD(MONTH, -6, GETDATE())) AS LastSixMonthCount,
+                     (SELECT COUNT(*) FROM TransactionDetails WHERE PerformedAt > DATEADD(YEAR, -1, GETDATE())) AS LastYearCount";
                 result = await _connection.QuerySingleAsync<TransactionCountDTO>(sql, transaction: _transaction);
                 
             }
@@ -65,13 +67,14 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result;
         }
 
+        //tatia
         public async Task<Dictionary<string, decimal>> AverageBankProfitAsyncAsync()
         {
             var result = new Dictionary<string, decimal>();
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT c.Type, ISNULL(AVG(BankProfit), 0) AS AverageProfit FROM TransactionDetails AS t " +
-                    "RIGHT JOIN CurrencyType AS c ON c.Id = t.CurrencyId GROUP BY c.Type";
+                var sql = @"SELECT c.Type, ISNULL(AVG(BankProfit), 0) AS AverageProfit FROM TransactionDetails AS t 
+                    RIGHT JOIN CurrencyType AS c ON c.Id = t.CurrencyId GROUP BY c.Type";
                 var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql, transaction: _transaction);
                 result = sqlResult.ToDictionary(row => row.Item1, row => row.Item2);
 
@@ -80,12 +83,13 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result;
         }
 
+        //tatia
         public async Task<List<TransactionCountChartDTO>> NumberOfTransactionsLastMonthAsync()
         {
             var result = new List<TransactionCountChartDTO>();
             if (_connection != null && _transaction != null)
             {
-                var sql = @$"WITH LastMonthDays AS (
+                var sql = @"WITH LastMonthDays AS (
                                 SELECT CAST(DATEADD(MONTH, -1, GETDATE()) AS DATE) AS DayName
 
                                 UNION ALL
@@ -102,7 +106,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 result = sqlResult.Select(row => new TransactionCountChartDTO { Date = DateOnly.FromDateTime(row.Item1), 
                     Count = row.Item2 })
                     .ToList();
-                    //ToDictionary(row => DateOnly.FromDateTime(row.Item1), row => row.Item2);
 
             }
 
