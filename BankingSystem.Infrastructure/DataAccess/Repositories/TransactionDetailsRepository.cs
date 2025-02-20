@@ -79,7 +79,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                     SUM(CASE WHEN TD.PerformedAt > DATEADD(MONTH, -6, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastSixMonthProfit,
                     SUM(CASE WHEN TD.PerformedAt > DATEADD(YEAR, -1, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastYearProfit
                 FROM TransactionDetails TD
-                JOIN CurrencyType C ON TD.CurrencyId = C.Id
                 GROUP BY C.Type;";
 
                 var result = await _connection.QueryAsync<BankProfitDTO>(sql, transaction: _transaction);
@@ -96,12 +95,11 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             {
                 var sql = @"
                 SELECT 
-                    C.Type AS Currency,
-                    SUM(TD.Amount) AS TotalWithdrawnAmount
-                FROM TransactionDetails AS TD
-                JOIN CurrencyType C ON TD.CurrencyId = C.Id
+                    CurrencyId AS Currency,
+                    SUM(Amount) AS TotalWithdrawnAmount
+                FROM TransactionDetails
                 WHERE IsATM = 1
-                GROUP BY C.Type;";
+                GROUP BY CurrencyId;";
 
                 var result = await _connection.QueryAsync<AtmWithdrawDTO>(sql, transaction: _transaction);
                 return result.ToList();
