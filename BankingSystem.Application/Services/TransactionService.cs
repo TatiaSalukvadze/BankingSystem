@@ -162,6 +162,20 @@ namespace BankingSystem.Application.Services
                 return (true, "Transaction Count retreived!", transactionCountDTO);
             else return (false, "Transaction Count couldn't be retreived!", null);
         }
+
+        //tamar
+        public async Task<(bool Success, string Message, object Data)> GetBankProfitByTimePeriodAsync()
+        {
+            var profitData = await _unitOfWork.TransactionDetailsRepository.GetBankProfitByTimePeriodAsync();
+
+            if (profitData.Any())
+            {
+                return (true, "Bank profit retrieved successfully.", profitData);
+            }
+
+            return (false, "No bank profit data found.", null);
+        }
+
         //tatia
         public async Task<(bool Success, string Message, object Data)> AverageBankProfitAsync()
         {
@@ -170,6 +184,7 @@ namespace BankingSystem.Application.Services
                 return (true, "Bank profit Count retreived!", averageBankProfits);
             else return (false, "Bank profit couldn't be retreived!", null);
         }
+
         //tatia
         public async Task<(bool Success, string Message, object Data)> NumberOfTransactionsChartAsync()
         {
@@ -177,6 +192,19 @@ namespace BankingSystem.Application.Services
             if (transactionCountDTO is not null)
                 return (true, "Transaction Count retreived!", transactionCountDTO);
             else return (false, "Transaction Count couldn't be retreived!", null);
+        }
+
+        //tamr
+        public async Task<(bool Success, string Message, object Data)> GetTotalAtmWithdrawalsAsync()
+        {
+            var rawData = await _unitOfWork.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync();
+
+            if (rawData != null && rawData.Any())
+            {
+                return (true, "ATM withdrawals data retrieved successfully.", rawData);
+            }
+
+            return (false, "No ATM withdrawal data found.", null);
         }
     }
 }

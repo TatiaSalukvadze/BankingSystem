@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BankingSystem.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Contracts.DTOs
 {
@@ -14,5 +15,8 @@ namespace BankingSystem.Contracts.DTOs
 
         [Required]
         public decimal Amount { get; set; }
+
+        [Required]
+        public CurrencyType Currency { get; set; }
     }
 }

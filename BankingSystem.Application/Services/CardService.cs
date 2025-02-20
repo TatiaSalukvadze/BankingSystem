@@ -1,18 +1,25 @@
 ﻿using BankingSystem.Contracts.DTOs;
 using BankingSystem.Contracts.Interfaces;
+using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
+using BankingSystem.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace BankingSystem.Application.Services
 {
     public class CardService : ICardService
     {
+        private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrencyService _currencyService;
 
-        public CardService(IUnitOfWork unitOfWork)
+        public CardService(IConfiguration configuration,IUnitOfWork unitOfWork, ICurrencyService currencyService)
         {
+            _configuration = configuration;
             _unitOfWork = unitOfWork;
+            _currencyService = currencyService; 
         }
         //tamar
         public async Task<(bool success, string message, object? data)> CreateCardAsync(CreateCardDTO createCardDto)
@@ -88,22 +95,6 @@ namespace BankingSystem.Application.Services
             {
                 return (false, message, null);
             }
-            //var card = await _unitOfWork.CardRepository.GetCardAsync(cardNumber);
-
-            //if (card is null)
-            //{
-            //    return (false, "Card not found!", null);
-            //}
-
-            //if (CheckCardExpired(card.ExpirationDate))
-            //{
-            //    return (false, "Card is expired!", null);
-            //}
-
-            //if (card.PIN != pin)
-            //{
-            //    return (false, "Incorrect PIN!", null);
-            //}
 
             var (amount, currency) = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
 
@@ -120,7 +111,7 @@ namespace BankingSystem.Application.Services
 
             return (true, "Balance retrieved successfully.", result);
         }
-        //tamar
+
         public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
         {
             var (cardValidated, message, card) = await CheckCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
@@ -128,22 +119,6 @@ namespace BankingSystem.Application.Services
             {
                 return (false, message);
             }
-            //var card = await _unitOfWork.CardRepository.GetCardAsync(withdrawalDto.CardNumber);
-
-            //if (card == null)
-            //{
-            //    return (false, "Card not found!");
-            //}
-
-            //if (CheckCardExpired(card.ExpirationDate))
-            //{
-            //    return (false, "Card is expired!");
-            //}
-
-            //if (card.PIN != withdrawalDto.PIN)
-            //{
-            //    return (false, "Incorrect PIN!");
-            //}
 
             if (withdrawalDto.Amount <= 0)
             {
@@ -151,7 +126,7 @@ namespace BankingSystem.Application.Services
             }
 
             var account = await _unitOfWork.CardRepository.GetBalanceAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-            if (account.Currency == 0 || account.Amount == null) //??????????
+            if (account.Currency == 0 || account.Amount == null)
             {
                 return (false, "Unable to retrieve account balance.");
             }
@@ -162,7 +137,18 @@ namespace BankingSystem.Application.Services
                 return (false, "You can't withdraw more than 10000 within 24 hours.");
             }
 
-            decimal fee = withdrawalDto.Amount * 0.02m;
+            if (withdrawalDto.Currency != (CurrencyType)account.Currency)
+            {
+                decimal currencyRate = await _currencyService.GetCurrencyRate(
+                    withdrawalDto.Currency.ToString(), 
+                    ((CurrencyType)account.Currency).ToString()); 
+
+                withdrawalDto.Amount = withdrawalDto.Amount * currencyRate;  
+            }
+
+            decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
+
+            decimal fee = withdrawalDto.Amount * (atmWithdrawalPercent / 100); 
             decimal totalAmountToDeduct = withdrawalDto.Amount + fee;
 
             if (account.Amount < totalAmountToDeduct)
@@ -182,7 +168,7 @@ namespace BankingSystem.Application.Services
                 Amount = withdrawalDto.Amount,
                 FromAccountId = card.AccountId,
                 ToAccountId = card.AccountId,
-                CurrencyId = account.Currency,
+                CurrencyId = (int)withdrawalDto.Currency, // Set the selected currency
                 IsATM = true
             };
 
@@ -191,11 +177,75 @@ namespace BankingSystem.Application.Services
             {
                 return (false, "Transaction could not be created, something happened!");
             }
+
             transaction.Id = insertedId;
 
             _unitOfWork.SaveChanges();
             return (true, "Withdrawal successful.");
         }
+
+        ////tamar
+        //public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
+        //{
+        //    var (cardValidated, message, card) = await CheckCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
+        //    if (!cardValidated)
+        //    {
+        //        return (false, message);
+        //    }
+
+        //    if (withdrawalDto.Amount <= 0)
+        //    {
+        //        return (false, "Withdrawal amount must be greater than zero.");
+        //    }
+
+        //    var account = await _unitOfWork.CardRepository.GetBalanceAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
+        //    if (account.Currency == 0 || account.Amount == null) //??????????
+        //    {
+        //        return (false, "Unable to retrieve account balance.");
+        //    }
+
+        //    decimal withdrawnAmountIn24Hours = await _unitOfWork.TransactionDetailsRepository.GetTotalWithdrawnAmountIn24Hours(card.AccountId);
+        //    if (withdrawnAmountIn24Hours + withdrawalDto.Amount > 10000)
+        //    {
+        //        return (false, "You can't withdraw more than 10000 within 24 hours.");
+        //    }
+
+        //    decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
+
+        //    decimal fee = withdrawalDto.Amount * (atmWithdrawalPercent / 100); 
+        //    decimal totalAmountToDeduct = withdrawalDto.Amount + fee;
+
+        //    if (account.Amount < totalAmountToDeduct)
+        //    {
+        //        return (false, "Not enough money.");
+        //    }
+
+        //    bool isBalanceUpdated = await _unitOfWork.CardRepository.UpdateAccountBalanceAsync(card.AccountId, totalAmountToDeduct);
+        //    if (!isBalanceUpdated)
+        //    {
+        //        return (false, "Failed to update account balance.");
+        //    }
+
+        //    var transaction = new TransactionDetails
+        //    {
+        //        BankProfit = fee,
+        //        Amount = withdrawalDto.Amount,
+        //        FromAccountId = card.AccountId,
+        //        ToAccountId = card.AccountId,
+        //        CurrencyId = account.Currency,
+        //        IsATM = true
+        //    };
+
+        //    int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
+        //    if (insertedId <= 0)
+        //    {
+        //        return (false, "Transaction could not be created, something happened!");
+        //    }
+        //    transaction.Id = insertedId;
+
+        //    _unitOfWork.SaveChanges();
+        //    return (true, "Withdrawal successful.");
+        //}
 
         //tatia
         public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)

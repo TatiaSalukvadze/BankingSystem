@@ -10,5 +10,7 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<TransactionCountDTO> NumberOfTransactionsAsync();
         Task<List<TransactionCountChartDTO>> NumberOfTransactionsLastMonthAsync();
         Task<Dictionary<string, decimal>>  AverageBankProfitAsyncAsync();
+        Task<List<BankProfitDTO>> GetBankProfitByTimePeriodAsync();
+        Task<List<AtmWithdrawDTO>> GetTotalAtmWithdrawalsAsync();
     }
 }

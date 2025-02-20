@@ -1,10 +1,11 @@
-﻿using BankingSystem.Contracts.Interfaces.IServices;
+﻿using BankingSystem.Application.Services;
+using BankingSystem.Contracts.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.Reports
 {
-    [Authorize(policy: "ManagerOnly")]
+    //[Authorize(policy: "ManagerOnly")]
     [Route("/Report/[controller]")]
     public class TransactionStatisticsController : WrapperController
     {
@@ -31,6 +32,18 @@ namespace BankingSystem.API.Controllers.Reports
             return Ok(new { message, data });
         }
 
+        [HttpGet("BankProfitByTimePeriod")] //and currency
+        public async Task<IActionResult> GetBankProfitByTimePeriodAsync()
+        {
+            var (success, message, data) = await _transactionService.GetBankProfitByTimePeriodAsync();
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new { message, data });
+        }
+
+
         [HttpGet("CountChart")]
         public async Task<IActionResult> TransactionsCountChart()
         {
@@ -50,6 +63,19 @@ namespace BankingSystem.API.Controllers.Reports
         {
 
             var (success, message, data) = await _transactionService.AverageBankProfitAsync();
+
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message, data });
+        }
+
+        [HttpGet("AtmWithdrawals")]
+        public async Task<IActionResult> GetAtmWithdrawals()
+        {
+            var (success, message, data) = await _transactionService.GetTotalAtmWithdrawalsAsync();
 
             if (!success)
             {

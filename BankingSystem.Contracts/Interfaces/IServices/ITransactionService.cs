@@ -9,5 +9,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
         Task<(bool Success, string Message, object Data)> NumberOfTransactionsAsync();
         Task<(bool Success, string Message, object Data)> NumberOfTransactionsChartAsync();
         Task<(bool Success, string Message, object Data)> AverageBankProfitAsync();
+        Task<(bool Success, string Message, object Data)> GetBankProfitByTimePeriodAsync();
+        Task<(bool Success, string Message, object Data)> GetTotalAtmWithdrawalsAsync();
     }
 }

@@ -67,6 +67,49 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result;
         }
 
+        //tamr
+        public async Task<List<BankProfitDTO>> GetBankProfitByTimePeriodAsync()
+        {
+            if (_connection != null && _transaction != null)
+            {
+                var sql = @"
+                SELECT 
+                    C.Type AS Currency,
+                    SUM(CASE WHEN TD.PerformedAt > DATEADD(MONTH, -1, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastMonthProfit,
+                    SUM(CASE WHEN TD.PerformedAt > DATEADD(MONTH, -6, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastSixMonthProfit,
+                    SUM(CASE WHEN TD.PerformedAt > DATEADD(YEAR, -1, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastYearProfit
+                FROM TransactionDetails TD
+                JOIN CurrencyType C ON TD.CurrencyId = C.Id
+                GROUP BY C.Type;";
+
+                var result = await _connection.QueryAsync<BankProfitDTO>(sql, transaction: _transaction);
+                return result.ToList();
+            }
+
+            return new List<BankProfitDTO>();
+        }
+
+        //tamr
+        public async Task<List<AtmWithdrawDTO>> GetTotalAtmWithdrawalsAsync()
+        {
+            if (_connection != null && _transaction != null)
+            {
+                var sql = @"
+                SELECT 
+                    C.Type AS Currency,
+                    SUM(TD.Amount) AS TotalWithdrawnAmount
+                FROM TransactionDetails AS TD
+                JOIN CurrencyType C ON TD.CurrencyId = C.Id
+                WHERE IsATM = 1
+                GROUP BY C.Type;";
+
+                var result = await _connection.QueryAsync<AtmWithdrawDTO>(sql, transaction: _transaction);
+                return result.ToList();
+            }
+
+            return new List<AtmWithdrawDTO>();
+        }
+
         //tatia
         public async Task<Dictionary<string, decimal>> AverageBankProfitAsyncAsync()
         {
