@@ -5,6 +5,7 @@ using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Infrastructure;
+using BankingSystem.Infrastructure.Configuration;
 using BankingSystem.Infrastructure.DataAccess;
 using BankingSystem.Infrastructure.DataAccess.Repositories;
 using BankingSystem.Infrastructure.ExternalServices;
@@ -94,6 +95,7 @@ builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>(); 
 builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<ITransactionDetailsRepository, TransactionDetailsRepository>();
+builder.Services.Configure<CurrencyApiSettings>(builder.Configuration.GetSection("CurrencyApiSettings"));
 builder.Services.AddHttpClient<ICurrencyService,CurrencyService>();
 
 builder.Services

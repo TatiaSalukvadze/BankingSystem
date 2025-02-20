@@ -1,4 +1,7 @@
 ﻿using BankingSystem.Contracts.Interfaces.IExternalServices;
+using BankingSystem.Infrastructure.Configuration;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +15,18 @@ namespace BankingSystem.Infrastructure.ExternalServices
 {
     public class CurrencyService : ICurrencyService
     {
-        private readonly string _apiKey = "2cd5220a1105f2545898dec2";
-        private readonly string _baseUrl = "https://v6.exchangerate-api.com/v6/";
+        private readonly CurrencyApiSettings _currencyApiSettings;
+        //private readonly string _apiKey = "2cd5220a1105f2545898dec2";
+        //private readonly string _baseUrl = "https://v6.exchangerate-api.com/v6/";
         private readonly HttpClient _httpClient;
-        public CurrencyService(HttpClient httpClient) {
+        public CurrencyService(HttpClient httpClient, IOptions<CurrencyApiSettings> currencyApiSettings) {
             _httpClient = httpClient;
+            _currencyApiSettings = currencyApiSettings.Value;
         }
 
         public async Task<decimal> GetCurrencyRate(string fromCurrency, string toCurrency)
         {
-            string url = _baseUrl + _apiKey + "/latest/" + fromCurrency;
+            string url = _currencyApiSettings.BaseUrl + _currencyApiSettings.ApiKey + "/latest/" + fromCurrency;
             var result = await _httpClient.GetFromJsonAsync<JsonElement>(url);
             if(result.TryGetProperty("conversion_rates", out JsonElement conversionRates) 
                 && conversionRates.TryGetProperty(toCurrency, out JsonElement currencyRate)
