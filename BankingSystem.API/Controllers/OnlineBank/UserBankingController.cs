@@ -10,7 +10,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
 {
     [Authorize(policy: "UserOnly")]
     [Route("/OnlineBank/[controller]")]
-    public class PersonController : WrapperController
+    public class UserBankingController : WrapperController
     {
         private readonly IPersonService _personService;
         private readonly IAccountService _accountService;
@@ -18,7 +18,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         //private readonly ICurrencyService _currencyService;
         private readonly ITransactionService _transactionService;
 
-        public PersonController(IPersonService personService, IAccountService accountService,
+        public UserBankingController(IPersonService personService, IAccountService accountService,
             ICardService cardService, ITransactionService transactionService)
         {
             _personService = personService;
@@ -61,7 +61,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> TransferToOwnAccount([FromForm] CreateTransactionDTO createTransactionDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, true);
+            var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: true);
             if (!success)
             {
                 return BadRequest(message);
@@ -74,7 +74,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> TransferToOtherAccount([FromForm] CreateTransactionDTO createTransactionDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, false);
+            var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
             if (!success)
             {
                 return BadRequest(message);

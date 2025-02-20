@@ -126,7 +126,7 @@ namespace BankingSystem.Application.Services
             {
                 var personStatistics = new Dictionary<string, int>();
                 int peopleRegisteredThisYear = await _unitOfWork.PersonRepository.PeopleRegisteredThisYear();
-                personStatistics.Add("People Registed This Year", peopleRegisteredThisYear);
+                personStatistics.Add("People Registered This Year", peopleRegisteredThisYear);
 
                 int peopleRegisteredLast1Year = await _unitOfWork.PersonRepository.PeopleRegisteredLastOneYear();
                 personStatistics.Add("People Registered Last 1 Year", peopleRegisteredLast1Year);

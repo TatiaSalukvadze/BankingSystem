@@ -22,7 +22,7 @@ namespace BankingSystem.Application.Services
             _currencyService = currencyService; 
         }
         //tamar
-        public async Task<(bool success, string message, object? data)> CreateCardAsync(CreateCardDTO createCardDto)
+        public async Task<(bool success, string message, Card? data)> CreateCardAsync(CreateCardDTO createCardDto)
         {
             try
             {
@@ -184,68 +184,7 @@ namespace BankingSystem.Application.Services
             return (true, "Withdrawal successful.");
         }
 
-        ////tamar
-        //public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
-        //{
-        //    var (cardValidated, message, card) = await CheckCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-        //    if (!cardValidated)
-        //    {
-        //        return (false, message);
-        //    }
-
-        //    if (withdrawalDto.Amount <= 0)
-        //    {
-        //        return (false, "Withdrawal amount must be greater than zero.");
-        //    }
-
-        //    var account = await _unitOfWork.CardRepository.GetBalanceAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-        //    if (account.Currency == 0 || account.Amount == null) //??????????
-        //    {
-        //        return (false, "Unable to retrieve account balance.");
-        //    }
-
-        //    decimal withdrawnAmountIn24Hours = await _unitOfWork.TransactionDetailsRepository.GetTotalWithdrawnAmountIn24Hours(card.AccountId);
-        //    if (withdrawnAmountIn24Hours + withdrawalDto.Amount > 10000)
-        //    {
-        //        return (false, "You can't withdraw more than 10000 within 24 hours.");
-        //    }
-
-        //    decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
-
-        //    decimal fee = withdrawalDto.Amount * (atmWithdrawalPercent / 100); 
-        //    decimal totalAmountToDeduct = withdrawalDto.Amount + fee;
-
-        //    if (account.Amount < totalAmountToDeduct)
-        //    {
-        //        return (false, "Not enough money.");
-        //    }
-
-        //    bool isBalanceUpdated = await _unitOfWork.CardRepository.UpdateAccountBalanceAsync(card.AccountId, totalAmountToDeduct);
-        //    if (!isBalanceUpdated)
-        //    {
-        //        return (false, "Failed to update account balance.");
-        //    }
-
-        //    var transaction = new TransactionDetails
-        //    {
-        //        BankProfit = fee,
-        //        Amount = withdrawalDto.Amount,
-        //        FromAccountId = card.AccountId,
-        //        ToAccountId = card.AccountId,
-        //        CurrencyId = account.Currency,
-        //        IsATM = true
-        //    };
-
-        //    int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
-        //    if (insertedId <= 0)
-        //    {
-        //        return (false, "Transaction could not be created, something happened!");
-        //    }
-        //    transaction.Id = insertedId;
-
-        //    _unitOfWork.SaveChanges();
-        //    return (true, "Withdrawal successful.");
-        //}
+    
 
         //tatia
         public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
@@ -255,20 +194,6 @@ namespace BankingSystem.Application.Services
             {
                 return (false, message);
             }
-            //Card card = await _unitOfWork.CardRepository.GetCardAsync(changeCardDtp.CardNumber);
-
-            //if (card is null)
-            //{
-            //    return (false, "Card was not found!");
-            //}
-            //if (card.PIN != changeCardDtp.OldPIN)//rato iyo commented
-            //{
-            //    return (false, "Incorrect PIN!");
-            //}
-            //if (CheckCardExpired(card.ExpirationDate))
-            //{
-            //    return (false, "Card is expired!");
-            //}
 
             bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardDtp.NewPIN);
             if (!updated)
