@@ -8,6 +8,6 @@ namespace BankingSystem.Contracts.Interfaces.IExternalServices
 {
     public interface ICurrencyService
     {
-        Task<decimal> GetCurrencyRate(string fromCurrency, string toCurrency);
+        Task<decimal> GetCurrencyRateAsync(string fromCurrency, string toCurrency);
     }
 }

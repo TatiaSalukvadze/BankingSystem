@@ -24,7 +24,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
             _currencyApiSettings = currencyApiSettings.Value;
         }
 
-        public async Task<decimal> GetCurrencyRate(string fromCurrency, string toCurrency)
+        public async Task<decimal> GetCurrencyRateAsync(string fromCurrency, string toCurrency)
         {
             string url = _currencyApiSettings.BaseUrl + _currencyApiSettings.ApiKey + "/latest/" + fromCurrency;
             var result = await _httpClient.GetFromJsonAsync<JsonElement>(url);

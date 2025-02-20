@@ -139,7 +139,7 @@ namespace BankingSystem.Application.Services
 
             if (withdrawalDto.Currency != (CurrencyType)account.Currency)
             {
-                decimal currencyRate = await _currencyService.GetCurrencyRate(
+                decimal currencyRate = await _currencyService.GetCurrencyRateAsync(
                     withdrawalDto.Currency.ToString(), 
                     ((CurrencyType)account.Currency).ToString()); 
 

@@ -135,7 +135,7 @@ namespace BankingSystem.Application.Services
             {
                 var fromCurrency = ((CurrencyType)fromCurrencyId).ToString();
                 var toCurrency = ((CurrencyType)toCurrencyId).ToString();
-                currencyRate = await _currencyService.GetCurrencyRate(fromCurrency, toCurrency);
+                currencyRate = await _currencyService.GetCurrencyRateAsync(fromCurrency, toCurrency);
             }
             return currencyRate;
 
