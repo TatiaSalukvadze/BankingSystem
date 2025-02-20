@@ -25,9 +25,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             int insertedId = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = "INSERT INTO TransactionDetails (BankProfit, Amount, FromAccountId, ToAccountId, CurrencyId, IsATM) " +
-                    "OUTPUT INSERTED.Id " +
-                    "VALUES (@BankProfit, @Amount, @FromAccountId, @ToAccountId, @CurrencyId, @IsATM)";
+                var sql = @"INSERT INTO TransactionDetails (BankProfit, Amount, FromAccountId, ToAccountId, CurrencyId, IsATM) 
+                    OUTPUT INSERTED.Id 
+                    VALUES (@BankProfit, @Amount, @FromAccountId, @ToAccountId, @CurrencyId, @IsATM)";
                 insertedId = await _connection.ExecuteScalarAsync<int>(sql, transaction, _transaction);
             }
 
@@ -74,7 +74,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             {
                 var sql = @"
                 SELECT 
-                    C.Type AS Currency,
+                    C.Id AS Currency,
                     SUM(CASE WHEN TD.PerformedAt > DATEADD(MONTH, -1, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastMonthProfit,
                     SUM(CASE WHEN TD.PerformedAt > DATEADD(MONTH, -6, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastSixMonthProfit,
                     SUM(CASE WHEN TD.PerformedAt > DATEADD(YEAR, -1, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastYearProfit

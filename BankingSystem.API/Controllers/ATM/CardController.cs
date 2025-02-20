@@ -17,6 +17,7 @@ namespace BankingSystem.API.Controllers.ATM
             _cardService = cardService;
         }
 
+        //tamar
         [HttpPost("SeeBalance")]
         public async Task<IActionResult> SeeBalanceAsync([FromForm] string cardNumber, [FromForm] string pin)
         {
@@ -27,7 +28,7 @@ namespace BankingSystem.API.Controllers.ATM
             }
             return Ok(new { message, data });
         }
-
+        //tamar
         [HttpPost("Withdraw")]
         public async Task<IActionResult> WithdrawAsync([FromForm] WithdrawalDTO withdrawalDto)
         {
@@ -40,7 +41,7 @@ namespace BankingSystem.API.Controllers.ATM
 
             return Ok(new { message });
         }
-
+        //tatia
         [HttpPut("PIN")]
         public async Task<IActionResult> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
         {

@@ -34,7 +34,7 @@ namespace BankingSystem.Application.Services
 
         }
         //tatia
-        public async Task<(bool Success, string Message, object Data)> OnlineTransactionAsync(CreateTransactionDTO createTransactionDto,
+        public async Task<(bool Success, string Message, TransactionDetails Data)> OnlineTransactionAsync(CreateTransactionDTO createTransactionDto,
             string email, bool isSelfTransfer)
         {
             try
@@ -155,18 +155,18 @@ namespace BankingSystem.Application.Services
 
         }
         //tatia
-        public async Task<(bool Success, string Message, object Data)> NumberOfTransactionsAsync()
+        public async Task<(bool Success, string Message, TransactionCountDTO Data)> NumberOfTransactionsAsync()
         {
-            var transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsAsync();
+            TransactionCountDTO transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsAsync();
             if (transactionCountDTO is not null)
                 return (true, "Transaction Count retreived!", transactionCountDTO);
             else return (false, "Transaction Count couldn't be retreived!", null);
         }
 
         //tamar
-        public async Task<(bool Success, string Message, object Data)> GetBankProfitByTimePeriodAsync()
+        public async Task<(bool Success, string Message, List<BankProfitDTO> Data)> GetBankProfitByTimePeriodAsync()
         {
-            var profitData = await _unitOfWork.TransactionDetailsRepository.GetBankProfitByTimePeriodAsync();
+            List<BankProfitDTO> profitData = await _unitOfWork.TransactionDetailsRepository.GetBankProfitByTimePeriodAsync();
 
             if (profitData.Any())
             {
@@ -177,7 +177,7 @@ namespace BankingSystem.Application.Services
         }
 
         //tatia
-        public async Task<(bool Success, string Message, object Data)> AverageBankProfitAsync()
+        public async Task<(bool Success, string Message, Dictionary<string, decimal> Data)> AverageBankProfitAsync()
         {
             var averageBankProfits = await _unitOfWork.TransactionDetailsRepository.AverageBankProfitAsyncAsync();
             if (averageBankProfits is not null && averageBankProfits.Count != 0)
@@ -186,16 +186,16 @@ namespace BankingSystem.Application.Services
         }
 
         //tatia
-        public async Task<(bool Success, string Message, object Data)> NumberOfTransactionsChartAsync()
+        public async Task<(bool Success, string Message, List<TransactionCountChartDTO> Data)> NumberOfTransactionsChartAsync()
         {
-            var transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync();
+            List<TransactionCountChartDTO> transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync();
             if (transactionCountDTO is not null)
                 return (true, "Transaction Count retreived!", transactionCountDTO);
             else return (false, "Transaction Count couldn't be retreived!", null);
         }
 
         //tamr
-        public async Task<(bool Success, string Message, object Data)> GetTotalAtmWithdrawalsAsync()
+        public async Task<(bool Success, string Message, List<AtmWithdrawDTO> Data)> GetTotalAtmWithdrawalsAsync()
         {
             var rawData = await _unitOfWork.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync();
 

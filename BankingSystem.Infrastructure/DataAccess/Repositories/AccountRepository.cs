@@ -23,9 +23,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             int insertedId = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = "INSERT INTO Account (PersonId, IBAN, Amount, CurrencyId) " +
-                    "OUTPUT INSERTED.Id " +
-                    "VALUES (@PersonId, @IBAN, @Amount, @CurrencyId)";
+                var sql = @"INSERT INTO Account (PersonId, IBAN, Amount, CurrencyId) 
+                    OUTPUT INSERTED.Id 
+                    VALUES (@PersonId, @IBAN, @Amount, @CurrencyId)";
                 insertedId = await _connection.ExecuteScalarAsync<int>(sql, account, _transaction);
             }
 
@@ -50,8 +50,8 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             bool exists = false;
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT CASE WHEN EXISTS (SELECT 1 FROM Account as a WHERE @email = " +
-                    "(SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId)) THEN 1 ELSE 0 END AS AccountExists";
+                var sql = @"SELECT CASE WHEN EXISTS (SELECT 1 FROM Account as a WHERE @email = 
+                    (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId)) THEN 1 ELSE 0 END AS AccountExists";
                 exists = await _connection.ExecuteScalarAsync<bool>(sql, new { email }, _transaction);
             }
 
@@ -91,8 +91,8 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             Account account = null;
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT TOP 1 * FROM Account WHERE PersonId = "+
-                    "(SELECT Id FROM Person WHERE Email = @email) AND IBAN = @IBAN";
+                var sql = @"SELECT TOP 1 * FROM Account WHERE PersonId = 
+                    (SELECT Id FROM Person WHERE Email = @email) AND IBAN = @IBAN";
                 account = await _connection.QueryFirstOrDefaultAsync<Account>(sql, new { email, IBAN }, _transaction);
             }
             return account;

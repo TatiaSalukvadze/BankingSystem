@@ -21,7 +21,7 @@ namespace BankingSystem.Application.Services
 
         }
         //tatia
-        public async Task<(bool Success, string Message, object? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto)
+        public async Task<(bool Success, string Message, Account? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto)
         {
             try
             {

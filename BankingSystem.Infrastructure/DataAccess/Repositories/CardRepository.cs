@@ -61,9 +61,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             int insertedId = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = "INSERT INTO Card (AccountId, CardNumber, ExpirationDate, CVV, PIN) " +
-                          "OUTPUT INSERTED.Id " +
-                          "VALUES (@AccountId, @CardNumber, @ExpirationDate, @CVV, @PIN)";
+                var sql = @"INSERT INTO Card (AccountId, CardNumber, ExpirationDate, CVV, PIN) 
+                          OUTPUT INSERTED.Id
+                          VALUES (@AccountId, @CardNumber, @ExpirationDate, @CVV, @PIN)";
                 insertedId = await _connection.ExecuteScalarAsync<int>(sql, card, _transaction);
             }
             return insertedId;
