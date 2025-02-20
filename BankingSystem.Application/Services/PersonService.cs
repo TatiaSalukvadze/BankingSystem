@@ -31,8 +31,7 @@ namespace BankingSystem.Application.Services
         //tamar
         public async Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto)
         {
-            try
-            {
+
                 var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username!.ToLower());
                 if (user == null)
                 {
@@ -53,18 +52,13 @@ namespace BankingSystem.Application.Services
                 
                 _unitOfWork.SaveChanges();
                 return (true, "Login successful!", new { token, customUser });
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message, null);
-            }
+
         }
 
         //tatia
         public async Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto)
         {
-            try
-            {
+
                 var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
                 if (existingUser != null)
                 {
@@ -114,16 +108,11 @@ namespace BankingSystem.Application.Services
                     return (false, "Adding user in identity system failed!", null);
                 }
 
-
-
-            }
-            catch (Exception ex) { return (false, ex.Message, null); }
         }
         //both
         public async Task<(bool Success, string Message, Dictionary<string, int> statistics)> RegisteredPeopleStatisticsAsync()
         {
-            try
-            {
+
                 var personStatistics = new Dictionary<string, int>();
                 int peopleRegisteredThisYear = await _unitOfWork.PersonRepository.PeopleRegisteredThisYear();
                 personStatistics.Add("People Registered This Year", peopleRegisteredThisYear);
@@ -135,8 +124,7 @@ namespace BankingSystem.Application.Services
                 personStatistics.Add("People Registered Last 30 Days", peopleRegisteredLast30Days);
 
                 return (true, "Statistics are retrieved!", personStatistics);
-             }
-            catch (Exception ex) { return (false, ex.Message, null); }
+
         }
     }
 }

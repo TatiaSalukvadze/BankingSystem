@@ -23,8 +23,7 @@ namespace BankingSystem.Application.Services
         //tatia
         public async Task<(bool Success, string Message, Account? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto)
         {
-            try
-            {
+
                 int personId = await _unitOfWork.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber);
                 if (personId <= 0)
                 {
@@ -54,14 +53,12 @@ namespace BankingSystem.Application.Services
 
                 _unitOfWork.SaveChanges();
                 return (true, "Account was created successfully!", account);
-            }
-            catch (Exception ex) { return (false, ex.Message, null); }
+
         }
         //tamar
         public async Task<(bool success, string message, List<SeeAccountsDTO>? data)> SeeAccountsAsync(string email)
         {
-            try
-            {
+
                 bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
 
                 if (!accountsExist)
@@ -77,11 +74,7 @@ namespace BankingSystem.Application.Services
                 }
 
                 return (true, "Accounts retrieved successfully!", accounts);
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message, null);
-            }
+
         }
     }
 }

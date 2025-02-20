@@ -37,8 +37,7 @@ namespace BankingSystem.Application.Services
         public async Task<(bool Success, string Message, TransactionDetails Data)> OnlineTransactionAsync(CreateTransactionDTO createTransactionDto,
             string email, bool isSelfTransfer)
         {
-            try
-            {
+
                 if(createTransactionDto.Amount <= 0)
                 {
                     return (false, "You need to enter more than 0 value!", null);
@@ -72,8 +71,7 @@ namespace BankingSystem.Application.Services
                 transaction.Id = insertedId;
                 _unitOfWork.SaveChanges();
                 return (true, "Transaction was successfull!", transaction);
-            }
-            catch (Exception ex) { return (false, ex.Message, null); }
+
 
         }
         //helper methods

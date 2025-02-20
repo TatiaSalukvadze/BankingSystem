@@ -24,8 +24,7 @@ namespace BankingSystem.Application.Services
         //tamar
         public async Task<(bool success, string message, Card? data)> CreateCardAsync(CreateCardDTO createCardDto)
         {
-            try
-            {
+
                 var account = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN);
                 if (account == null)
                 {
@@ -57,17 +56,12 @@ namespace BankingSystem.Application.Services
                 _unitOfWork.SaveChanges();
 
                 return (true, "Card was created successfully!", card);
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message, null);
-            }
+
         }
         //tatia
         public async Task<(bool success, string message, List<CardWithIBANDTO> data)> SeeCardsAsync(string email)
         {
-            try
-            {
+
                 bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
                 if (!accountsExist)
                 {
@@ -81,11 +75,8 @@ namespace BankingSystem.Application.Services
                 }
 
                 return (true, "Cards For Account (IBAN) were found!", cards);
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message, null);
-            }
+            
+
         }
         //tamar
         public async Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(string cardNumber, string pin)
