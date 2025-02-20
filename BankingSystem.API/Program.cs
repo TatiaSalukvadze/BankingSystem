@@ -97,6 +97,8 @@ builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<ITransactionDetailsRepository, TransactionDetailsRepository>();
 builder.Services.Configure<CurrencyApiSettings>(builder.Configuration.GetSection("CurrencyApiSettings"));
 builder.Services.AddHttpClient<ICurrencyService,CurrencyService>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services
     .AddAuthentication(x =>

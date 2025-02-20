@@ -1,12 +1,5 @@
-using BankingSystem.Application.Services;
-using BankingSystem.Contracts;
-using BankingSystem.Contracts.DTOs;
-using BankingSystem.Contracts.Interfaces;
-using BankingSystem.Contracts.Interfaces.IServices;
-using Microsoft.AspNetCore.Authorization;
+using BankingSystem.Contracts.Interfaces.IExternalServices;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq.Expressions;
-using System.Security.Claims;
 
 
 namespace BankingSystem.API.Controllers
@@ -23,11 +16,26 @@ namespace BankingSystem.API.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
+        private readonly IEmailService _emailService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IEmailService emailService)
         {
             _logger = logger;
+            _emailService = emailService;   
+        }
 
+        [HttpPost("SendEmail")]
+        public async Task<IActionResult> SendEmailToUser(string email, string subject, string message)
+        {
+            try
+            {
+                await _emailService.SendEmailPlaint(email, subject, message);
+                return Ok("Email sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to send email: {ex.Message}");
+            }
         }
 
         [HttpGet("Accounts")]

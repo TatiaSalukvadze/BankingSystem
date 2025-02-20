@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace BankingSystem.API.Controllers.Reports
 {
-    [Authorize(policy: "ManagerOnly")]
+    //[Authorize(policy: "ManagerOnly")]
     [Route("/Report/[controller]")]
     public class PersonStatisticsController : WrapperController
     {
