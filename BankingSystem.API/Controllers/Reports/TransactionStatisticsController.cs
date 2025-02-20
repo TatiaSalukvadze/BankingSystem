@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.Reports
 {
-    [Authorize(policy: "ManagerOnly")]
+    //[Authorize(policy: "ManagerOnly")]
     [Route("/Report/[controller]")]
     public class TransactionStatisticsController : WrapperController
     {

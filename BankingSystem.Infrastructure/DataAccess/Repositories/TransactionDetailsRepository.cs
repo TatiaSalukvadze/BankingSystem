@@ -74,13 +74,13 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             {
                 var sql = @"
                 SELECT 
-                    C.Type AS Currency,
+                    C.Id AS Currency,
                     SUM(CASE WHEN TD.PerformedAt > DATEADD(MONTH, -1, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastMonthProfit,
                     SUM(CASE WHEN TD.PerformedAt > DATEADD(MONTH, -6, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastSixMonthProfit,
                     SUM(CASE WHEN TD.PerformedAt > DATEADD(YEAR, -1, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastYearProfit
                 FROM TransactionDetails TD
                 JOIN CurrencyType C ON TD.CurrencyId = C.Id
-                GROUP BY C.Type;";
+                GROUP BY C.Id;";
 
                 var result = await _connection.QueryAsync<BankProfitDTO>(sql, transaction: _transaction);
                 return result.ToList();
