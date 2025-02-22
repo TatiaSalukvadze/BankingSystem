@@ -1,5 +1,6 @@
 ﻿using BankingSystem.Contracts.DTOs;
 using BankingSystem.Contracts.Interfaces;
+using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -19,13 +20,16 @@ namespace BankingSystem.Application.Services
         private readonly IAuthService _authService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IEmailService _emailService;
 
-        public PersonService(IUnitOfWork unitOfWork,IAuthService authService, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public PersonService(IUnitOfWork unitOfWork,IAuthService authService, UserManager<IdentityUser> userManager, 
+            SignInManager<IdentityUser> signInManager, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _authService = authService;
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailService = emailService;
         }
 
         //tamar
@@ -89,8 +93,9 @@ namespace BankingSystem.Application.Services
 
                         var userId = await _unitOfWork.PersonRepository.RegisterPersonAsync(person);
                         if (userId > 0)
-                        {
+                        {                           
                             _unitOfWork.SaveChanges();
+                        await _emailService.SendEmailPlaint(person.Email, "Registration", "Your were registered successfully!");
                             return (true, "User was registered successfully!",new { IdentityUserId = user.Id, CustomUserId = userId });
                         }
                         else

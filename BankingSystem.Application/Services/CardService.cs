@@ -89,7 +89,7 @@ namespace BankingSystem.Application.Services
 
             var balance = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
 
-            if (balance.Amount == 0 || balance.Currency == null)//?????
+            if (balance is null || balance.Amount == 0 || balance.Currency == null)//?????
             {
                 return (false, "Unable to retrieve balance.", null);
             }
@@ -112,7 +112,7 @@ namespace BankingSystem.Application.Services
             }
 
             var account = await _unitOfWork.CardRepository.GetBalanceAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-            if (account.Currency == 0 || account.Amount == null)
+            if (account.Currency == 0 || account.Amount == null)//balance is null || ???????????????/
             {
                 return (false, "Unable to retrieve account balance.");
             }
