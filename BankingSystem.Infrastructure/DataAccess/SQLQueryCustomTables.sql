@@ -18,7 +18,7 @@ CREATE TABLE Person (
 
 CREATE TABLE CurrencyType(
 	Id INT IDENTITY(1,1) PRIMARY KEY,  
-	Type CHAR(3) NOT NULL,
+	[Type] CHAR(3) NOT NULL,
 );
 GO
 CREATE TABLE Account(

@@ -10,7 +10,7 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<bool> CardNumberExists(string cardNumber);
         Task<int> CreateCardAsync(Card card);
         Task<bool> UpdateCardAsync(int cardId, string newPIN);
-        Task<(decimal Amount, int Currency)> GetBalanceAsync(string cardNumber, string pin);
+        Task<SeeBalanceDTO> GetBalanceAsync(string cardNumber, string pin);
         Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct);
     }
 }

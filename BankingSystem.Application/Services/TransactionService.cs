@@ -19,17 +19,17 @@ namespace BankingSystem.Application.Services
 {
     public class TransactionService : ITransactionService
     {
-        private readonly ICurrencyService _currencyService;
+        private readonly IExchangeRateService _exchangeRateService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
         private readonly IAccountRepository _accountRepository;
 
-        public TransactionService(IConfiguration configuration, IUnitOfWork unitOfWork, ICurrencyService currencyService,
+        public TransactionService(IConfiguration configuration, IUnitOfWork unitOfWork, IExchangeRateService exchangeRateService,
             IAccountRepository accountRepository)
         {
             _configuration = configuration;
             _unitOfWork = unitOfWork;
-            _currencyService = currencyService;
+            _exchangeRateService = exchangeRateService;
             _accountRepository = accountRepository;
 
         }
@@ -43,13 +43,20 @@ namespace BankingSystem.Application.Services
                     return (false, "You need to enter more than 0 value!", null);
                 }
                 var (validated, message, fromAccount, toAccount) = await ValidateAccountsAsync(createTransactionDto.FromIBAN,
-                    createTransactionDto.ToIBAN, email, createTransactionDto.Amount, isSelfTransfer);
+                    createTransactionDto.ToIBAN, email, isSelfTransfer);
                 if (!validated) return (validated, message, null);
                 
 
                 var (bankProfit, amountFromAccount, amountToAccount) = await CalculateTransactionAmountAsync(fromAccount.CurrencyId,
                     toAccount.CurrencyId, createTransactionDto.Amount, isSelfTransfer);
-                bool accountsUpdated = await UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, amountFromAccount, amountToAccount);
+            if (bankProfit == 0 && amountFromAccount == 0 && amountToAccount == 0) {
+                return (false, "One of the account has incorrect currency!", null);
+            }
+            if (fromAccount.Amount < amountFromAccount)
+            {
+                return (false, "You don't have enough money to transfer on your account!", null);
+            }
+            bool accountsUpdated = await UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, amountFromAccount, amountToAccount);
                 if(!accountsUpdated) return (false, "Balance couldn't be updated!", null);
 
                 var transaction = new TransactionDetails
@@ -77,7 +84,7 @@ namespace BankingSystem.Application.Services
         //helper methods
         //tatia
         private async Task<(bool Validated, string Message, Account from, Account to)> ValidateAccountsAsync(string fromIBAN,
-            string toIBAN, string email,decimal amountToTransfer, bool isSelfTransfer)
+            string toIBAN, string email, bool isSelfTransfer)
         {
             var fromAccount = await _accountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
             Account toAccount;
@@ -94,10 +101,10 @@ namespace BankingSystem.Application.Services
                 return (false, "There is no account for one or both provided IBANs, check well!", null, null);
             }
 
-            if (fromAccount.Amount < amountToTransfer)
-            {
-                return (false, "You don't have enough money to transfer on your account!", null, null);
-            }
+            //if (fromAccount.Amount < amountToTransfer)
+            //{
+            //    return (false, "You don't have enough money to transfer on your account!", null, null);
+            //}
             return (true, "Accounts validated!", fromAccount, toAccount);
         }
         //tatia
@@ -105,7 +112,7 @@ namespace BankingSystem.Application.Services
             int fromCurrencyId, int toCurrencyId, decimal amountToTransfer, bool isSelfTransfer)
         {
             decimal currencyRate = await CalculateCurrencyRateAsync(fromCurrencyId, toCurrencyId);
-
+            if(currencyRate <= 0) { return (0,0,0); }
 
             decimal fee;
             decimal extraFeeValue = 0;
@@ -131,9 +138,11 @@ namespace BankingSystem.Application.Services
             decimal currencyRate = 1;
             if (fromCurrencyId != toCurrencyId)
             {
-                var fromCurrency = ((CurrencyType)fromCurrencyId).ToString();
-                var toCurrency = ((CurrencyType)toCurrencyId).ToString();
-                currencyRate = await _currencyService.GetCurrencyRateAsync(fromCurrency, toCurrency);
+                var fromCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(fromCurrencyId);
+                   // ((CurrencyType)fromCurrencyId).ToString();
+                var toCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(toCurrencyId); //((CurrencyType)toCurrencyId).ToString();
+                if(fromCurrency == "" || toCurrency == "") {  return 0; }
+                currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
             }
             return currencyRate;
 

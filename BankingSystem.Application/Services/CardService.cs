@@ -13,13 +13,13 @@ namespace BankingSystem.Application.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ICurrencyService _currencyService;
+        private readonly IExchangeRateService _exchangeRateService;
 
-        public CardService(IConfiguration configuration,IUnitOfWork unitOfWork, ICurrencyService currencyService)
+        public CardService(IConfiguration configuration,IUnitOfWork unitOfWork, IExchangeRateService exchangeRateService)
         {
             _configuration = configuration;
             _unitOfWork = unitOfWork;
-            _currencyService = currencyService; 
+            _exchangeRateService = exchangeRateService; 
         }
         //tamar
         public async Task<(bool success, string message, Card? data)> CreateCardAsync(CreateCardDTO createCardDto)
@@ -87,20 +87,15 @@ namespace BankingSystem.Application.Services
                 return (false, message, null);
             }
 
-            var (amount, currency) = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
+            var balance = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
 
-            if (amount == null || currency == 0)//?????
+            if (balance.Amount == 0 || balance.Currency == null)//?????
             {
                 return (false, "Unable to retrieve balance.", null);
             }
+         
 
-            var result = new SeeBalanceDTO
-            {
-                Amount = amount,
-                Currency = (Domain.Enums.CurrencyType)currency
-            };
-
-            return (true, "Balance retrieved successfully.", result);
+            return (true, "Balance retrieved successfully.", balance);
         }
 
         public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
@@ -130,7 +125,7 @@ namespace BankingSystem.Application.Services
 
             if (withdrawalDto.Currency != (CurrencyType)account.Currency)
             {
-                decimal currencyRate = await _currencyService.GetCurrencyRateAsync(
+                decimal currencyRate = await _exchangeRateService.GetCurrencyRateAsync(
                     withdrawalDto.Currency.ToString(), 
                     ((CurrencyType)account.Currency).ToString()); 
 
@@ -194,7 +189,7 @@ namespace BankingSystem.Application.Services
             _unitOfWork.SaveChanges();
             return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
         }
-        //both
+        //tamar
         private async Task<(bool success, string message, Card card)> CheckCardAsync(string CardNumber, string PIN)
         {
             Card card = await _unitOfWork.CardRepository.GetCardAsync(CardNumber);

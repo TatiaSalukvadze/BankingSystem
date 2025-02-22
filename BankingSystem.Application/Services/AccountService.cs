@@ -35,13 +35,17 @@ namespace BankingSystem.Application.Services
                 {
                     return (false, "Such IBAN already exist in our system!", null);
                 }
-
+                int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(createAccountDto.Currency.ToString());
+                if (currencyId <= 0)
+                {
+                    return (false, "Such Currency does not exist in our system!", null);
+                }
                 var account = new Account
                 {
                     PersonId = personId,
                     IBAN = createAccountDto.IBAN,
                     Amount = createAccountDto.Amount,
-                    CurrencyId = (int)createAccountDto.Currency
+                    CurrencyId = currencyId//(int)createAccountDto.Currency
                 };
 
                 int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);

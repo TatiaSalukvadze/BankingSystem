@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.Interfaces.IExternalServices
 {
-    public interface ICurrencyService
+    public interface IExchangeRateService
     {
         Task<decimal> GetCurrencyRateAsync(string fromCurrency, string toCurrency);
     }

@@ -55,13 +55,14 @@ namespace BankingSystem.API.Extensions
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICardRepository, CardRepository>();
             services.AddScoped<ITransactionDetailsRepository, TransactionDetailsRepository>();
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 
             return services;
         }
         public static IServiceCollection InjectExternalServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<CurrencyApiSettings>(configuration.GetSection("CurrencyApiSettings"));
-            services.AddHttpClient<ICurrencyService, CurrencyService>();
+            services.AddHttpClient<IExchangeRateService, ExchangeRateService>();
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddScoped<IEmailService, EmailService>();
 

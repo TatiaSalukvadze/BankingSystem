@@ -13,13 +13,13 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Infrastructure.ExternalServices
 {
-    public class CurrencyService : ICurrencyService
+    public class ExchangeRateService : IExchangeRateService
     {
         private readonly CurrencyApiSettings _currencyApiSettings;
         //private readonly string _apiKey = "2cd5220a1105f2545898dec2";
         //private readonly string _baseUrl = "https://v6.exchangerate-api.com/v6/";
         private readonly HttpClient _httpClient;
-        public CurrencyService(HttpClient httpClient, IOptions<CurrencyApiSettings> currencyApiSettings) {
+        public ExchangeRateService(HttpClient httpClient, IOptions<CurrencyApiSettings> currencyApiSettings) {
             _httpClient = httpClient;
             _currencyApiSettings = currencyApiSettings.Value;
         }

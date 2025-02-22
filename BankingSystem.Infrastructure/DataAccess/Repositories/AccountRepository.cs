@@ -65,8 +65,8 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             if (_connection != null && _transaction != null)
             {
                 var sql = @"
-                SELECT a.IBAN, a.CurrencyId AS Currency, a.Amount 
-                FROM Account AS a
+                SELECT a.IBAN, c.[Type] AS Currency, a.Amount 
+                FROM Account AS a JOIN CurrencyType as c ON c.Id = a.CurrencyId
                 WHERE @email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId);";
 
                 result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email }, _transaction)).ToList();
