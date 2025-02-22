@@ -28,7 +28,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             int id = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT TOP 1 Id FROM Currency WHERE Type = @type";
+                var sql = "SELECT TOP 1 Id FROM CurrencyType WHERE [Type] = @type";
                 id = await _connection.QueryFirstOrDefaultAsync<int>(sql, new { type }, _transaction);
             }
 
@@ -40,7 +40,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             string type = "";
             if (_connection != null && _transaction != null)
             {
-                var sql = "SELECT TOP 1 [Type] FROM Currency WHERE Id = @id";
+                var sql = "SELECT TOP 1 [Type] FROM CurrencyType WHERE Id = @id";
                 type = await _connection.QueryFirstOrDefaultAsync<string>(sql, new { id }, _transaction);
             }
             return (type is null)?"":type;

@@ -48,15 +48,15 @@ namespace BankingSystem.Application.Services
                     CurrencyId = currencyId//(int)createAccountDto.Currency
                 };
 
-                int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);
-                if (insertedId <= 0)
-                {
-                    return (false, "Account could not be created, something happened!", null);
-                }
-                account.Id = insertedId;
+            int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);
+            if (insertedId <= 0)
+            {
+                return (false, "Account could not be created, something happened!", null);
+            }
+            account.Id = insertedId;
 
-                _unitOfWork.SaveChanges();
-                return (true, "Account was created successfully!", account);
+            _unitOfWork.SaveChanges();
+            return (true, "Account was created successfully!", account);
 
         }
         //tamar

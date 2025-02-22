@@ -31,6 +31,7 @@ namespace BankingSystem.Infrastructure.DataAccess
             AccountRepository = accountRepository;
             CardRepository = cardRepository;
             TransactionDetailsRepository = transactionDetailsRepository;
+            CurrencyRepository = currencyRepository;
         }
         //private void RepoSetUp(IPersonRepository personRepository, IAccountRepository accountRepository,
         //   ICardRepository cardRepository,ITransactionDetailsRepository transactionDetailsRepository)
