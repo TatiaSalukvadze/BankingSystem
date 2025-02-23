@@ -50,6 +50,20 @@ namespace BankingSystem.API.Controllers.OnlineBank
             }
             return Ok(new { message, data });
         }
+
+        [HttpDelete("DeleteAccount")]
+        public async Task<IActionResult> DeleteAccount(string iban)
+        {
+            var (success, message) = await _accountService.DeleteAccountAsync(iban);
+
+            if (!success)
+            {
+                return NotFound(new { message }); 
+            }
+
+            return Ok(new { message }); 
+        }
+
         //tamar
         [HttpPost("CreateCard")]
         public async Task<IActionResult> CreateCard([FromForm] CreateCardDTO createCardDto)
