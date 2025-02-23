@@ -88,6 +88,12 @@ namespace BankingSystem.Application.Services
                 return (false, "Account not found.");
             }
 
+            var balance = await _unitOfWork.AccountRepository.GetBalanceByIBANAsync(iban);
+            if (balance > 0)
+            {
+                return (false, "Account cannot be deleted while it has a balance.");
+            }
+
             bool deleted = await _unitOfWork.AccountRepository.DeleteAccountByIBANAsync(iban);
             if (!deleted)
             {
@@ -95,7 +101,6 @@ namespace BankingSystem.Application.Services
             }
 
             _unitOfWork.SaveChanges();
-
             return (true, "Account deleted successfully.");
         }
 

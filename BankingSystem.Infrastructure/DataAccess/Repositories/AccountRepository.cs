@@ -110,6 +110,8 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return updated;
         }
 
+
+
         public async Task<bool> DeleteAccountByIBANAsync(string iban)
         {
             bool deleted = false;
@@ -123,6 +125,14 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return deleted;
         }
 
-
+        public async Task<decimal> GetBalanceByIBANAsync(string iban)
+        {
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "SELECT Amount FROM Account WHERE IBAN = @IBAN";
+                return await _connection.ExecuteScalarAsync<decimal>(sql, new { IBAN = iban }, _transaction);
+            }
+            return 0;
+        }
     }
 }

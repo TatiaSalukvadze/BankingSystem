@@ -42,10 +42,10 @@ namespace BankingSystem.Application.Services
                 return (false, "Invalid username!", null);
             }
 
-            if (!user.EmailConfirmed)
-            {
-                return (false, "Email is not confirmed. Please verify your email before logging in.", null);
-            }
+            //if (!user.EmailConfirmed)
+            //{
+            //    return (false, "Email is not confirmed. Please verify your email before logging in.", null);
+            //}
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password!, false);
             if (!result.Succeeded)
@@ -66,7 +66,6 @@ namespace BankingSystem.Application.Services
             var token = _authService.GenerateToken(user, role);
           
             return (true, "Login successful!", new { token, customUser });
-
         }
 
         //tatia
