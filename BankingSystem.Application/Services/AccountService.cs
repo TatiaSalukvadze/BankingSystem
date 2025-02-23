@@ -103,6 +103,5 @@ namespace BankingSystem.Application.Services
             _unitOfWork.SaveChanges();
             return (true, "Account deleted successfully.");
         }
-
     }
 }
