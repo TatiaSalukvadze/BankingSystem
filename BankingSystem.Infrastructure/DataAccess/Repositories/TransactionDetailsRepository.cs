@@ -95,11 +95,12 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             {
                 var sql = @"
                 SELECT 
-                    CurrencyId AS Currency,
-                    SUM(Amount) AS TotalWithdrawnAmount
-                FROM TransactionDetails
-                WHERE IsATM = 1
-                GROUP BY CurrencyId;";
+                    c.[Type] AS Currency,
+                    SUM(td.Amount) AS TotalWithdrawnAmount
+                FROM TransactionDetails td
+                JOIN CurrencyType c ON c.Id = td.CurrencyId
+                WHERE td.IsATM = 1
+                GROUP BY c.[Type];";
 
                 var result = await _connection.QueryAsync<AtmWithdrawDTO>(sql, transaction: _transaction);
                 return result.ToList();

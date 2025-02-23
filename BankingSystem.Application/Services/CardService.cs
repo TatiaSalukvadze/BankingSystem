@@ -6,6 +6,7 @@ using BankingSystem.Domain.Entities;
 using BankingSystem.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 
 namespace BankingSystem.Application.Services
 {
@@ -89,72 +90,116 @@ namespace BankingSystem.Application.Services
 
             var balance = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
 
-            if (balance is null || balance.Amount == 0 || balance.Currency == null)//?????
+            if (balance is null || balance.Amount == 0 || balance.Currency == 0)
             {
                 return (false, "Unable to retrieve balance.", null);
             }
          
-
             return (true, "Balance retrieved successfully.", balance);
         }
-
+        //tamar
         public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
         {
             var (cardValidated, message, card) = await CheckCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-            if (!cardValidated)
+            if (!cardValidated) return (false, message);
+
+            var (isBalanceValid, balanceMessage, balance) = await GetAccountBalanceAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
+            if (!isBalanceValid) return (false, balanceMessage);
+
+            var (withinLimit, limitMessage) = await IsWithinDailyLimitAsync(card.AccountId, withdrawalDto.Amount);
+            if (!withinLimit) return (false, limitMessage);
+
+            var (convertedAmount, conversionMessage) = await ConvertCurrencyIfNeededAsync(withdrawalDto.Amount, withdrawalDto.Currency, balance.Currency);
+            if (conversionMessage != null) return (false, conversionMessage);
+
+            decimal fee = CalculateWithdrawalFee(convertedAmount);
+            decimal totalAmountToDeduct = convertedAmount + fee;
+
+            if (balance.Amount < totalAmountToDeduct) return (false, "Not enough money.");
+
+            bool isBalanceUpdated = await _unitOfWork.CardRepository.UpdateAccountBalanceAsync(card.AccountId, totalAmountToDeduct);
+            if (!isBalanceUpdated) return (false, "Failed to update account balance.");
+
+            var (isTransactionCreated, transactionMessage) = await CreateTransactionAsync(card.AccountId, convertedAmount, fee, withdrawalDto.Currency);
+            if (!isTransactionCreated) return (false, transactionMessage);
+
+            return (true, "Withdrawal successful.");
+        }
+
+        //tamar
+        private async Task<(bool, string, SeeBalanceDTO balance)> GetAccountBalanceAsync(string cardNumber, string pin)
+        {
+            var balance = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
+            if (balance == null || balance.Currency == 0 || balance.Amount == 0)
             {
-                return (false, message);
+                return (false, "Unable to retrieve account balance.", null);
             }
 
-            if (withdrawalDto.Amount <= 0)
+            return (true, "", balance);
+        }
+
+        //tamar
+        private async Task<(bool, string)> IsWithinDailyLimitAsync(int accountId, decimal amount)
+        {
+            if (amount <= 0)
             {
                 return (false, "Withdrawal amount must be greater than zero.");
             }
 
-            var account = await _unitOfWork.CardRepository.GetBalanceAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-            if (account.Currency == 0 || account.Amount == null)//balance is null || ???????????????/
-            {
-                return (false, "Unable to retrieve account balance.");
-            }
+            decimal withdrawnAmount = await _unitOfWork.TransactionDetailsRepository.GetTotalWithdrawnAmountIn24Hours(accountId);
+            decimal newTotal = withdrawnAmount + amount;
 
-            decimal withdrawnAmountIn24Hours = await _unitOfWork.TransactionDetailsRepository.GetTotalWithdrawnAmountIn24Hours(card.AccountId);
-            if (withdrawnAmountIn24Hours + withdrawalDto.Amount > 10000)
+            if (newTotal > 10000)
             {
                 return (false, "You can't withdraw more than 10000 within 24 hours.");
             }
 
-            if (withdrawalDto.Currency != (CurrencyType)account.Currency)
-            {
-                decimal currencyRate = await _exchangeRateService.GetCurrencyRateAsync(
-                    withdrawalDto.Currency.ToString(), 
-                    ((CurrencyType)account.Currency).ToString()); 
+            return (true, "");
+        }
 
-                withdrawalDto.Amount = withdrawalDto.Amount * currencyRate;  
+        //tamar
+        private async Task<(decimal, string)> ConvertCurrencyIfNeededAsync(decimal amount, CurrencyType fromCurrency, CurrencyType toCurrency)
+        {
+            if (fromCurrency == toCurrency)
+            {
+                return (amount, null);
             }
 
+            decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency.ToString(), toCurrency.ToString());
+
+            if (exchangeRate <= 0)
+            {
+                return (0, "Currency conversion failed.");
+            }
+
+            decimal convertedAmount = amount * exchangeRate;
+            return (convertedAmount, null);
+        }
+
+        //tamar
+        private decimal CalculateWithdrawalFee(decimal amount)
+        {
             decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
+            var withdrawalFee = amount * (atmWithdrawalPercent / 100);
+            return withdrawalFee;
+        }
 
-            decimal fee = withdrawalDto.Amount * (atmWithdrawalPercent / 100); 
-            decimal totalAmountToDeduct = withdrawalDto.Amount + fee;
-
-            if (account.Amount < totalAmountToDeduct)
+        //tamar
+        private async Task<(bool, string)> CreateTransactionAsync(int accountId, decimal amount, decimal fee, CurrencyType currency)
+        {
+            int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(currency.ToString());
+            if (currencyId <= 0)
             {
-                return (false, "Not enough money.");
-            }
-
-            bool isBalanceUpdated = await _unitOfWork.CardRepository.UpdateAccountBalanceAsync(card.AccountId, totalAmountToDeduct);
-            if (!isBalanceUpdated)
-            {
-                return (false, "Failed to update account balance.");
+                return (false, "Currency does not exist in our system.");
             }
 
             var transaction = new TransactionDetails
             {
                 BankProfit = fee,
-                Amount = withdrawalDto.Amount,
-                FromAccountId = card.AccountId,
-                ToAccountId = card.AccountId,
-                CurrencyId = (int)withdrawalDto.Currency, // Set the selected currency
+                Amount = amount,
+                FromAccountId = accountId,
+                ToAccountId = accountId,
+                CurrencyId = currencyId,
                 IsATM = true
             };
 
@@ -165,12 +210,12 @@ namespace BankingSystem.Application.Services
             }
 
             transaction.Id = insertedId;
-
             _unitOfWork.SaveChanges();
-            return (true, "Withdrawal successful.");
+
+            return (true, "");
         }
 
-    
+
 
         //tatia
         public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)

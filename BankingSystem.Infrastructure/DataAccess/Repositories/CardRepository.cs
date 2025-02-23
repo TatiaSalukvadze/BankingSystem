@@ -84,7 +84,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<SeeBalanceDTO> GetBalanceAsync(string cardNumber, string pin)
         {
             var sql = @"
-            SELECT a.Amount, c.[Type]
+            SELECT a.Amount, c.[Type] as Currency
             FROM Card ca
             JOIN Account a ON ca.AccountId = a.Id
             JOIN CurrencyType as c ON c.Id = a.CurrencyId
@@ -93,7 +93,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
             var result = await _connection.QueryFirstOrDefaultAsync<SeeBalanceDTO>(sql, new { cardNumber, pin }, _transaction);
 
-            return result;// == default ? (0, null) : result;
+            return result;
         }
 
         public async Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct)
