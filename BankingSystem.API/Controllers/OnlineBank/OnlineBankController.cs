@@ -61,5 +61,16 @@ namespace BankingSystem.API.Controllers.OnlineBank
             }
             return Ok(new { message, data });
         }
+
+        [HttpDelete("Card")]
+        public async Task<IActionResult> CancelCard([FromForm] string cardNumber)
+        {
+            var (success, message) = await _cardService.CalcelCardAsync(cardNumber);
+            if (!success)
+            {
+                return BadRequest(message);
+            }
+            return Ok(new { message });
+        }
     }
 }

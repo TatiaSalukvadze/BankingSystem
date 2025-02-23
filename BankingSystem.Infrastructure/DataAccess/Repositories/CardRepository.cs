@@ -45,7 +45,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result;
         }
 
-        public async Task<bool> CardNumberExists(string cardNumber)
+        public async Task<bool> CardNumberExistsAsync(string cardNumber)
         {
             bool exists = false;
             if (_connection != null && _transaction != null)
@@ -106,6 +106,18 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             var result = await _connection.ExecuteAsync(sql, new { AccountId = accountId, TotalAmountToDeduct = totalAmountToDeduct }, _transaction);
 
             return result > 0;
+        }
+
+        public async Task<bool> CalcelCardAsync(string cardNumber)
+        {
+            bool deleted = false;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "DELETE FROM Card WHERE CardNumber = @cardNumber";
+                int rowsAffected = await _connection.ExecuteAsync(sql, new { cardNumber }, _transaction);
+                if (rowsAffected > 0) { deleted = true; }
+            }
+            return deleted;
         }
     }
 }
