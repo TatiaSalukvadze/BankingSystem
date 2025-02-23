@@ -123,6 +123,22 @@ namespace BankingSystem.Application.Services
 
         }
 
+        public async Task<(bool Success, string Message)> ConfirmEmailAsync(string email, string token)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return (false, "Email confirmation request is invalid, user was not found!");
+            }
+
+            var confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
+            if (!confirmEmail.Succeeded)
+            {
+                return (false, "Email confirmation request is invalid!");
+            }
+            return (true, "Email was successfully confirmed!");
+        }
+
 
         public async Task<(bool Success, string Message)> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO)
         {
@@ -141,7 +157,7 @@ namespace BankingSystem.Application.Services
 
             var url = QueryHelpers.AddQueryString(forgotPasswordDTO.ClientUrl, tokenEmail);
             await _emailService.SendEmailPlaint(forgotPasswordDTO.Email, "Reset password token", url);
-
+            return (true, "Reset password!");
         }
 
         public async Task<(bool Success, string Message)> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)

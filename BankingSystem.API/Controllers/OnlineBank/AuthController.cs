@@ -10,7 +10,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         private readonly IPersonService _personService;
         private readonly IIdentityService _identityService;
 
-        public AuthController(IPersonService personService)
+        public AuthController(IPersonService personService, IIdentityService identityService)
         {
             _personService = personService;
             _identityService = identityService;
@@ -20,7 +20,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromForm] LoginDTO loginDto)
         {
-            var (success, message, data) = await _personService.LoginPersonAsync(loginDto);
+            var (success, message, data) = await _identityService.LoginPersonAsync(loginDto);
 
             if (!success)
             {
