@@ -12,6 +12,6 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<bool> UpdateCardAsync(int cardId, string newPIN);
         Task<SeeBalanceDTO> GetBalanceAsync(string cardNumber, string pin);
         Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct);
-        Task<bool> CalcelCardAsync(string cardNumber);
+        Task<bool> DeleteCardAsync(string cardNumber);
     }
 }

@@ -108,7 +108,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result > 0;
         }
 
-        public async Task<bool> CalcelCardAsync(string cardNumber)
+        public async Task<bool> DeleteCardAsync(string cardNumber)
         {
             bool deleted = false;
             if (_connection != null && _transaction != null)

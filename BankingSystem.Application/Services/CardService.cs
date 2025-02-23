@@ -273,7 +273,7 @@ namespace BankingSystem.Application.Services
             return true;
         }
 
-        public async Task<(bool success, string message)> CalcelCardAsync(string cardNumber)
+        public async Task<(bool success, string message)> CancelCardAsync(string cardNumber)
         {
             var cardExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(cardNumber);
             if (!cardExists)
@@ -281,7 +281,7 @@ namespace BankingSystem.Application.Services
                 return (false, "There is no Card for that Card Number!");
             }
 
-            var cardDeleted = await _unitOfWork.CardRepository.CalcelCardAsync(cardNumber);
+            var cardDeleted = await _unitOfWork.CardRepository.DeleteCardAsync(cardNumber);
             if (!cardDeleted)
             {
                 return (false, "Card could not be canceled!");

@@ -11,6 +11,6 @@ namespace BankingSystem.Contracts.Interfaces.IServices
         Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(string cardNumber, string pin);
         Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto);
         Task<(bool success, string message)> ChangeCardPINAsync(ChangeCardPINDTO changeCardDtp);
-        Task<(bool success, string message)> CalcelCardAsync(string cardNumber);
+        Task<(bool success, string message)> CancelCardAsync(string cardNumber);
     }
 }
