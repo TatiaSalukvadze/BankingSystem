@@ -91,35 +91,30 @@ namespace BankingSystem.Application.Services
             {
                 return (false, "Adding user corresponding role  in system failed!", null);
             }
-            //var person = new Person
-            //{
-            //    IdentityUserId = user.Id,
-            //    Name = registerDto.Name,
-            //    Surname = registerDto.Surname,
-            //    IDNumber = registerDto.IDNumber,
-            //    Birthdate = registerDto.Birthdate,
-            //    Email = registerDto.Email,
-            //    CreatedAt = DateTime.Now
 
+
+            //var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            //var tokenEmail = new Dictionary<string, string?>()
+            //{
+            //    {"email", registerDto.Email},
+            //    {"token", token }
             //};
-
-            //var userId = await _unitOfWork.PersonRepository.RegisterPersonAsync(person);
-            //if (userId <= 0)
-            //{
-            //    return (false, "Adding user in physical person system failed!", null);
-            //}
-            //_unitOfWork.SaveChanges();
-
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var tokenEmail = new Dictionary<string, string?>()
-            {
-                {"email", registerDto.Email},
-                {"token", token }
-            };
-            var verificationUrl = QueryHelpers.AddQueryString(registerDto.ClientUrl!, tokenEmail);
-            await _emailService.SendEmailPlaint(registerDto.Email, "Email Confirmation Token", verificationUrl);
+            //var verificationUrl = QueryHelpers.AddQueryString(registerDto.ClientUrl!, tokenEmail);
+            //await _emailService.SendEmailPlaint(registerDto.Email, "Email Confirmation Token", verificationUrl);
+            await GenerateEmailConfirmationTokenAsync(user, registerDto.Email, registerDto.ClientUrl);
             return (true, "User was registered successfully!",  user.Id );
 
+            async Task GenerateEmailConfirmationTokenAsync(IdentityUser identityUser, string email, string ClientUrl)
+            {
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
+                var tokenEmail = new Dictionary<string, string?>()
+                {
+                    {"email", email},
+                    {"token", token }
+                };
+                var verificationUrl = QueryHelpers.AddQueryString(ClientUrl!, tokenEmail);
+                await _emailService.SendEmailPlaint(email, "Email Confirmation Token", verificationUrl);
+            }
 
         }
 

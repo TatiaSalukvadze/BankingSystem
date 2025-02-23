@@ -31,7 +31,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         }
         //tatia
         //https://fusionauth.io/dev-tools/url-encoder-decoder used for decode
-        [HttpPost("emailConfirmation")]
+        [HttpPost("EmailConfirmation")]
         public async Task<IActionResult> EmailConfirmation([FromQuery] string email, [FromQuery] string token)
         {
             var (success, message) = await _identityService.ConfirmEmailAsync(email, token);

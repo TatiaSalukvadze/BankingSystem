@@ -32,7 +32,7 @@ namespace BankingSystem.Application.Services
                     return (false, "Account does not exist in the system!", null);
                 }
 
-                bool cardNumberExists = await _unitOfWork.CardRepository.CardNumberExists(createCardDto.CardNumber);
+                bool cardNumberExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(createCardDto.CardNumber);
                 if (cardNumberExists)
                 {
                     return (false, "Card number already exists!", null);
@@ -234,7 +234,7 @@ namespace BankingSystem.Application.Services
             _unitOfWork.SaveChanges();
             return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
         }
-        //tamar
+        //both
         private async Task<(bool success, string message, Card card)> CheckCardAsync(string CardNumber, string PIN)
         {
             Card card = await _unitOfWork.CardRepository.GetCardAsync(CardNumber);
@@ -271,6 +271,23 @@ namespace BankingSystem.Application.Services
                 return false;
             }
             return true;
+        }
+
+        public async Task<(bool success, string message)> CalcelCardAsync(string cardNumber)
+        {
+            var cardExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(cardNumber);
+            if (!cardExists)
+            {
+                return (false, "There is no Card for that Card Number!");
+            }
+
+            var cardDeleted = await _unitOfWork.CardRepository.CalcelCardAsync(cardNumber);
+            if (!cardDeleted)
+            {
+                return (false, "Card could not be canceled!");
+            }
+            _unitOfWork.SaveChanges();
+            return (true, "Card was successfully canceled!");
         }
     }
 }
