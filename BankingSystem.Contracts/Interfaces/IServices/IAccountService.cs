@@ -12,5 +12,6 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     {
         Task<(bool Success, string Message, Account? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto);
         Task<(bool success, string message, List<SeeAccountsDTO>? data)> SeeAccountsAsync(string email);
+        Task<(bool success, string message)> DeleteAccountAsync(string iban);
     }
 }

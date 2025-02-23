@@ -17,5 +17,6 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<int> CreateAccountAsync(Account account);
         Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email);
         Task<bool> UpdateAccountAmountAsync(int id,decimal amount);
+        Task<bool> DeleteAccountByIBANAsync(string iban);
     }
 }

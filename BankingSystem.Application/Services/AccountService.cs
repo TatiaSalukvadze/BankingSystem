@@ -62,23 +62,42 @@ namespace BankingSystem.Application.Services
         //tamar
         public async Task<(bool success, string message, List<SeeAccountsDTO>? data)> SeeAccountsAsync(string email)
         {
+            bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
 
-                bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
+            if (!accountsExist)
+            {
+                return (true, "You don't have any accounts!", null);
+            }
 
-                if (!accountsExist)
-                {
-                    return (true, "You don't have any accounts!", null);
-                }
+            var accounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email);
 
-                var accounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email);
+            if (accounts == null || accounts.Count == 0)
+            {
+                return (true, "No accounts found!", null);
+            }
 
-                if (accounts == null || accounts.Count == 0)
-                {
-                    return (true, "No accounts found!", null);
-                }
-
-                return (true, "Accounts retrieved successfully!", accounts);
-
+            return (true, "Accounts retrieved successfully!", accounts);
         }
+
+        //tamar
+        public async Task<(bool success, string message)> DeleteAccountAsync(string iban)
+        {
+            bool exists = await _unitOfWork.AccountRepository.IBANExists(iban);
+            if (!exists)
+            {
+                return (false, "Account not found.");
+            }
+
+            bool deleted = await _unitOfWork.AccountRepository.DeleteAccountByIBANAsync(iban);
+            if (!deleted)
+            {
+                return (false, "Failed to delete account.");
+            }
+
+            _unitOfWork.SaveChanges();
+
+            return (true, "Account deleted successfully.");
+        }
+
     }
 }

@@ -109,5 +109,20 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return updated;
         }
+
+        public async Task<bool> DeleteAccountByIBANAsync(string iban)
+        {
+            bool deleted = false;
+            if (_connection != null && _transaction != null)
+            {
+                var sql = "DELETE FROM Account WHERE IBAN = @IBAN";
+                var rowsAffected = await _connection.ExecuteAsync(sql, new { IBAN = iban }, _transaction);
+                deleted = rowsAffected > 0;
+            }
+
+            return deleted;
+        }
+
+
     }
 }

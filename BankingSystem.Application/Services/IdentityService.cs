@@ -33,16 +33,18 @@ namespace BankingSystem.Application.Services
             _emailService = emailService;
         }
 
-
         //tamar
         public async Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto)
         {
-            //confirm email
-
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username!.ToLower());
             if (user == null)
             {
                 return (false, "Invalid username!", null);
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                return (false, "Email is not confirmed. Please verify your email before logging in.", null);
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password!, false);
@@ -119,8 +121,6 @@ namespace BankingSystem.Application.Services
             var verificationUrl = QueryHelpers.AddQueryString(registerDto.ClientUrl!, tokenEmail);
             await _emailService.SendEmailPlaint(registerDto.Email, "Email Confirmation Token", verificationUrl);
             return (true, "User was registered successfully!",  user.Id );
-
-
         }
 
         public async Task<(bool Success, string Message)> ConfirmEmailAsync(string email, string token)
@@ -157,7 +157,7 @@ namespace BankingSystem.Application.Services
 
             var url = QueryHelpers.AddQueryString(forgotPasswordDTO.ClientUrl, tokenEmail);
             await _emailService.SendEmailPlaint(forgotPasswordDTO.Email, "Reset password token", url);
-            return (true, "Reset password!");
+            return (true, "Check email to reset password!");
         }
 
         public async Task<(bool Success, string Message)> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
@@ -176,7 +176,5 @@ namespace BankingSystem.Application.Services
 
             return (true, "Password reset successful!");
         }
-
-
     }
 }
