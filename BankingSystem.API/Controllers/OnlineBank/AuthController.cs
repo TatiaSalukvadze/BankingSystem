@@ -8,10 +8,12 @@ namespace BankingSystem.API.Controllers.OnlineBank
     public class AuthController : WrapperController
     {
         private readonly IPersonService _personService;
+        private readonly IIdentityService _identityService;
 
-        public AuthController(IPersonService personService)
+        public AuthController(IPersonService personService, IIdentityService identityService)
         {
             _personService = personService;
+            _identityService = identityService;
         }
 
         //tamar
@@ -26,6 +28,32 @@ namespace BankingSystem.API.Controllers.OnlineBank
             }
 
             return Ok(new { message, data });
+        }
+
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromForm] ForgotPasswordDTO forgotPasswordDTO)
+        {
+            var (success, message) = await _identityService.ForgotPasswordAsync(forgotPasswordDTO);
+
+            if (!success)
+            {
+                return BadRequest(message);
+            }
+
+            return Ok(new { message });
+        }
+
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordDTO resetPasswordDTO)
+        {
+            var (success, message) = await _identityService.ResetPasswordAsync(resetPasswordDTO);
+
+            if (!success)
+            {
+                return BadRequest(message);
+            }
+
+            return Ok(new { message });
         }
 
     }

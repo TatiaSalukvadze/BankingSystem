@@ -36,6 +36,7 @@ namespace BankingSystem.Application.Services
         //tamar
         public async Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto)
         {
+            //confirm email
 
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username!.ToLower());
             if (user == null)
@@ -53,9 +54,14 @@ namespace BankingSystem.Application.Services
             var role = roles.FirstOrDefault() ?? "";
 
             var customUser = await _unitOfWork.PersonRepository.FindByIdentityIdAsync(user.Id);
-            var token = _authService.GenerateToken(user, role);
 
-            _unitOfWork.SaveChanges();
+            if (role == "User" && customUser == null)
+            {
+                return (false, "Custom user data not found for this account!", null);
+            }
+
+            var token = _authService.GenerateToken(user, role);
+          
             return (true, "Login successful!", new { token, customUser });
 
         }
@@ -108,13 +114,53 @@ namespace BankingSystem.Application.Services
             {
                 
             };
-            var verificationUrl = QueryHelpers.AddQueryString
-                //$"https://yourapi.com/verify-email?email={email}&token={token}";
-            await _emailService.SendEmailPlaint(person.Email, "Registration", "Your were registered successfully!");
+            //var verificationUrl = QueryHelpers.AddQueryString
+            //    //$"https://yourapi.com/verify-email?email={email}&token={token}";
+            //await _emailService.SendEmailPlaint(person.Email, "Registration", "Your were registered successfully!");
             return (true, "User was registered successfully!", new { IdentityUserId = user.Id, CustomUserId = userId });
 
 
         }
+
+
+        public async Task<(bool Success, string Message)> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO)
+        {
+            var user = await _userManager.FindByEmailAsync(forgotPasswordDTO.Email);
+            if (user == null)
+            {
+                return (false, "User not found!");
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var tokenEmail = new Dictionary<string, string>()
+            {
+                { "email", forgotPasswordDTO.Email },
+                { "token", token }
+            };
+
+            var url = QueryHelpers.AddQueryString(forgotPasswordDTO.ClientUrl, tokenEmail);
+            await _emailService.SendEmailPlaint(forgotPasswordDTO.Email, "Reset password token", url);
+
+            return (true, "Password reset email sent!");
+        }
+
+        public async Task<(bool Success, string Message)> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
+        {
+            var user = await _userManager.FindByEmailAsync(resetPasswordDTO.Email);
+            if (user == null)
+            {
+                return (false, "User not found!");
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, resetPasswordDTO.Token, resetPasswordDTO.Password);
+            if (!result.Succeeded)
+            {
+                return (false, "Password reset failed! Please try again.");
+            }
+
+            return (true, "Password reset successful!");
+        }
+
 
     }
 }

@@ -20,6 +20,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             _accountService = accountService;
             _cardService = cardService;
         }
+
         //tatia
         [HttpPost("RegisterPerson")]
         public async Task<IActionResult> RegisterPerson([FromForm] RegisterPersonDTO registerDto)

@@ -11,5 +11,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     {
         Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto);
         Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto);
+        Task<(bool Success, string Message)> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO);
+        Task<(bool Success, string Message)> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
     }
 }
