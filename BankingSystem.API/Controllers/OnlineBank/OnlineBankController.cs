@@ -7,29 +7,37 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.OnlineBank
 {
-    [Authorize(policy: "OperatorOnly")]
+    //[Authorize(policy: "OperatorOnly")]
     public class OnlineBankController : WrapperController
     {
         private readonly IPersonService _personService;
         private readonly IAccountService _accountService;
         private readonly ICardService _cardService;
+        private readonly IIdentityService _identityService;
 
-        public OnlineBankController(IPersonService personService, IAccountService accountService, ICardService cardService)
+        public OnlineBankController(IPersonService personService, IAccountService accountService, 
+            ICardService cardService, IIdentityService identityService)
         {
             _personService = personService;
             _accountService = accountService;
             _cardService = cardService;
+            _identityService = identityService;
         }
 
         //tatia
         [HttpPost("RegisterPerson")]
         public async Task<IActionResult> RegisterPerson([FromForm] RegisterPersonDTO registerDto)
         {
-            var (success, message, data) = await _personService.RegisterPersonAsync(registerDto);
+            var (success, message, data) = await _identityService.RegisterPersonAsync(registerDto);
             if (!success) {
                 return BadRequest(message);
             }
-            return Ok(new {message, data});
+            var (finalSuccess, finalMessage, finalData) = await _personService.RegisterCustomPersonAsync(registerDto, data);
+            if (!finalSuccess)
+            {
+                return BadRequest(finalMessage);
+            }
+            return Ok(new { finalMessage, finalData });
         }
         //tatia
         [HttpPost("CreateAccount")]

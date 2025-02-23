@@ -33,6 +33,7 @@ namespace BankingSystem.Application.Services
             _emailService = emailService;
         }
 
+
         //tamar
         public async Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto)
         {
@@ -67,7 +68,7 @@ namespace BankingSystem.Application.Services
         }
 
         //tatia
-        public async Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto)
+        public async Task<(bool Success, string Message, string? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto)
         {
 
             var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
@@ -109,15 +110,15 @@ namespace BankingSystem.Application.Services
             //}
             //_unitOfWork.SaveChanges();
 
-            var token = _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var tokenEmail = new Dictionary<string, string>()
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var tokenEmail = new Dictionary<string, string?>()
             {
-                
+                {"email", registerDto.Email},
+                {"token", token }
             };
-            //var verificationUrl = QueryHelpers.AddQueryString
-            //    //$"https://yourapi.com/verify-email?email={email}&token={token}";
-            //await _emailService.SendEmailPlaint(person.Email, "Registration", "Your were registered successfully!");
-            return (true, "User was registered successfully!", new { IdentityUserId = user.Id, CustomUserId = userId });
+            var verificationUrl = QueryHelpers.AddQueryString(registerDto.ClientUrl!, tokenEmail);
+            await _emailService.SendEmailPlaint(registerDto.Email, "Email Confirmation Token", verificationUrl);
+            return (true, "User was registered successfully!",  user.Id );
 
 
         }
@@ -141,7 +142,6 @@ namespace BankingSystem.Application.Services
             var url = QueryHelpers.AddQueryString(forgotPasswordDTO.ClientUrl, tokenEmail);
             await _emailService.SendEmailPlaint(forgotPasswordDTO.Email, "Reset password token", url);
 
-            return (true, "Password reset email sent!");
         }
 
         public async Task<(bool Success, string Message)> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
