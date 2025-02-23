@@ -28,5 +28,7 @@ namespace BankingSystem.Contracts.DTOs
 
         [Required]
         public string Password { get; set; }
+
+        public string ClientUrl { get; set; }   
     }
 }

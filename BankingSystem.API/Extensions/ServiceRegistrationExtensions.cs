@@ -45,6 +45,7 @@ namespace BankingSystem.API.Extensions
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICardService, CardService>();
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IIdentityService, IdentityService>();
 
             return services;
         }
