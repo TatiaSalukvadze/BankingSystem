@@ -33,6 +33,7 @@ namespace BankingSystem.Application.Services
             _emailService = emailService;
         }
 
+
         //tamar
         public async Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto)
         {
@@ -61,7 +62,7 @@ namespace BankingSystem.Application.Services
         }
 
         //tatia
-        public async Task<(bool Success, string Message, object? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto)
+        public async Task<(bool Success, string Message, string? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto)
         {
 
             var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
@@ -103,17 +104,29 @@ namespace BankingSystem.Application.Services
             //}
             //_unitOfWork.SaveChanges();
 
-            var token = _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var tokenEmail = new Dictionary<string, string>()
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var tokenEmail = new Dictionary<string, string?>()
             {
-                
+                {"email", registerDto.Email},
+                {"token", token }
             };
-            var verificationUrl = QueryHelpers.AddQueryString
-                //$"https://yourapi.com/verify-email?email={email}&token={token}";
-            await _emailService.SendEmailPlaint(person.Email, "Registration", "Your were registered successfully!");
-            return (true, "User was registered successfully!", new { IdentityUserId = user.Id, CustomUserId = userId });
+            var verificationUrl = QueryHelpers.AddQueryString(registerDto.ClientUrl!, tokenEmail);
+            await _emailService.SendEmailPlaint(registerDto.Email, "Email Confirmation Token", verificationUrl);
+            return (true, "User was registered successfully!",  user.Id );
 
+        }
+        public async Task<(bool Success, string Message)> ConfirmEmailAsync(string email, string token)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) {
+                return (false, "Email confirmation request is invalid, user was not found!");
+            }
 
+            var confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
+            if (!confirmEmail.Succeeded) {
+                return (false, "Email confirmation request is invalid!");
+            }
+            return (true, "Email was successfully confirmed!");
         }
 
     }

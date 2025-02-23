@@ -18,7 +18,7 @@ namespace BankingSystem.API.Extensions
                 options.Password.RequireUppercase = true;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequiredLength = 8;
-            }).AddEntityFrameworkStores<ApplicationDbContext>();
+            }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders(); 
             services.AddTransient<DataSeeder>();
 
             return services;
