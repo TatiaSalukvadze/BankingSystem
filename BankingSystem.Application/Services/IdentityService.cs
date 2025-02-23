@@ -119,15 +119,16 @@ namespace BankingSystem.Application.Services
 
         }
 
-        public async Task<(bool Success, string Message)> ConfirmEmailAsync(string email, string token)
+        public async Task<(bool Success, string Message)> ConfirmEmailAsync(EmailConfirmationDTO emailConfirmationDto)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(emailConfirmationDto.Email);
+
             if (user == null)
             {
                 return (false, "Email confirmation request is invalid, user was not found!");
             }
 
-            var confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
+            var confirmEmail = await _userManager.ConfirmEmailAsync(user, emailConfirmationDto.Token);
             if (!confirmEmail.Succeeded)
             {
                 return (false, "Email confirmation request is invalid!");
