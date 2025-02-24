@@ -8,7 +8,7 @@ namespace BankingSystem.Contracts.DTOs
 {
     public class IncomeExpenseDTO
     {
-        public decimal Income { get; set; }
-        public decimal Expense { get; set; }
+        public Dictionary<string,decimal> Income { get; set; }
+        public Dictionary<string, decimal> Expense { get; set; }
     }
 }

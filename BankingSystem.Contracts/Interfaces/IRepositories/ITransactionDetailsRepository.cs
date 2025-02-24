@@ -12,7 +12,7 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<Dictionary<string, decimal>>  AverageBankProfitAsyncAsync();
         Task<List<BankProfitDTO>> GetBankProfitByTimePeriodAsync();
         Task<List<AtmWithdrawDTO>> GetTotalAtmWithdrawalsAsync();
-        Task<decimal> GetTotalIncomeAsync(DateTime fromTime, DateTime toTime);
-        Task<decimal> GetTotalExpenseAsync(DateTime fromTime, DateTime toTime);
+        Task<Dictionary<string, decimal>> GetTotalIncomeAsync(DateTime fromTime, DateTime toTime, string email);
+        Task<Dictionary<string, decimal>> GetTotalExpenseAsync(DateTime fromTime, DateTime toTime, string email);
     }
 }

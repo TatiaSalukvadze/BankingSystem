@@ -86,7 +86,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> TotalIncomeExpense([FromQuery] DateRangeDTO dateRangeDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _transactionService.TotalIncomeExpenseAsync(dateRangeDto);
+            var (success, message, data) = await _transactionService.TotalIncomeExpenseAsync(dateRangeDto, userEmail);
             if (!success)
             {
                 return BadRequest(message);

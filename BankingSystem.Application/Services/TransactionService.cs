@@ -214,7 +214,7 @@ namespace BankingSystem.Application.Services
             return (false, "No ATM withdrawal data found.", null);
         }
 
-        public async Task<(bool Success, string Message, IncomeExpenseDTO Data)> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto)
+        public async Task<(bool Success, string Message, IncomeExpenseDTO Data)> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto, string email)
         {
             var exactNow = DateTime.Now;
             var now = new DateTime(exactNow.Year, exactNow.Month, exactNow.Day, exactNow.Hour, exactNow.Minute, 0, exactNow.Kind);
