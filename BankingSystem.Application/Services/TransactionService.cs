@@ -86,6 +86,10 @@ namespace BankingSystem.Application.Services
         private async Task<(bool Validated, string Message, Account from, Account to)> ValidateAccountsAsync(string fromIBAN,
             string toIBAN, string email, bool isSelfTransfer)
         {
+            if (fromIBAN == toIBAN)
+            {
+                return (false, "You can't transfer to same account!", null, null);
+            }
             var fromAccount = await _accountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
             Account toAccount;
             if (isSelfTransfer)
