@@ -166,7 +166,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                     JOIN CurrencyType ct ON ct.Id = td.CurrencyId
                     JOIN Person p ON p.Id = a.PersonId
                     WHERE td.IsATM = 0 AND td.FromAccountId != td.ToAccountId 	
-                        AND td.PerformedAt >= @fromDate-- AND td.PerformedAt <= @toDate
+                        AND td.PerformedAt >= @fromDate AND td.PerformedAt <= @toDate
 	                    AND p.Email = @Email
                     GROUP BY ct.Type;";
                 var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql,
