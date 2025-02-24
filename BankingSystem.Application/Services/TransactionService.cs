@@ -226,7 +226,7 @@ namespace BankingSystem.Application.Services
             {
                 return (false, "Provide correct time, toDate cannot be yearlier than fromDate!", null);
             }
-
+            var expenses = _unitOfWork.TransactionDetailsRepository.GetTotalExpenseAsync(dateRangeDto, email);
             return (true, "Income and Expense retreived!", null);
             //    async Task CheckDates(DateRangeDTO dateRangeDto)
             //{

@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace BankingSystem.API.Controllers.OnlineBank
 {
-    //[Authorize(policy: "UserOnly")]
+    [Authorize(policy: "UserOnly")]
     [Route("/OnlineBank/[controller]")]
     public class UserBankingController : WrapperController
     {

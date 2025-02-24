@@ -154,18 +154,17 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result;
         }
 
-        public async Task<Dictionary<string, decimal>> GetTotalIncomeAsync(DateTime fromTime, DateTime toTime, string email)
+        public async Task<Dictionary<string, decimal>> GetTotalIncomeAsync(DateRangeDTO dateRangeDto, string email)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Dictionary<string, decimal>> GetTotalExpenseAsync(DateTime fromTime, DateTime toTime, string email)
+        public async Task<Dictionary<string, decimal>> GetTotalExpenseAsync(DateRangeDTO dateRangeDto, string email)
         {
             var result = new Dictionary<string, decimal>();
             if (_connection != null && _transaction != null)
             {
-                var sql = @"SELECT c.Type, ISNULL(AVG(BankProfit), 0) AS AverageProfit FROM TransactionDetails AS t 
-                    RIGHT JOIN CurrencyType AS c ON c.Id = t.CurrencyId GROUP BY c.Type";
+                var sql = @"";
                 var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql, transaction: _transaction);
                 result = sqlResult.ToDictionary(row => row.Item1, row => row.Item2);
 
