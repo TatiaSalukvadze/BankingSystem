@@ -213,9 +213,10 @@ namespace BankingSystem.Application.Services
 
             return (false, "No ATM withdrawal data found.", null);
         }
-
+        //both
         public async Task<(bool Success, string Message, IncomeExpenseDTO Data)> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto, string email)
         {
+
             var exactNow = DateTime.Now;
             var now = new DateTime(exactNow.Year, exactNow.Month, exactNow.Day, exactNow.Hour, exactNow.Minute, 0, exactNow.Kind);
             if (dateRangeDto.FromDate >= now || dateRangeDto.ToDate > now)
@@ -226,12 +227,15 @@ namespace BankingSystem.Application.Services
             {
                 return (false, "Provide correct time, toDate cannot be yearlier than fromDate!", null);
             }
-            var expenses = _unitOfWork.TransactionDetailsRepository.GetTotalExpenseAsync(dateRangeDto, email);
-            return (true, "Income and Expense retreived!", null);
-            //    async Task CheckDates(DateRangeDTO dateRangeDto)
-            //{
-            //    if(dateRangeDto.FromDate > DateOnly.FromDateTime(DateTime.Now))
-            //}
+            var income = await _unitOfWork.TransactionDetailsRepository.GetTotalIncomeAsync(dateRangeDto.FromDate, dateRangeDto.ToDate, email);
+            var expense = await _unitOfWork.TransactionDetailsRepository.GetTotalExpenseAsync(dateRangeDto.FromDate, dateRangeDto.ToDate, email);
+            var incomeExpense = new IncomeExpenseDTO
+            {
+                Income = income,
+                Expense = expense
+            };
+            return (true, "Income and Expense retreived!", incomeExpense);
+
         }
     }
 }

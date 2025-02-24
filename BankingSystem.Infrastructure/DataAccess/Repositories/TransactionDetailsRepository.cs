@@ -154,22 +154,34 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result;
         }
 
-        public async Task<Dictionary<string, decimal>> GetTotalIncomeAsync(DateRangeDTO dateRangeDto, string email)
+        public async Task<Dictionary<string, decimal>> GetTotalIncomeAsync(DateTime fromDate, DateTime toDate, string email)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Dictionary<string, decimal>> GetTotalExpenseAsync(DateRangeDTO dateRangeDto, string email)
+        public async Task<Dictionary<string, decimal>> GetTotalExpenseAsync(DateTime fromDate, DateTime toDate, string email)
         {
             var result = new Dictionary<string, decimal>();
+
             if (_connection != null && _transaction != null)
             {
-                var sql = @"";
-                var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql, transaction: _transaction);
+                var sql = @"  SELECT ct.[Type], ISNULL(SUM(td.BankProfit + td.Amount),0) 
+                            FROM TransactionDetails AS td 
+                              RIGHT JOIN Account AS a ON td.FromAccountId = a.Id
+                              RIGHT JOIN Person AS p ON p.Id = a.PersonId 
+                              JOIN CurrencyType AS ct ON ct.Id = td.CurrencyId
+                              WHERE p.Email = @email AND 
+                              td.PerformedAt >= @fromDate-- AND td.PerformedAt <= @toDate
+                              GROUP BY ct.[Type]";
+                var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql,
+                    new { email, fromDate, toDate }, transaction: _transaction);
                 result = sqlResult.ToDictionary(row => row.Item1, row => row.Item2);
 
             }
-
+            if (result.Count <= 0)
+            {
+                result.Add("TotalExpense", 0);
+            }
             return result;
         }
     }
