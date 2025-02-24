@@ -12,5 +12,6 @@ namespace BankingSystem.Contracts.Interfaces.IServices
         Task<(bool Success, string Message, Dictionary<string, decimal> Data)> AverageBankProfitAsync();
         Task<(bool Success, string Message, List<BankProfitDTO> Data)> GetBankProfitByTimePeriodAsync();
         Task<(bool Success, string Message, List<AtmWithdrawDTO> Data)> GetTotalAtmWithdrawalsAsync();
+        Task<(bool Success, string Message, IncomeExpenseDTO Data)> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDTO);
     }
 }

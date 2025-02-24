@@ -153,5 +153,15 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
             return result;
         }
+
+        public async Task<decimal> GetTotalIncomeAsync(DateTime fromTime, DateTime toTime)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<decimal> GetTotalExpenseAsync(DateTime fromTime, DateTime toTime)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

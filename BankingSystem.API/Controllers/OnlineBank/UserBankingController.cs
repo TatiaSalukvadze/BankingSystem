@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace BankingSystem.API.Controllers.OnlineBank
 {
-    [Authorize(policy: "UserOnly")]
+    //[Authorize(policy: "UserOnly")]
     [Route("/OnlineBank/[controller]")]
     public class UserBankingController : WrapperController
     {
@@ -75,6 +75,18 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
+            if (!success)
+            {
+                return BadRequest(message);
+            }
+            return Ok(new { message, data });
+        }
+
+        [HttpGet("TotalIncomeExpense")]
+        public async Task<IActionResult> TotalIncomeExpense([FromQuery] DateRangeDTO dateRangeDto)
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Name);
+            var (success, message, data) = await _transactionService.TotalIncomeExpenseAsync(dateRangeDto);
             if (!success)
             {
                 return BadRequest(message);

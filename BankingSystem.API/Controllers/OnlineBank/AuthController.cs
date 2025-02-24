@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.OnlineBank
 {
-    [Route("OnlineBank")]
+    [Route("OnlineBank/[Controller]")]
     public class AuthController : WrapperController
     {
         private readonly IPersonService _personService;

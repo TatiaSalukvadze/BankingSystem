@@ -213,5 +213,25 @@ namespace BankingSystem.Application.Services
 
             return (false, "No ATM withdrawal data found.", null);
         }
+
+        public async Task<(bool Success, string Message, IncomeExpenseDTO Data)> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto)
+        {
+            var exactNow = DateTime.Now;
+            var now = new DateTime(exactNow.Year, exactNow.Month, exactNow.Day, exactNow.Hour, exactNow.Minute, 0, exactNow.Kind);
+            if (dateRangeDto.FromDate >= now || dateRangeDto.ToDate > now)
+            {
+                return (false, "Provide correct time, not future time!", null);
+            }
+            if(dateRangeDto.ToDate <= dateRangeDto.FromDate)
+            {
+                return (false, "Provide correct time, toDate cannot be yearlier than fromDate!", null);
+            }
+
+            return (true, "Income and Expense retreived!", null);
+            //    async Task CheckDates(DateRangeDTO dateRangeDto)
+            //{
+            //    if(dateRangeDto.FromDate > DateOnly.FromDateTime(DateTime.Now))
+            //}
+        }
     }
 }
