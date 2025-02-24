@@ -188,12 +188,13 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             if (_connection != null && _transaction != null)
             {
                 var sql = @"  SELECT ct.[Type], ISNULL(SUM(td.BankProfit + td.Amount),0) 
-                            FROM TransactionDetails AS td 
+                              FROM TransactionDetails AS td 
                               RIGHT JOIN Account AS a ON td.FromAccountId = a.Id
                               RIGHT JOIN Person AS p ON p.Id = a.PersonId 
                               JOIN CurrencyType AS ct ON ct.Id = td.CurrencyId
                               WHERE p.Email = @email AND 
-                              td.PerformedAt >= @fromDate-- AND td.PerformedAt <= @toDate
+                                td.FromAccountId != td.ToAccountId AND
+                                td.PerformedAt >= @fromDate-- AND td.PerformedAt <= @toDate
                               GROUP BY ct.[Type]";
                 var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql,
                     new { email, fromDate, toDate }, transaction: _transaction);
