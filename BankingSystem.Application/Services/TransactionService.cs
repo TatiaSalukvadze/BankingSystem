@@ -38,17 +38,17 @@ namespace BankingSystem.Application.Services
             string email, bool isSelfTransfer)
         {
 
-                if(createTransactionDto.Amount <= 0)
-                {
-                    return (false, "You need to enter more than 0 value!", null);
-                }
-                var (validated, message, fromAccount, toAccount) = await ValidateAccountsAsync(createTransactionDto.FromIBAN,
-                    createTransactionDto.ToIBAN, email, isSelfTransfer);
-                if (!validated) return (validated, message, null);
+            if(createTransactionDto.Amount <= 0)
+            {
+                return (false, "You need to enter more than 0 value!", null);
+            }
+            var (validated, message, fromAccount, toAccount) = await ValidateAccountsAsync(createTransactionDto.FromIBAN,
+                createTransactionDto.ToIBAN, email, isSelfTransfer);
+            if (!validated) return (validated, message, null);
                 
 
-                var (bankProfit, amountFromAccount, amountToAccount) = await CalculateTransactionAmountAsync(fromAccount.CurrencyId,
-                    toAccount.CurrencyId, createTransactionDto.Amount, isSelfTransfer);
+            var (bankProfit, amountFromAccount, amountToAccount) = await CalculateTransactionAmountAsync(fromAccount.CurrencyId,
+                toAccount.CurrencyId, createTransactionDto.Amount, isSelfTransfer);
             if (bankProfit == 0 && amountFromAccount == 0 && amountToAccount == 0) {
                 return (false, "One of the account has incorrect currency!", null);
             }
@@ -57,27 +57,27 @@ namespace BankingSystem.Application.Services
                 return (false, "You don't have enough money to transfer on your account!", null);
             }
             bool accountsUpdated = await UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, amountFromAccount, amountToAccount);
-                if(!accountsUpdated) return (false, "Balance couldn't be updated!", null);
+            if(!accountsUpdated) return (false, "Balance couldn't be updated!", null);
 
-                var transaction = new TransactionDetails
-                {
-                    BankProfit = bankProfit,
-                    Amount = createTransactionDto.Amount,
-                    FromAccountId = fromAccount.Id,
-                    ToAccountId = toAccount.Id,
-                    CurrencyId = fromAccount.CurrencyId,
-                    IsATM = false,
-                };
+            var transaction = new TransactionDetails
+            {
+                BankProfit = bankProfit,
+                Amount = createTransactionDto.Amount,
+                FromAccountId = fromAccount.Id,
+                ToAccountId = toAccount.Id,
+                CurrencyId = fromAccount.CurrencyId,
+                IsATM = false,
+            };
               
-                int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
-                if (insertedId <= 0)
-                {
-                    return (false, "Transaction could not be created, something happened!", null);
-                }
+            int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
+            if (insertedId <= 0)
+            {
+                return (false, "Transaction could not be created, something happened!", null);
+            }
 
-                transaction.Id = insertedId;
-                _unitOfWork.SaveChanges();
-                return (true, "Transaction was successfull!", transaction);
+            transaction.Id = insertedId;
+            _unitOfWork.SaveChanges();
+            return (true, "Transaction was successfull!", transaction);
 
 
         }

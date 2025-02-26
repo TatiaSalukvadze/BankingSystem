@@ -24,29 +24,29 @@ namespace BankingSystem.Application.Services
         public async Task<(bool Success, string Message, Account? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto)
         {
 
-                int personId = await _unitOfWork.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber);
-                if (personId <= 0)
-                {
-                    return (false, "Such person doesn't exist in our system!", null);
-                }
+            int personId = await _unitOfWork.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber);
+            if (personId <= 0)
+            {
+                return (false, "Such person doesn't exist in our system!", null);
+            }
 
-                bool IBANExists = await _unitOfWork.AccountRepository.IBANExists(createAccountDto.IDNumber);
-                if (IBANExists)
-                {
-                    return (false, "Such IBAN already exist in our system!", null);
-                }
-                int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(createAccountDto.Currency.ToString());
-                if (currencyId <= 0)
-                {
-                    return (false, "Such Currency does not exist in our system!", null);
-                }
-                var account = new Account
-                {
-                    PersonId = personId,
-                    IBAN = createAccountDto.IBAN,
-                    Amount = createAccountDto.Amount,
-                    CurrencyId = currencyId//(int)createAccountDto.Currency
-                };
+            bool IBANExists = await _unitOfWork.AccountRepository.IBANExists(createAccountDto.IDNumber);
+            if (IBANExists)
+            {
+                return (false, "Such IBAN already exist in our system!", null);
+            }
+            int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(createAccountDto.Currency.ToString());
+            if (currencyId <= 0)
+            {
+                return (false, "Such Currency does not exist in our system!", null);
+            }
+            var account = new Account
+            {
+                PersonId = personId,
+                IBAN = createAccountDto.IBAN,
+                Amount = createAccountDto.Amount,
+                CurrencyId = currencyId//(int)createAccountDto.Currency
+            };
 
             int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);
             if (insertedId <= 0)

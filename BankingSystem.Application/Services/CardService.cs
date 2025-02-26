@@ -25,58 +25,55 @@ namespace BankingSystem.Application.Services
         //tamar
         public async Task<(bool success, string message, Card? data)> CreateCardAsync(CreateCardDTO createCardDto)
         {
+            var account = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN);
+            if (account == null)
+            {
+                return (false, "Account does not exist in the system!", null);
+            }
 
-                var account = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN);
-                if (account == null)
-                {
-                    return (false, "Account does not exist in the system!", null);
-                }
+            bool cardNumberExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(createCardDto.CardNumber);
+            if (cardNumberExists)
+            {
+                return (false, "Card number already exists!", null);
+            }
 
-                bool cardNumberExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(createCardDto.CardNumber);
-                if (cardNumberExists)
-                {
-                    return (false, "Card number already exists!", null);
-                }
+            var card = new Card
+            {
+                AccountId = account.Id,
+                CardNumber = createCardDto.CardNumber,
+                ExpirationDate = createCardDto.ExpirationDate,
+                CVV = createCardDto.CVV,
+                PIN = createCardDto.PIN
+            };
 
-                var card = new Card
-                {
-                    AccountId = account.Id,
-                    CardNumber = createCardDto.CardNumber,
-                    ExpirationDate = createCardDto.ExpirationDate,
-                    CVV = createCardDto.CVV,
-                    PIN = createCardDto.PIN
-                };
+            int insertedId = await _unitOfWork.CardRepository.CreateCardAsync(card);
+            if (insertedId <= 0)
+            {
+                return (false, "Card could not be created, something went wrong!", null);
+            }
 
-                int insertedId = await _unitOfWork.CardRepository.CreateCardAsync(card);
-                if (insertedId <= 0)
-                {
-                    return (false, "Card could not be created, something went wrong!", null);
-                }
+            card.Id = insertedId;
+            _unitOfWork.SaveChanges();
 
-                card.Id = insertedId;
-                _unitOfWork.SaveChanges();
-
-                return (true, "Card was created successfully!", card);
+            return (true, "Card was created successfully!", card);
 
         }
         //tatia
         public async Task<(bool success, string message, List<CardWithIBANDTO> data)> SeeCardsAsync(string email)
         {
+            bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
+            if (!accountsExist)
+            {
+                return (true, "You don't have accounts!", null);
+            }
 
-                bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
-                if (!accountsExist)
-                {
-                    return (true, "You don't have accounts!", null);
-                }
+            var cards = await _unitOfWork.CardRepository.GetCardsForPersonAsync(email);
+            if (cards == null || cards.Count == 0)
+            {
+                return (true, "You don't have cards!", null);
+            }
 
-                var cards = await _unitOfWork.CardRepository.GetCardsForPersonAsync(email);
-                if (cards == null || cards.Count == 0)
-                {
-                    return (true, "You don't have cards!", null);
-                }
-
-                return (true, "Cards For Account (IBAN) were found!", cards);
-            
+            return (true, "Cards For Account (IBAN) were found!", cards);          
 
         }
         //tamar

@@ -26,7 +26,6 @@ namespace BankingSystem.Application.Services
 
         }
 
-        //tamar
         
         //tatia
         public async Task<(bool Success, string Message, object? Data)> RegisterCustomPersonAsync(RegisterPersonDTO registerDto, string IdentityUserId)
@@ -60,17 +59,17 @@ namespace BankingSystem.Application.Services
         public async Task<(bool Success, string Message, Dictionary<string, int> statistics)> RegisteredPeopleStatisticsAsync()
         {
 
-                var personStatistics = new Dictionary<string, int>();
-                int peopleRegisteredThisYear = await _unitOfWork.PersonRepository.PeopleRegisteredThisYear();
-                personStatistics.Add("People Registered This Year", peopleRegisteredThisYear);
+            var personStatistics = new Dictionary<string, int>();
+            int peopleRegisteredThisYear = await _unitOfWork.PersonRepository.PeopleRegisteredThisYear();
+            personStatistics.Add("People Registered This Year", peopleRegisteredThisYear);
 
-                int peopleRegisteredLast1Year = await _unitOfWork.PersonRepository.PeopleRegisteredLastOneYear();
-                personStatistics.Add("People Registered Last 1 Year", peopleRegisteredLast1Year);
+            int peopleRegisteredLast1Year = await _unitOfWork.PersonRepository.PeopleRegisteredLastOneYear();
+            personStatistics.Add("People Registered Last 1 Year", peopleRegisteredLast1Year);
 
-                int peopleRegisteredLast30Days = await _unitOfWork.PersonRepository.PeopleRegisteredLast30Days();
-                personStatistics.Add("People Registered Last 30 Days", peopleRegisteredLast30Days);
+            int peopleRegisteredLast30Days = await _unitOfWork.PersonRepository.PeopleRegisteredLast30Days();
+            personStatistics.Add("People Registered Last 30 Days", peopleRegisteredLast30Days);
 
-                return (true, "Statistics are retrieved!", personStatistics);
+            return (true, "Statistics are retrieved!", personStatistics);
 
         }
     }
