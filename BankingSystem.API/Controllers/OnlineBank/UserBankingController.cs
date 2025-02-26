@@ -34,13 +34,13 @@ namespace BankingSystem.API.Controllers.OnlineBank
             //string email = User.Identity.Name; 
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var (success, message, data) = await _accountService.SeeAccountsAsync(userEmail);
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(new { message });
+            //}
 
-            if (!success)
-            {
-                return BadRequest(new { message });
-            }
-
-            return Ok(new { message, data });
+            //return Ok(new { message, data });
         }
 
 
@@ -49,11 +49,12 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var (success, message, data) = await _cardService.SeeCardsAsync(userEmail);
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-            return Ok(new { message, data });
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
+            //return Ok(new { message, data });
         }
 
 
@@ -62,11 +63,12 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: true);
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-            return Ok(new { message, data });
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
+            //return Ok(new { message, data });
         }
 
 
@@ -75,11 +77,12 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-            return Ok(new { message, data });
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
+            //return Ok(new { message, data });
         }
 
         [HttpGet("TotalIncomeExpense")]
@@ -87,11 +90,12 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var (success, message, data) = await _transactionService.TotalIncomeExpenseAsync(dateRangeDto, userEmail);
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-            return Ok(new { message, data });
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
+            //return Ok(new { message, data });
         }
 
     }

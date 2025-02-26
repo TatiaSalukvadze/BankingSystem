@@ -4,6 +4,7 @@ using BankingSystem.Contracts.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BankingSystem.API.Controllers.OnlineBank
 {
@@ -33,35 +34,37 @@ namespace BankingSystem.API.Controllers.OnlineBank
                 return BadRequest(message);
             }
             var (finalSuccess, finalMessage, finalData) = await _personService.RegisterCustomPersonAsync(registerDto, data);
-            if (!finalSuccess)
-            {
-                return BadRequest(finalMessage);
-            }
-            return Ok(new { finalMessage, finalData });
+            return await HandleResult(finalSuccess, finalMessage, finalData);
+            //if (!finalSuccess)
+            //{
+            //    return BadRequest(finalMessage);
+            //}
+            //return Ok(new { finalMessage, finalData });
         }
         //tatia
         [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateAccount([FromForm] CreateAccountDTO createAccountDto)
         {
             var (success, message, data) = await _accountService.CreateAccountAsync(createAccountDto);
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-            return Ok(new { message, data });
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
+            //return Ok(new { message, data });
         }
 
         [HttpDelete("DeleteAccount")]
         public async Task<IActionResult> DeleteAccount(string iban)
         {
             var (success, message) = await _accountService.DeleteAccountAsync(iban);
+            return await HandleResult(success, message);
+            //if (!success)
+            //{
+            //    return NotFound(new { message }); 
+            //}
 
-            if (!success)
-            {
-                return NotFound(new { message }); 
-            }
-
-            return Ok(new { message }); 
+            //return Ok(new { message }); 
         }
 
         //tamar
@@ -69,22 +72,24 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> CreateCard([FromForm] CreateCardDTO createCardDto)
         {
             var (success, message, data) = await _cardService.CreateCardAsync(createCardDto);
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-            return Ok(new { message, data });
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
+            //return Ok(new { message, data });
         }
 
         [HttpDelete("Card")]
         public async Task<IActionResult> CancelCard([FromForm] string cardNumber)
         {
             var (success, message) = await _cardService.CancelCardAsync(cardNumber);
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-            return Ok(new { message });
+            return await HandleResult(success, message);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
+            //return Ok(new { message });
         }
     }
 }

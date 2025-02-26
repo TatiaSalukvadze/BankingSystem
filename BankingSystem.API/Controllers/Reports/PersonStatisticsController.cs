@@ -24,13 +24,13 @@ namespace BankingSystem.API.Controllers.Reports
         {
 
             var (success, message, data) = await _personService.RegisteredPeopleStatisticsAsync();
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(new { message });
+            //}
 
-            if (!success)
-            {
-                return BadRequest(new { message });
-            }
-
-            return Ok(new { message, data });
+            //return Ok(new { message, data });
         }
     }
 }

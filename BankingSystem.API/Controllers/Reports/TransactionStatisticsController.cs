@@ -23,24 +23,24 @@ namespace BankingSystem.API.Controllers.Reports
         {
 
             var (success, message, data) = await _transactionService.NumberOfTransactionsAsync();
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(new { message });
+            //}
 
-            if (!success)
-            {
-                return BadRequest(new { message });
-            }
-
-            return Ok(new { message, data });
+            //return Ok(new { message, data });
         }
 
         [HttpGet("BankProfitByTimePeriod")] //and currency
         public async Task<IActionResult> GetBankProfitByTimePeriodAsync()
         {
             var (success, message, data) = await _transactionService.GetBankProfitByTimePeriodAsync();
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //    return BadRequest(new { message });
 
-            if (!success)
-                return BadRequest(new { message });
-
-            return Ok(new { message, data });
+            //return Ok(new { message, data });
         }
 
 
@@ -49,13 +49,13 @@ namespace BankingSystem.API.Controllers.Reports
         {
 
             var (success, message, data) = await _transactionService.NumberOfTransactionsChartAsync();
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(new { message });
+            //}
 
-            if (!success)
-            {
-                return BadRequest(new { message });
-            }
-
-            return Ok(new { message, data });
+            //return Ok(new { message, data });
         }
 
         [HttpGet("AverageProfit")]
@@ -63,26 +63,26 @@ namespace BankingSystem.API.Controllers.Reports
         {
 
             var (success, message, data) = await _transactionService.AverageBankProfitAsync();
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(new { message });
+            //}
 
-            if (!success)
-            {
-                return BadRequest(new { message });
-            }
-
-            return Ok(new { message, data });
+            //return Ok(new { message, data });
         }
 
         [HttpGet("AtmWithdrawals")]
         public async Task<IActionResult> GetAtmWithdrawals()
         {
             var (success, message, data) = await _transactionService.GetTotalAtmWithdrawalsAsync();
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(new { message });
+            //}
 
-            if (!success)
-            {
-                return BadRequest(new { message });
-            }
-
-            return Ok(new { message, data });
+            //return Ok(new { message, data });
         }
     }
 }

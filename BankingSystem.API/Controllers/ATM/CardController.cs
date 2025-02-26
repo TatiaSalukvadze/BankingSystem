@@ -22,24 +22,25 @@ namespace BankingSystem.API.Controllers.ATM
         public async Task<IActionResult> SeeBalanceAsync([FromForm] string cardNumber, [FromForm] string pin)
         {
             var (success, message, data) = await _cardService.SeeBalanceAsync(cardNumber, pin);
-            if (!success)
-            {
-                return BadRequest(new { message });
-            }
-            return Ok(new { message, data });
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(new { message });
+            //}
+            //return Ok(new { message, data });
         }
         //tamar
         [HttpPost("Withdraw")]
         public async Task<IActionResult> WithdrawAsync([FromForm] WithdrawalDTO withdrawalDto)
         {
             var (success, message) = await _cardService.WithdrawAsync(withdrawalDto);
+            return await HandleResult(success, message);
+            //if (!success)
+            //{
+            //    return BadRequest(new { message });
+            //}
 
-            if (!success)
-            {
-                return BadRequest(new { message });
-            }
-
-            return Ok(new { message });
+            //return Ok(new { message });
         }
         //tatia
         [HttpPut("PIN")]
@@ -47,11 +48,12 @@ namespace BankingSystem.API.Controllers.ATM
         {
           
             var (success, message) = await _cardService.ChangeCardPINAsync(changeCardDtp);
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-            return Ok(new { message });
+            return await HandleResult(success, message);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
+            //return Ok(new { message });
         }
     }
 }

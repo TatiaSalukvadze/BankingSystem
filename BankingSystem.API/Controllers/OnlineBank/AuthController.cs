@@ -22,13 +22,13 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> Login([FromForm] LoginDTO loginDto)
         {
             var (success, message, data) = await _identityService.LoginPersonAsync(loginDto);
+            return await HandleResult(success, message, data);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
 
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-
-            return Ok(new { message, data });
+            //return Ok(new { message, data });
         }
         //tatia
         //https://fusionauth.io/dev-tools/url-encoder-decoder used for decode
@@ -36,39 +36,40 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> EmailConfirmation([FromQuery] EmailConfirmationDTO emailConfirmationDto)//string email, [FromQuery] string token)
         {
             var (success, message) = await _identityService.ConfirmEmailAsync(emailConfirmationDto);
+            return await HandleResult(success, message);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
 
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-
-            return Ok(new { message});
+            //return Ok(new { message});
         }
 
         [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromForm] ForgotPasswordDTO forgotPasswordDTO)
         {
             var (success, message) = await _identityService.ForgotPasswordAsync(forgotPasswordDTO);
+            return await HandleResult(success, message);
+         
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
 
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-
-            return Ok(new { message });
+                //return Ok(new { message });
         }
 
         [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordDTO resetPasswordDTO)
         {
             var (success, message) = await _identityService.ResetPasswordAsync(resetPasswordDTO);
+            return await HandleResult(success, message);
+            //if (!success)
+            //{
+            //    return BadRequest(message);
+            //}
 
-            if (!success)
-            {
-                return BadRequest(message);
-            }
-
-            return Ok(new { message });
+            //return Ok(new { message });
         }
 
     }
