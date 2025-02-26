@@ -158,7 +158,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<Dictionary<string, decimal>> GetTotalIncomeAsync(DateTime fromDate, DateTime toDate, string email)
         {
             var result = new Dictionary<string, decimal>();
-
             if (_connection != null && _transaction != null)
             {
                 var sql = @"SELECT ct.[Type] AS Currency, ISNULL(SUM(td.Amount),0) AS TotalIncome
@@ -173,7 +172,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql,
                     new { email, fromDate, toDate }, transaction: _transaction);
                 result = sqlResult.ToDictionary(row => row.Item1, row => row.Item2);
-
             }
             if (result.Count <= 0)
             {
