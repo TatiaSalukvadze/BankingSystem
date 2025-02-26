@@ -67,14 +67,14 @@ namespace BankingSystem.Application.Services
 
             if (!accountsExist)
             {
-                return (true, "You don't have any accounts!", null);
+                return (false, "You don't have any accounts!", null);
             }
 
             var accounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email);
 
             if (accounts == null || accounts.Count == 0)
             {
-                return (true, "No accounts found!", null);
+                return (false, "No accounts found!", null);
             }
 
             return (true, "Accounts retrieved successfully!", accounts);

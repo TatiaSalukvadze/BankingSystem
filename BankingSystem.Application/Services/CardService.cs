@@ -66,13 +66,13 @@ namespace BankingSystem.Application.Services
             bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
             if (!accountsExist)
             {
-                return (true, "You don't have accounts!", null);
+                return (false, "You don't have accounts!", null);
             }
 
             var cards = await _unitOfWork.CardRepository.GetCardsForPersonAsync(email);
             if (cards == null || cards.Count == 0)
             {
-                return (true, "You don't have cards!", null);
+                return (false, "You don't have cards!", null);
             }
 
             return (true, "Cards For Account (IBAN) were found!", cards);          
