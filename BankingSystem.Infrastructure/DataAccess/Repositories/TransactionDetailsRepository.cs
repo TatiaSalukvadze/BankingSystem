@@ -160,15 +160,15 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             var result = new Dictionary<string, decimal>();
             if (_connection != null && _transaction != null)
             {
-                var sql = @"SELECT ct.[Type] AS Currency, ISNULL(SUM(td.Amount),0) AS TotalIncome
-                    FROM CurrencyType ct 
-					LEFT JOIN TransactionDetails td ON ct.Id = td.CurrencyId
-					    AND td.IsATM = 0 AND td.FromAccountId != td.ToAccountId 	
-                        AND td.PerformedAt >= @fromDate AND td.PerformedAt <= @toDate
-                    LEFT JOIN Account a ON a.Id = td.ToAccountId  
-                    LEFT JOIN Person p ON p.Id = a.PersonId
+                var sql = @"SELECT ct.Type AS Currency, SUM(td.Amount) AS TotalIncome
+                    FROM TransactionDetails td
+                    JOIN Account a ON a.Id = td.ToAccountId  
+                    JOIN CurrencyType ct ON ct.Id = td.CurrencyId
+                    JOIN Person p ON p.Id = a.PersonId
+                    WHERE td.IsATM = 0 AND td.FromAccountId != td.ToAccountId 	
+                        AND td.PerformedAt >= @fromDate AND td.PerformedAt <=  @toDate
 	                    AND p.Email = @email
-                    GROUP BY ct.[Type];";
+                    GROUP BY ct.Type;";
                 var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql,
                     new { email, fromDate, toDate }, transaction: _transaction);
                 result = sqlResult.ToDictionary(row => row.Item1, row => row.Item2);
