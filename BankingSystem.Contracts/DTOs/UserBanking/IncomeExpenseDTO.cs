@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankingSystem.Contracts.DTOs
+namespace BankingSystem.Contracts.DTOs.UserBanking
 {
     public class IncomeExpenseDTO
     {
-        public Dictionary<string,decimal> Income { get; set; }
+        public Dictionary<string, decimal> Income { get; set; }
         public Dictionary<string, decimal> Expense { get; set; }
     }
 }

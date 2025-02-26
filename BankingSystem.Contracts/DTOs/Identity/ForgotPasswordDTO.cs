@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BankingSystem.Contracts.DTOs
+namespace BankingSystem.Contracts.DTOs.Identity
 {
     public class ForgotPasswordDTO
     {

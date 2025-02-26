@@ -1,7 +1,7 @@
 ﻿using BankingSystem.Domain.Validation;
 using System.ComponentModel.DataAnnotations;
 
-namespace BankingSystem.Contracts.DTOs
+namespace BankingSystem.Contracts.DTOs.UserBanking
 {
     public class CreateTransactionDTO
     {

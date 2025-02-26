@@ -1,5 +1,5 @@
 ﻿using BankingSystem.Application.Services;
-using BankingSystem.Contracts.DTOs;
+using BankingSystem.Contracts.DTOs.ATM;
 using BankingSystem.Contracts.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

@@ -1,4 +1,6 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.Auth;
+using BankingSystem.Contracts.DTOs.Identity;
+using BankingSystem.Contracts.DTOs.OnlineBank;
 using System;
 using System.Collections.Generic;
 using System.Linq;

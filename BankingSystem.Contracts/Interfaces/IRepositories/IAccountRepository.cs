@@ -1,4 +1,4 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Domain.Entities;
 using System;
 using System.Collections.Generic;

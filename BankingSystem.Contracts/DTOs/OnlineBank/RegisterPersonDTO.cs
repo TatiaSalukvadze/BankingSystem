@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankingSystem.Contracts.DTOs
+namespace BankingSystem.Contracts.DTOs.OnlineBank
 {
     public class RegisterPersonDTO
     {
@@ -29,6 +29,6 @@ namespace BankingSystem.Contracts.DTOs
         [Required]
         public string Password { get; set; }
 
-        public string ClientUrl { get; set; }   
+        public string ClientUrl { get; set; }
     }
 }

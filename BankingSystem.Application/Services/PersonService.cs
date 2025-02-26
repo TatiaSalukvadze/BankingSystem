@@ -1,4 +1,4 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;

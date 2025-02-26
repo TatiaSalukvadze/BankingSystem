@@ -1,4 +1,6 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.ATM;
+using BankingSystem.Contracts.DTOs.Report;
+using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IRepositories;

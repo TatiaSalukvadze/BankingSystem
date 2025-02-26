@@ -1,25 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace BankingSystem.Contracts.DTOs
+namespace BankingSystem.Contracts.DTOs.OnlineBank
 {
-    public class CardWithIBANDTO
+    public class CreateCardDTO
     {
         [Required, StringLength(22, MinimumLength = 22)]
         [RegularExpression("^GE[0-9]{2}CD[0-9]{16}$", ErrorMessage = "არასწორი IBAN ფორმატი.")]
         public string IBAN { get; set; }
-
-        [Required, StringLength(50, MinimumLength = 2)]
-        [RegularExpression(@"^[ა-ჰ]+$|^[A-Za-z]+$", ErrorMessage = "სახელი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
-        public string Name { get; set; }
-
-        [Required, StringLength(50, MinimumLength = 2)]
-        [RegularExpression(@"^[ა-ჰ]+$|^[A-Za-z]+$", ErrorMessage = "გვარი უნდა შეიცავდეს მხოლოდ ქართულ ან მხოლოდ ლათინურ ასოებს.")]
-        public string Surname { get; set; }
 
         [Required, StringLength(16, MinimumLength = 16)]
         [RegularExpression("^[0-9]{16}$", ErrorMessage = "ბარათის ნომერი უნდა იყოს 16 ციფრისგან შემდგარი.")]

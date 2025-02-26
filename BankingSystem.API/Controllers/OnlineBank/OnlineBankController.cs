@@ -1,5 +1,5 @@
 ﻿using BankingSystem.Application.Services;
-using BankingSystem.Contracts.DTOs;
+using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

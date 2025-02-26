@@ -1,4 +1,4 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.OnlineBank;
 
 namespace BankingSystem.Contracts.Interfaces.IServices
 {

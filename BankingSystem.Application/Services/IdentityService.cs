@@ -1,5 +1,4 @@
-﻿using BankingSystem.Contracts.DTOs;
-using BankingSystem.Contracts.Interfaces.IExternalServices;
+﻿using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Domain.Entities;
@@ -11,6 +10,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using BankingSystem.Contracts.DTOs.Auth;
+using BankingSystem.Contracts.DTOs.Identity;
+using BankingSystem.Contracts.DTOs.OnlineBank;
 
 namespace BankingSystem.Application.Services
 {

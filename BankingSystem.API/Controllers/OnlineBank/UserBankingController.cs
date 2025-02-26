@@ -1,4 +1,4 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Infrastructure.ExternalServices;

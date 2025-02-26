@@ -1,4 +1,6 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.ATM;
+using BankingSystem.Contracts.DTOs.OnlineBank;
+using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 

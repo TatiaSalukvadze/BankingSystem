@@ -1,6 +1,6 @@
 ﻿using BankingSystem.Domain.Enums;
 
-namespace BankingSystem.Contracts.DTOs
+namespace BankingSystem.Contracts.DTOs.Report
 {
     public class BankProfitDTO
     {

@@ -1,4 +1,5 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.OnlineBank;
+using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;

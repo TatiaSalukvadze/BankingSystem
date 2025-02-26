@@ -1,4 +1,5 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.ATM;
+using BankingSystem.Contracts.DTOs.Report;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
 using Dapper;

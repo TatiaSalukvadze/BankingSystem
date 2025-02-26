@@ -1,4 +1,5 @@
-﻿using BankingSystem.Contracts.DTOs;
+﻿using BankingSystem.Contracts.DTOs.Auth;
+using BankingSystem.Contracts.DTOs.Identity;
 using BankingSystem.Contracts.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 
