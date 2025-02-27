@@ -132,20 +132,21 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             var result = new List<TransactionCountChartDTO>();
             if (_connection != null && _transaction != null)
             {
-                var sql = @"WITH LastMonthDays AS (
-                                SELECT CAST(DATEADD(MONTH, -1, GETDATE()) AS DATE) AS DayName
+                //var sql = @"WITH LastMonthDays AS (
+                //                SELECT CAST(DATEADD(MONTH, -1, GETDATE()) AS DATE) AS DayName
 
-                                UNION ALL
+                //                UNION ALL
 
-                                SELECT DATEADD(DAY, 1, DayName) FROM LastMonthDays
-                                WHERE DayName < CAST(GETDATE() AS DATE)
-                            )
+                //                SELECT DATEADD(DAY, 1, DayName) FROM LastMonthDays
+                //                WHERE DayName < CAST(GETDATE() AS DATE)
+                //            )
 
-                            SELECT lm.DayName,  COUNT(td.BankProfit) FROM TransactionDetails as td 
-                            right join LastMonthDays as lm on lm.DayName = CAST(PerformedAt AS DATE)
-                            Group by lm.DayName
-                            HAVING lm.DayName < CAST(GETDATE() AS DATE)";
-                var sqlResult = await _connection.QueryAsync<(DateTime,int)>(sql, transaction: _transaction);
+                //            SELECT lm.DayName,  COUNT(td.BankProfit) FROM TransactionDetails as td 
+                //            right join LastMonthDays as lm on lm.DayName = CAST(PerformedAt AS DATE)
+                //            Group by lm.DayName
+                //            HAVING lm.DayName < CAST(GETDATE() AS DATE)";
+                var sqlResult = await _connection.QueryAsync<(DateTime,int)>("SelectTransactionCountLastMonth", 
+                    commandType: CommandType.StoredProcedure, transaction: _transaction);
                 result = sqlResult.Select(row => new TransactionCountChartDTO { Date = DateOnly.FromDateTime(row.Item1), 
                     Count = row.Item2 })
                     .ToList();
