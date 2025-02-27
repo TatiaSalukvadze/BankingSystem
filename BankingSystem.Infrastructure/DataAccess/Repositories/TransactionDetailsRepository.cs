@@ -186,17 +186,17 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
             if (_connection != null && _transaction != null)
             {
-                var sql =   @"SELECT ct.[Type], ISNULL(SUM(td.BankProfit + td.Amount),0) 
-                              FROM TransactionDetails AS td 
-                              JOIN Account AS a ON td.FromAccountId = a.Id
-                              JOIN Person AS p ON p.Id = a.PersonId 
-                              JOIN CurrencyType AS ct ON ct.Id = td.CurrencyId
-                              WHERE p.Email = @email AND 
-                                td.FromAccountId != td.ToAccountId AND
-                                td.PerformedAt >= @fromDate AND td.PerformedAt <= @toDate
-                              GROUP BY ct.[Type]";
-                var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql,
-                    new { email, fromDate, toDate }, transaction: _transaction);
+                //var sql =   @"SELECT ct.[Type], SUM(td.BankProfit + td.Amount) AS Expense
+                //              FROM TransactionDetails AS td 
+                //              JOIN Account AS a ON td.FromAccountId = a.Id
+                //              JOIN Person AS p ON p.Id = a.PersonId 
+                //              JOIN CurrencyType AS ct ON ct.Id = td.CurrencyId
+                //              WHERE p.Email = @email AND 
+                //                td.FromAccountId != td.ToAccountId AND
+                //                td.PerformedAt >= @fromDate AND td.PerformedAt <= @toDate
+                //              GROUP BY ct.[Type]";
+                var sqlResult = await _connection.QueryAsync<(string, decimal)>("SelectTotalExpense",
+                    new { email, fromDate, toDate }, commandType: CommandType.StoredProcedure, transaction: _transaction);
                 result = sqlResult.ToDictionary(row => row.Item1, row => row.Item2);
 
             }
