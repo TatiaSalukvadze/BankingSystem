@@ -20,7 +20,7 @@ namespace BankingSystem.Infrastructure
         {
             _key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config["JwtSettings:PrivateKey"]!));
         }
-        public string GenerateToken<T>(T entity, string role)
+        public string GenerateToken(IdentityUser User, string role)
         {
             var handler = new JwtSecurityTokenHandler();
             //var key = Encoding.ASCII.GetBytes(AuthSettings.PrivateKey);
@@ -30,7 +30,7 @@ namespace BankingSystem.Infrastructure
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = GenerateClaims(entity, role),
+                Subject = GenerateClaims(User, role),
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = credentials,
             };
@@ -39,16 +39,14 @@ namespace BankingSystem.Infrastructure
             return handler.WriteToken(token);
         }
 
-        private static ClaimsIdentity GenerateClaims<T>(T entity, string role)
+        private static ClaimsIdentity GenerateClaims(IdentityUser User, string role)
         {
             var claims = new ClaimsIdentity();
-            if (entity is IdentityUser user)//aq unda iyos IdentityUser
+            if (User is IdentityUser user)//aq unda iyos IdentityUser
             {
                 claims.AddClaim(new Claim(ClaimTypes.Name, user.Email));
                 claims.AddClaim(new Claim(ClaimTypes.Role, role));
             }
-
-
 
             return claims;
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace BankingSystem.Contracts.Interfaces
 {
     public interface IAuthService
     {
-        string GenerateToken<T>(T entity, string role);
+        string GenerateToken(IdentityUser user, string role);
     }
 }
