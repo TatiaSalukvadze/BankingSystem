@@ -18,8 +18,8 @@ namespace BankingSystem.API.Controllers.ATM
         }
 
         //tamar
-        [HttpPost("SeeBalance")]
-        public async Task<IActionResult> SeeBalanceAsync([FromForm] string cardNumber, [FromForm] string pin)
+        [HttpGet("SeeBalance")]
+        public async Task<IActionResult> SeeBalanceAsync([FromQuery] string cardNumber, [FromQuery] string pin)
         {
             var (success, message, data) = await _cardService.SeeBalanceAsync(cardNumber, pin);
             return await HandleResult(success, message, data);
