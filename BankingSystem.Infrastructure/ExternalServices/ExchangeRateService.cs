@@ -1,4 +1,5 @@
-﻿using BankingSystem.Contracts.Interfaces.IExternalServices;
+﻿using BankingSystem.Contracts.Exceptions;
+using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -36,7 +37,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
             }
             else
             {
-                throw new Exception($"Currency rate could not be found for {toCurrency}");
+                throw new CurrencyRateNotFoundException($"Currency rate could not be found for {toCurrency}");
             }
 
         }

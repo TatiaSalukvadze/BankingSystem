@@ -6,6 +6,11 @@ namespace BankingSystem.API.Filters
 {
     public class CustomExceptionFilter : IAsyncExceptionFilter
     {
+        private readonly ILogger<CustomExceptionFilter> _logger;
+        public CustomExceptionFilter(ILogger<CustomExceptionFilter> logger)
+        {
+            _logger = logger;
+        }
         public async Task OnExceptionAsync(ExceptionContext context)
         {
             var exception = context.Exception;
@@ -14,8 +19,11 @@ namespace BankingSystem.API.Filters
             {
                 Description = exception.Message,
                 ErrorType = exception.GetType().Name,
+                exception.Source,
             };
-           
+
+            _logger.LogError("Unhandled exception occurred while executing request: {ex}", exception);
+
             context.Result = new BadRequestObjectResult(error);
             context.ExceptionHandled = true;
             await Task.CompletedTask;
