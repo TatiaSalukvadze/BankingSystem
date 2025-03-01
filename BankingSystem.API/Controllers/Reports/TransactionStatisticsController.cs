@@ -11,9 +11,9 @@ namespace BankingSystem.API.Controllers.Reports
     {
 
 
-        private readonly ITransactionService _transactionService;
+        private readonly ITransactionDetailsService _transactionService;
 
-        public TransactionStatisticsController(ITransactionService transactionService)
+        public TransactionStatisticsController(ITransactionDetailsService transactionService)
         {
             _transactionService = transactionService;
         }

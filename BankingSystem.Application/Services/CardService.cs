@@ -81,25 +81,19 @@ namespace BankingSystem.Application.Services
         //tamar
         public async Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(string cardNumber, string pin)
         {
-            var (cardValidated, message, card) = await CheckCardAsync(cardNumber, pin);
+            var (cardValidated, message, card) = await AuthorizeCardAsync(cardNumber, pin);
             if (!cardValidated)
             {
                 return (false, message, null);
             }
 
-            var balance = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
+            return await GetAccountBalanceAsync(cardNumber, pin);
 
-            if (balance is null || balance.Amount == 0 || balance.Currency == 0)
-            {
-                return (false, "Unable to retrieve balance.", null);
-            }
-         
-            return (true, "Balance retrieved successfully.", balance);
         }
         //tamar
         public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
         {
-            var (cardValidated, message, card) = await CheckCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
+            var (cardValidated, message, card) = await AuthorizeCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
             if (!cardValidated) return (false, message);
 
             var (isBalanceValid, balanceMessage, balance) = await GetAccountBalanceAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
@@ -125,16 +119,17 @@ namespace BankingSystem.Application.Services
             return (true, "Withdrawal successful.");
         }
 
-        //tamar
+        //tamar//wasashleloa(copyiaa), see balance edzaxis im or methods!!!!!!!!!!!!!!!!!!!!!
         private async Task<(bool, string, SeeBalanceDTO balance)> GetAccountBalanceAsync(string cardNumber, string pin)
         {
             var balance = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
-            if (balance == null || balance.Currency == 0 || balance.Amount == 0)
+
+            if (balance is null || balance.Amount == 0 || balance.Currency == 0)
             {
-                return (false, "Unable to retrieve account balance.", null);
+                return (false, "Unable to retrieve balance.", null);
             }
 
-            return (true, "", balance);
+            return (true, "Balance retrieved successfully.", balance);
         }
 
         //tamar
@@ -219,7 +214,7 @@ namespace BankingSystem.Application.Services
         //tatia
         public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
         {
-            var (cardValidated, message, card) = await CheckCardAsync(changeCardDtp.CardNumber, changeCardDtp.OldPIN);
+            var (cardValidated, message, card) = await AuthorizeCardAsync(changeCardDtp.CardNumber, changeCardDtp.OldPIN);
             if (!cardValidated)
             {
                 return (false, message);
@@ -234,7 +229,7 @@ namespace BankingSystem.Application.Services
             return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
         }
         //both
-        private async Task<(bool success, string message, Card card)> CheckCardAsync(string CardNumber, string PIN)
+        public async Task<(bool success, string message, Card card)> AuthorizeCardAsync(string CardNumber, string PIN)
         {
             Card card = await _unitOfWork.CardRepository.GetCardAsync(CardNumber);
 

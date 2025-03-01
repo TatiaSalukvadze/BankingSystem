@@ -15,5 +15,6 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<List<AtmWithdrawDTO>> GetTotalAtmWithdrawalsAsync();
         Task<Dictionary<string, decimal>> GetTotalIncomeAsync(DateTime fromDate, DateTime toDate, string email);
         Task<Dictionary<string, decimal>> GetTotalExpenseAsync(DateTime fromDate, DateTime toDate, string email);
+
     }
 }

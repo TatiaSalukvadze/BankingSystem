@@ -19,16 +19,15 @@ namespace BankingSystem.Application.Services
 
     public class IdentityService : IIdentityService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        //private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthService _authService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IEmailService _emailService;
 
-        public IdentityService(IUnitOfWork unitOfWork, IAuthService authService, UserManager<IdentityUser> userManager,
+        public IdentityService(IAuthService authService, UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager, IEmailService emailService)
         {
-            _unitOfWork = unitOfWork;
             _authService = authService;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -58,16 +57,16 @@ namespace BankingSystem.Application.Services
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? "";
 
-            var customUser = await _unitOfWork.PersonRepository.FindByIdentityIdAsync(user.Id);
+            //var customUser = await _unitOfWork.PersonRepository.FindByIdentityIdAsync(user.Id);
 
-            if (role == "User" && customUser == null)
-            {
-                return (false, "Custom user data not found for this account!", null);
-            }
+            //if (role == "User" && customUser == null)
+            //{
+            //    return (false, "Custom user data not found for this account!", null);
+            //}
 
             var token = _authService.GenerateToken(user, role);
-          
-            return (true, "Login successful!", new { token, customUser });
+
+            return (true, "Login successful!", new { token });//, customUser });
         }
 
         //tatia
@@ -104,20 +103,22 @@ namespace BankingSystem.Application.Services
             //};
             //var verificationUrl = QueryHelpers.AddQueryString(registerDto.ClientUrl!, tokenEmail);
             //await _emailService.SendEmailPlaint(registerDto.Email, "Email Confirmation Token", verificationUrl);
-            await GenerateEmailConfirmationTokenAsync(user, registerDto.Email, registerDto.ClientUrl);
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            await _emailService.SendTokenEmailAsync(token, registerDto.Email, registerDto.ClientUrl, "Email Confirmation Token");
+            //await GenerateEmailConfirmationTokenAsync(user, registerDto.Email, registerDto.ClientUrl);
             return (true, "User was registered successfully!",  user.Id );
 
-            async Task GenerateEmailConfirmationTokenAsync(IdentityUser identityUser, string email, string ClientUrl)
-            {
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
-                var tokenEmail = new Dictionary<string, string?>()
-                {
-                    {"email", email},
-                    {"token", token }
-                };
-                var verificationUrl = QueryHelpers.AddQueryString(ClientUrl!, tokenEmail);
-                await _emailService.SendEmailPlaint(email, "Email Confirmation Token", verificationUrl);
-            }
+            //async Task GenerateEmailConfirmationTokenAsync(IdentityUser identityUser, string email, string ClientUrl)
+            //{
+            //    var token = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
+            //    var tokenEmail = new Dictionary<string, string?>()
+            //    {
+            //        {"email", email},
+            //        {"token", token }
+            //    };
+            //    var verificationUrl = QueryHelpers.AddQueryString(ClientUrl!, tokenEmail);
+            //    await _emailService.SendEmailPlaint(email, "Email Confirmation Token", verificationUrl);
+            //}
 
         }
 
@@ -148,14 +149,16 @@ namespace BankingSystem.Application.Services
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var tokenEmail = new Dictionary<string, string>()
-            {
-                { "email", forgotPasswordDTO.Email },
-                { "token", token }
-            };
+            await _emailService.SendTokenEmailAsync(token, forgotPasswordDTO.Email, forgotPasswordDTO.ClientUrl, "Reset password token");
 
-            var url = QueryHelpers.AddQueryString(forgotPasswordDTO.ClientUrl, tokenEmail);
-            await _emailService.SendEmailPlaint(forgotPasswordDTO.Email, "Reset password token", url);
+            //var tokenEmail = new Dictionary<string, string>()
+            //{
+            //    { "email", forgotPasswordDTO.Email },
+            //    { "token", token }
+            //};
+
+            //var url = QueryHelpers.AddQueryString(forgotPasswordDTO.ClientUrl, tokenEmail);
+            //await _emailService.SendEmailPlaint(forgotPasswordDTO.Email, "Reset password token", url);
             return (true, "Check email to reset password!");
         }
 

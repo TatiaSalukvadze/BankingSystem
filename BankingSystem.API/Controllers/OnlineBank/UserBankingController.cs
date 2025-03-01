@@ -14,10 +14,10 @@ namespace BankingSystem.API.Controllers.OnlineBank
         private readonly IAccountService _accountService;
         private readonly ICardService _cardService;
         //private readonly ICurrencyService _currencyService;
-        private readonly ITransactionService _transactionService;
+        private readonly ITransactionDetailsService _transactionService;
 
         public UserBankingController(IPersonService personService, IAccountService accountService,
-            ICardService cardService, ITransactionService transactionService)
+            ICardService cardService, ITransactionDetailsService transactionService)
         {
             _personService = personService;
             _accountService = accountService;

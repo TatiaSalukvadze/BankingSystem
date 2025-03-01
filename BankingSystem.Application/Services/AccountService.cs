@@ -1,6 +1,7 @@
 ﻿using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces;
+using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -103,6 +104,50 @@ namespace BankingSystem.Application.Services
 
             _unitOfWork.SaveChanges();
             return (true, "Account deleted successfully.");
+        }
+        //for transaction changes
+        //tatia
+        public async Task<(bool Validated, string Message, Account from, Account to)> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
+            string toIBAN, string email, bool isSelfTransfer)
+        {
+            if (fromIBAN == toIBAN)
+            {
+                return (false, "You can't transfer to same account!", null, null);
+            }
+            var fromAccount = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
+            Account toAccount;
+            if (isSelfTransfer)
+            {
+                toAccount = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(toIBAN, email);
+            }
+            else
+            {
+                toAccount = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(toIBAN);
+            }
+            if (fromAccount is null || toAccount is null)
+            {
+                return (false, "There is no account for one or both provided IBANs, check well!", null, null);
+            }
+
+            //if (fromAccount.Amount < amountToTransfer)
+            //{
+            //    return (false, "You don't have enough money to transfer on your account!", null, null);
+            //}
+            return (true, "Accounts validated!", fromAccount, toAccount);
+        }
+        //tatia
+        public async Task<bool> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
+            decimal amountFromAccount, decimal amountToAccount)
+        {
+            var fromAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(fromAccountId, -amountFromAccount);
+            var toAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(toAccountId, amountToAccount);
+
+            if (!fromAccountUpdated || !toAccountUpdated)
+            {
+                return false;
+            }
+            return true;
+
         }
     }
 }
