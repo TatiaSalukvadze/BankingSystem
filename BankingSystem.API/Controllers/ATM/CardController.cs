@@ -9,11 +9,12 @@ namespace BankingSystem.API.Controllers.ATM
     [Route("/ATM/[controller]")]
     public class CardController : WrapperController
     {
-
+        private readonly ITransactionOperationService _transactionOperationService;
         private readonly ICardService _cardService;
 
-        public CardController(ICardService cardService)
+        public CardController(ITransactionOperationService transactionOperationService, ICardService cardService)
         {
+            _transactionOperationService = transactionOperationService;
             _cardService = cardService;
         }
 
@@ -29,11 +30,12 @@ namespace BankingSystem.API.Controllers.ATM
             //}
             //return Ok(new { message, data });
         }
+
         //tamar
         [HttpPost("Withdraw")]
         public async Task<IActionResult> WithdrawAsync([FromForm] WithdrawalDTO withdrawalDto)
         {
-            var (success, message) = await _cardService.WithdrawAsync(withdrawalDto);
+            var (success, message) = await _transactionOperationService.WithdrawAsync(withdrawalDto);
             return await HandleResult(success, message);
             //if (!success)
             //{
@@ -42,6 +44,7 @@ namespace BankingSystem.API.Controllers.ATM
 
             //return Ok(new { message });
         }
+
         //tatia
         [HttpPut("PIN")]
         public async Task<IActionResult> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)

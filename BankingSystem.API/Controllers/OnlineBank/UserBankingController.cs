@@ -13,17 +13,18 @@ namespace BankingSystem.API.Controllers.OnlineBank
         private readonly IPersonService _personService;
         private readonly IAccountService _accountService;
         private readonly ICardService _cardService;
-        //private readonly ICurrencyService _currencyService;
         private readonly ITransactionDetailsService _transactionService;
+        private readonly ITransactionOperationService _transactionOperationService;
 
         public UserBankingController(IPersonService personService, IAccountService accountService,
-            ICardService cardService, ITransactionDetailsService transactionService)
+            ICardService cardService, ITransactionDetailsService transactionService,
+            ITransactionOperationService transactionOperationService)
         {
             _personService = personService;
             _accountService = accountService;
             _cardService = cardService;
-            //_currencyService = currencyService;
             _transactionService = transactionService;
+            _transactionOperationService = transactionOperationService;
         }
 
         [HttpGet("Accounts")]
@@ -41,7 +42,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             //return Ok(new { message, data });
         }
 
-
         [HttpGet("Cards")]
         public async Task<IActionResult> SeeCards()
         {
@@ -55,12 +55,11 @@ namespace BankingSystem.API.Controllers.OnlineBank
             //return Ok(new { message, data });
         }
 
-
         [HttpPost("TransferToOwnAccount")]
         public async Task<IActionResult> TransferToOwnAccount([FromForm] CreateTransactionDTO createTransactionDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: true);
+            var (success, message, data) = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: true);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -69,12 +68,11 @@ namespace BankingSystem.API.Controllers.OnlineBank
             //return Ok(new { message, data });
         }
 
-
         [HttpPost("TransferToOtherAccount")]
         public async Task<IActionResult> TransferToOtherAccount([FromForm] CreateTransactionDTO createTransactionDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _transactionService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
+            var (success, message, data) = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
             return await HandleResult(success, message, data);
             //if (!success)
             //{

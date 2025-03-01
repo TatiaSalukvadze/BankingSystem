@@ -1,16 +1,9 @@
 ﻿using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces;
-using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using BankingSystem.Domain.Enums;
 namespace BankingSystem.Application.Services
 {
     public class AccountService : IAccountService
@@ -20,8 +13,8 @@ namespace BankingSystem.Application.Services
         public AccountService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-
         }
+
         //tatia
         public async Task<(bool Success, string Message, Account? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto)
         {
@@ -59,8 +52,8 @@ namespace BankingSystem.Application.Services
 
             _unitOfWork.SaveChanges();
             return (true, "Account was created successfully!", account);
-
         }
+
         //tamar
         public async Task<(bool success, string message, List<SeeAccountsDTO>? data)> SeeAccountsAsync(string email)
         {
@@ -147,7 +140,44 @@ namespace BankingSystem.Application.Services
                 return false;
             }
             return true;
-
         }
+
+        //for atm --- feec unda gvaitvaliswino
+        //tamar 
+        public async Task<(bool success, string message, decimal balance, CurrencyType currency)> CheckBalanceAndWithdrawalLimitAsync(string cardNumber, string pin, decimal withdrawalAmount)
+        {
+            var result = await _unitOfWork.AccountRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
+
+            if (result == null)
+            {
+                return (false, "Unable to retrieve account details.", 0, 0);
+            }
+
+            decimal balance = result.Amount;
+            decimal totalWithdrawnIn24Hours = result.WithdrawnAmountIn24Hours;
+            CurrencyType currency = result.Currency;
+
+            decimal newTotal = totalWithdrawnIn24Hours + withdrawalAmount;
+
+            if (newTotal > 10000)
+            {
+                return (false, "You can't withdraw more than 10,000 within 24 hours.", balance,currency);
+            }
+
+            return (true, "", balance,  currency);
+        }
+
+        public async Task<(bool success, string message)> UpdateBalanceAsync(int accountId, decimal amountToDeduct)
+        {
+            bool isBalanceUpdated = await _unitOfWork.AccountRepository.UpdateAccountBalanceAsync(accountId, amountToDeduct);
+
+            if (!isBalanceUpdated)
+            {
+                return (false, "Failed to update account balance.");
+            }
+
+            return (true, "Balance updated successfully.");
+        }
+
     }
 }

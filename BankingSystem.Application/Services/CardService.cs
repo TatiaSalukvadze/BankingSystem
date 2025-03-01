@@ -24,6 +24,7 @@ namespace BankingSystem.Application.Services
             _unitOfWork = unitOfWork;
             _exchangeRateService = exchangeRateService; 
         }
+
         //tamar
         public async Task<(bool success, string message, Card? data)> CreateCardAsync(CreateCardDTO createCardDto)
         {
@@ -58,8 +59,8 @@ namespace BankingSystem.Application.Services
             _unitOfWork.SaveChanges();
 
             return (true, "Card was created successfully!", card);
-
         }
+
         //tatia
         public async Task<(bool success, string message, List<CardWithIBANDTO> data)> SeeCardsAsync(string email)
         {
@@ -76,8 +77,8 @@ namespace BankingSystem.Application.Services
             }
 
             return (true, "Cards For Account (IBAN) were found!", cards);          
-
         }
+
         //tamar
         public async Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(string cardNumber, string pin)
         {
@@ -86,43 +87,7 @@ namespace BankingSystem.Application.Services
             {
                 return (false, message, null);
             }
-
-            return await GetAccountBalanceAsync(cardNumber, pin);
-
-        }
-        //tamar
-        public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
-        {
-            var (cardValidated, message, card) = await AuthorizeCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-            if (!cardValidated) return (false, message);
-
-            var (isBalanceValid, balanceMessage, balance) = await GetAccountBalanceAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-            if (!isBalanceValid) return (false, balanceMessage);
-
-            var (withinLimit, limitMessage) = await IsWithinDailyLimitAsync(card.AccountId, withdrawalDto.Amount);
-            if (!withinLimit) return (false, limitMessage);
-
-            var (convertedAmount, conversionMessage) = await ConvertCurrencyIfNeededAsync(withdrawalDto.Amount, withdrawalDto.Currency, balance.Currency);
-            if (conversionMessage != null) return (false, conversionMessage);
-
-            decimal fee = CalculateWithdrawalFee(convertedAmount);
-            decimal totalAmountToDeduct = convertedAmount + fee;
-
-            if (balance.Amount < totalAmountToDeduct) return (false, "Not enough money.");
-
-            bool isBalanceUpdated = await _unitOfWork.CardRepository.UpdateAccountBalanceAsync(card.AccountId, totalAmountToDeduct);
-            if (!isBalanceUpdated) return (false, "Failed to update account balance.");
-
-            var (isTransactionCreated, transactionMessage) = await CreateTransactionAsync(card.AccountId, convertedAmount, fee, withdrawalDto.Currency);
-            if (!isTransactionCreated) return (false, transactionMessage);
-
-            return (true, "Withdrawal successful.");
-        }
-
-        //tamar//wasashleloa(copyiaa), see balance edzaxis im or methods!!!!!!!!!!!!!!!!!!!!!
-        private async Task<(bool, string, SeeBalanceDTO balance)> GetAccountBalanceAsync(string cardNumber, string pin)
-        {
-            var balance = await _unitOfWork.CardRepository.GetBalanceAsync(cardNumber, pin);
+            var balance = await _unitOfWork.AccountRepository.GetBalanceAsync(cardNumber, pin);
 
             if (balance is null || balance.Amount == 0 || balance.Currency == 0)
             {
@@ -131,85 +96,6 @@ namespace BankingSystem.Application.Services
 
             return (true, "Balance retrieved successfully.", balance);
         }
-
-        //tamar
-        private async Task<(bool, string)> IsWithinDailyLimitAsync(int accountId, decimal amount)
-        {
-            if (amount <= 0)
-            {
-                return (false, "Withdrawal amount must be greater than zero.");
-            }
-
-            decimal withdrawnAmount = await _unitOfWork.TransactionDetailsRepository.GetTotalWithdrawnAmountIn24Hours(accountId);
-            decimal newTotal = withdrawnAmount + amount;
-
-            if (newTotal > 10000)
-            {
-                return (false, "You can't withdraw more than 10000 within 24 hours.");
-            }
-
-            return (true, "");
-        }
-
-        //tamar
-        private async Task<(decimal, string)> ConvertCurrencyIfNeededAsync(decimal amount, CurrencyType fromCurrency, CurrencyType toCurrency)
-        {
-            if (fromCurrency == toCurrency)
-            {
-                return (amount, null);
-            }
-
-            decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency.ToString(), toCurrency.ToString());
-
-            if (exchangeRate <= 0)
-            {
-                return (0, "Currency conversion failed.");
-            }
-
-            decimal convertedAmount = amount * exchangeRate;
-            return (convertedAmount, null);
-        }
-
-        //tamar
-        private decimal CalculateWithdrawalFee(decimal amount)
-        {
-            decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
-            var withdrawalFee = amount * (atmWithdrawalPercent / 100);
-            return withdrawalFee;
-        }
-
-        //tamar
-        private async Task<(bool, string)> CreateTransactionAsync(int accountId, decimal amount, decimal fee, CurrencyType currency)
-        {
-            int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(currency.ToString());
-            if (currencyId <= 0)
-            {
-                return (false, "Currency does not exist in our system.");
-            }
-
-            var transaction = new TransactionDetails
-            {
-                BankProfit = fee,
-                Amount = amount,
-                FromAccountId = accountId,
-                ToAccountId = accountId,
-                CurrencyId = currencyId,
-                IsATM = true
-            };
-
-            int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
-            if (insertedId <= 0)
-            {
-                return (false, "Transaction could not be created, something happened!");
-            }
-
-            transaction.Id = insertedId;
-            _unitOfWork.SaveChanges();
-
-            return (true, "");
-        }
-
-
 
         //tatia
         public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
@@ -228,6 +114,7 @@ namespace BankingSystem.Application.Services
             _unitOfWork.SaveChanges();
             return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
         }
+
         //both
         public async Task<(bool success, string message, Card card)> AuthorizeCardAsync(string CardNumber, string PIN)
         {
@@ -247,6 +134,7 @@ namespace BankingSystem.Application.Services
             }
             return (true, "Card validated", card);
         }
+
         //tatia
         private bool CheckCardExpired(string expirationDate)
         {

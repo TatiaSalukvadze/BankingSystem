@@ -81,33 +81,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return updated;
         }
-        //tamar
-        public async Task<SeeBalanceDTO> GetBalanceAsync(string cardNumber, string pin)
-        {
-            var sql = @"
-            SELECT a.Amount, c.[Type] as Currency
-            FROM Card ca
-            JOIN Account a ON ca.AccountId = a.Id
-            JOIN CurrencyType as c ON c.Id = a.CurrencyId
-            WHERE ca.CardNumber = @cardNumber
-            AND ca.PIN = @pin";
-
-            var result = await _connection.QueryFirstOrDefaultAsync<SeeBalanceDTO>(sql, new { cardNumber, pin }, _transaction);
-
-            return result;
-        }
-
-        public async Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct)
-        {
-            var sql = @"
-            UPDATE Account
-            SET Amount = Amount - @TotalAmountToDeduct
-            WHERE Id = @AccountId";
-
-            var result = await _connection.ExecuteAsync(sql, new { AccountId = accountId, TotalAmountToDeduct = totalAmountToDeduct }, _transaction);
-
-            return result > 0;
-        }
+        
 
         public async Task<bool> DeleteCardAsync(string cardNumber)
         {

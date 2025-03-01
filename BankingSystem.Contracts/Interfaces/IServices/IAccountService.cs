@@ -1,6 +1,7 @@
 ﻿using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Domain.Entities;
+using BankingSystem.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace BankingSystem.Contracts.Interfaces.IServices
             string toIBAN, string email, bool isSelfTransfer);
         Task<bool> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
             decimal amountFromAccount, decimal amountToAccount);
+        Task<(bool success, string message, decimal balance, CurrencyType currency)> CheckBalanceAndWithdrawalLimitAsync(string cardNumber, string pin, decimal withdrawalAmount);
+        Task<(bool success, string message)> UpdateBalanceAsync(int accountId, decimal amountToDeduct);
     }
 
 }

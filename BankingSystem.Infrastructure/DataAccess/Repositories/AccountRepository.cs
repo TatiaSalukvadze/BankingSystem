@@ -1,6 +1,8 @@
-﻿using BankingSystem.Contracts.DTOs.UserBanking;
+﻿using BankingSystem.Contracts.DTOs.ATM;
+using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
+using BankingSystem.Domain.Enums;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -111,7 +113,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         }
 
 
-
         public async Task<bool> DeleteAccountByIBANAsync(string iban)
         {
             bool deleted = false;
@@ -133,6 +134,69 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 return await _connection.ExecuteScalarAsync<decimal>(sql, new { IBAN = iban }, _transaction);
             }
             return 0;
+        }
+
+        //tamar
+        public async Task<SeeBalanceDTO> GetBalanceAsync(string cardNumber, string pin)
+        {
+            if (_connection != null && _transaction != null)
+            {
+                var sql = @"
+                SELECT a.Amount, c.[Type] as Currency
+                FROM Card ca
+                JOIN Account a ON ca.AccountId = a.Id
+                JOIN CurrencyType as c ON c.Id = a.CurrencyId
+                WHERE ca.CardNumber = @cardNumber
+                AND ca.PIN = @pin";
+
+                var result = await _connection.QueryFirstOrDefaultAsync<SeeBalanceDTO>(sql, new { cardNumber, pin }, _transaction);
+
+                return result;
+            }
+            return null;
+        }
+
+        //tamar
+        public async Task<BalanceAndWithdrawalDTO> GetBalanceAndWithdrawnAmountAsync(string cardNumber, string pin)
+        {
+            if (_connection != null && _transaction != null)
+            {
+                var sql = @"
+                SELECT 
+                    a.Amount, 
+                    c.[Type] as Currency, 
+                    (SELECT COALESCE(SUM(td.Amount), 0) 
+                     FROM TransactionDetails td
+                     WHERE td.FromAccountId = a.Id
+                     AND td.IsATM = 1
+                     AND td.PerformedAt >= DATEADD(HOUR, -24, GETDATE())) AS WithdrawnAmountIn24Hours
+                FROM Card ca
+                JOIN Account a ON ca.AccountId = a.Id
+                JOIN CurrencyType c ON c.Id = a.CurrencyId
+                WHERE ca.CardNumber = @cardNumber
+                AND ca.PIN = @pin";
+
+                var result = await _connection.QueryFirstOrDefaultAsync<BalanceAndWithdrawalDTO>(sql, new { cardNumber, pin }, _transaction);
+                return result;
+            }
+            return null;
+        }
+
+        //tamar
+        public async Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct)
+        {
+            if (_connection != null && _transaction != null)
+            {
+                var sql = @"
+                UPDATE Account
+                SET Amount = Amount - @TotalAmountToDeduct
+                WHERE Id = @AccountId";
+
+                var result = await _connection.ExecuteAsync(sql, new { AccountId = accountId, TotalAmountToDeduct = totalAmountToDeduct }, _transaction);
+
+                return result > 0;
+            }
+            return false;
         }
     }
 }

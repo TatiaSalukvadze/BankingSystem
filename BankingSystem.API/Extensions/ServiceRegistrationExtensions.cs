@@ -1,9 +1,9 @@
 ﻿using BankingSystem.Application.Services;
+using BankingSystem.Application.FacadeServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Infrastructure;
 using BankingSystem.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Infrastructure.DataAccess.Repositories;
@@ -46,6 +46,7 @@ namespace BankingSystem.API.Extensions
             services.AddScoped<ICardService, CardService>();
             services.AddScoped<ITransactionDetailsService, TransactionDetailsService>();
             services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<ITransactionOperationService, TransactionOperationService>();
 
             return services;
         }
