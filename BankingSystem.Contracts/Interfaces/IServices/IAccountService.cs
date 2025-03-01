@@ -19,7 +19,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
             string toIBAN, string email, bool isSelfTransfer);
         Task<bool> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
             decimal amountFromAccount, decimal amountToAccount);
-        Task<(bool success, string message, decimal balance, CurrencyType currency)> CheckBalanceAndWithdrawalLimitAsync(string cardNumber, string pin, decimal withdrawalAmount);
+        Task<(bool success, string message, decimal balance, string currency)> CheckBalanceAndWithdrawalLimitAsync(string cardNumber, string pin, decimal withdrawalAmount);
         Task<(bool success, string message)> UpdateBalanceAsync(int accountId, decimal amountToDeduct);
     }
 

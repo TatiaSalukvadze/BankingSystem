@@ -6,6 +6,6 @@ namespace BankingSystem.Contracts.DTOs.ATM
     {
         public decimal Amount { get; set; }
         public decimal WithdrawnAmountIn24Hours { get; set; }
-        public CurrencyType Currency { get; set; }
+        public string Currency { get; set; }
     }
 }

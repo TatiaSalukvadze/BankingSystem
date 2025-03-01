@@ -25,9 +25,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             int insertedId = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = @"INSERT INTO Account (PersonId, IBAN, Amount, CurrencyId) 
+                var sql = @"INSERT INTO Account (PersonId, IBAN, Amount, Currency) 
                     OUTPUT INSERTED.Id 
-                    VALUES (@PersonId, @IBAN, @Amount, @CurrencyId)";
+                    VALUES (@PersonId, @IBAN, @Amount, @Currency)";
                 insertedId = await _connection.ExecuteScalarAsync<int>(sql, account, _transaction);
             }
 
@@ -67,8 +67,8 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             if (_connection != null && _transaction != null)
             {
                 var sql = @"
-                SELECT a.IBAN, c.[Type] AS Currency, a.Amount 
-                FROM Account AS a JOIN CurrencyType as c ON c.Id = a.CurrencyId
+                SELECT IBAN, Currency, Amount 
+                FROM Account AS a
                 WHERE @email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId);";
 
                 result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email }, _transaction)).ToList();
@@ -142,10 +142,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             if (_connection != null && _transaction != null)
             {
                 var sql = @"
-                SELECT a.Amount, c.[Type] as Currency
+                SELECT a.Amount, a.Currency
                 FROM Card ca
                 JOIN Account a ON ca.AccountId = a.Id
-                JOIN CurrencyType as c ON c.Id = a.CurrencyId
                 WHERE ca.CardNumber = @cardNumber
                 AND ca.PIN = @pin";
 
@@ -164,7 +163,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 var sql = @"
                 SELECT 
                     a.Amount, 
-                    c.[Type] as Currency, 
+                    a.Currency, 
                     (SELECT COALESCE(SUM(td.Amount), 0) 
                      FROM TransactionDetails td
                      WHERE td.FromAccountId = a.Id
@@ -172,7 +171,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                      AND td.PerformedAt >= DATEADD(HOUR, -24, GETDATE())) AS WithdrawnAmountIn24Hours
                 FROM Card ca
                 JOIN Account a ON ca.AccountId = a.Id
-                JOIN CurrencyType c ON c.Id = a.CurrencyId
                 WHERE ca.CardNumber = @cardNumber
                 AND ca.PIN = @pin";
 

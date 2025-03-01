@@ -19,34 +19,34 @@ namespace BankingSystem.Application.FacadeServices
         }
 
         //tatia
-        public async Task<(bool Success, string Message, TransactionDetails Data)> OnlineTransactionAsync(CreateTransactionDTO createTransactionDto,
+        public async Task<(bool Success, string Message)> OnlineTransactionAsync(CreateOnlineTransactionDTO createTransactionDto,
             string email, bool isSelfTransfer)
         {
 
             if (createTransactionDto.Amount <= 0)
             {
-                return (false, "You need to enter more than 0 value!", null);
+                return (false, "You need to enter more than 0 value!");
             }
             var (validated, message, fromAccount, toAccount) = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
                 createTransactionDto.ToIBAN, email, isSelfTransfer);
-            if (!validated) return (validated, message, null);
+            if (!validated) return (validated, message);
 
 
-            var (bankProfit, amountFromAccount, amountToAccount) = await _transactionDetailsService.CalculateTransactionAmountAsync(fromAccount.CurrencyId,
-                toAccount.CurrencyId, createTransactionDto.Amount, isSelfTransfer);
+            var (bankProfit, amountFromAccount, amountToAccount) = await _transactionDetailsService.CalculateTransactionAmountAsync(fromAccount.Currency,
+                toAccount.Currency, createTransactionDto.Amount, isSelfTransfer);
             if (bankProfit == 0 && amountFromAccount == 0 && amountToAccount == 0)
             {
-                return (false, "One of the account has incorrect currency!", null);
+                return (false, "One of the account has incorrect currency!");
             }
             if (fromAccount.Amount < amountFromAccount)
             {
-                return (false, "You don't have enough money to transfer on your account!", null);
+                return (false, "You don't have enough money to transfer on your account!");
             }
             bool accountsUpdated = await _accountService.UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, amountFromAccount, amountToAccount);
-            if (!accountsUpdated) return (false, "Balance couldn't be updated!", null);
+            if (!accountsUpdated) return (false, "Balance couldn't be updated!");
 
             return await _transactionDetailsService.CreateTransactionAsync(bankProfit, createTransactionDto.Amount, fromAccount.Id, toAccount.Id,
-                fromAccount.CurrencyId);
+                fromAccount.Currency);
         }
 
         public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
@@ -62,17 +62,15 @@ namespace BankingSystem.Application.FacadeServices
             var (success, message, balance, currency) = await _accountService.CheckBalanceAndWithdrawalLimitAsync(withdrawalDto.CardNumber, withdrawalDto.PIN, withdrawalDto.Amount);
             if (!success) return (false, message);
 
-            var (conversionSuccess, conversionMessage, amount, fee, totalAmountToDeduct) = await _transactionDetailsService.ConvertAndCalculateAsync(withdrawalDto.Amount, withdrawalDto.Currency, currency);
+            var (conversionSuccess, conversionMessage, amount, fee, totalAmountToDeduct) = await _transactionDetailsService.ConvertAndCalculateAsync(withdrawalDto.Amount, withdrawalDto.Currency.ToString(), currency);
             if (!conversionSuccess) return (false, conversionMessage);
             if (balance < totalAmountToDeduct) return (false, "Not enough money.");
 
             var (isBalanceUpdated, balanceMessage) = await _accountService.UpdateBalanceAsync(card.AccountId, totalAmountToDeduct);
             if (!isBalanceUpdated) return (false, balanceMessage);
 
-            var (isTransactionCreated, transactionMessage) = await _transactionDetailsService.CreateTransactionATMAsync(card.AccountId, amount, fee, currency);
-            if (!isTransactionCreated) return (false, transactionMessage);
-
-            return (true, "Withdrawal successful.");
+            return await _transactionDetailsService.CreateTransactionAsync(fee, amount, card.AccountId, card.AccountId, currency, IsATM:true);
+            
         }
     }
 }

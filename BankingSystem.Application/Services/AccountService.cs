@@ -30,17 +30,17 @@ namespace BankingSystem.Application.Services
             {
                 return (false, "Such IBAN already exist in our system!", null);
             }
-            int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(createAccountDto.Currency.ToString());
-            if (currencyId <= 0)
-            {
-                return (false, "Such Currency does not exist in our system!", null);
-            }
+            //int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(createAccountDto.Currency.ToString());
+            //if (currencyId <= 0)
+            //{
+            //    return (false, "Such Currency does not exist in our system!", null);
+            //}
             var account = new Account
             {
                 PersonId = personId,
                 IBAN = createAccountDto.IBAN,
                 Amount = createAccountDto.Amount,
-                CurrencyId = currencyId//(int)createAccountDto.Currency
+                Currency = createAccountDto.Currency.ToString()
             };
 
             int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);
@@ -144,18 +144,18 @@ namespace BankingSystem.Application.Services
 
         //for atm --- feec unda gvaitvaliswino
         //tamar 
-        public async Task<(bool success, string message, decimal balance, CurrencyType currency)> CheckBalanceAndWithdrawalLimitAsync(string cardNumber, string pin, decimal withdrawalAmount)
+        public async Task<(bool success, string message, decimal balance, string currency)> CheckBalanceAndWithdrawalLimitAsync(string cardNumber, string pin, decimal withdrawalAmount)
         {
             var result = await _unitOfWork.AccountRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
 
             if (result == null)
             {
-                return (false, "Unable to retrieve account details.", 0, 0);
+                return (false, "Unable to retrieve account details.", 0, null);
             }
 
             decimal balance = result.Amount;
             decimal totalWithdrawnIn24Hours = result.WithdrawnAmountIn24Hours;
-            CurrencyType currency = result.Currency;
+            string currency = result.Currency;
 
             decimal newTotal = totalWithdrawnIn24Hours + withdrawalAmount;
 

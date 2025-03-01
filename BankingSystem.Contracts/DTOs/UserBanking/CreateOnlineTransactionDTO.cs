@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Contracts.DTOs.UserBanking
 {
-    public class CreateTransactionDTO
+    public class CreateOnlineTransactionDTO
     {
         [Required, StringLength(22, MinimumLength = 22)]
         [RegularExpression("^GE[0-9]{2}CD[0-9]{16}$", ErrorMessage = "არასწორი IBAN ფორმატი.")]

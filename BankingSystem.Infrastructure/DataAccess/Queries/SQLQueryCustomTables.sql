@@ -16,20 +16,17 @@ CREATE TABLE Person (
     FOREIGN KEY (IdentityUserId) REFERENCES AspNetUsers(Id) ON DELETE CASCADE
 );
 
-CREATE TABLE CurrencyType(
-	Id INT IDENTITY(1,1) PRIMARY KEY,  
-	[Type] CHAR(3) NOT NULL,
-);
+
 GO
 CREATE TABLE Account(
 	Id INT IDENTITY(1,1) PRIMARY KEY,  
     PersonId INT NOT NULL,
 	IBAN CHAR(22) NOT NULL UNIQUE,
 	Amount DECIMAL(18,2) NOT NULL,
-	CurrencyId INT NOT NULL,
+	Currency CHAR(3) NOT NULL,
 	CONSTRAINT IBANFormatCheck CHECK(PATINDEX('GE[0-9][0-9]CD%', IBAN) = 1),
-	FOREIGN KEY (PersonId) REFERENCES Person(Id) ON DELETE CASCADE,
-	FOREIGN KEY (CurrencyId) REFERENCES  CurrencyType(Id)
+	CONSTRAINT CurrencyCheck CHECK(Currency IN('GEL','USD','EUR')),
+	FOREIGN KEY (PersonId) REFERENCES Person(Id) ON DELETE CASCADE
 );
 
 GO
@@ -56,20 +53,17 @@ CREATE TABLE TransactionDetails(
 	Amount DECIMAL(18,2) NOT NULL,
 	FromAccountId INT NOT NULL,
 	ToAccountId INT NOT NULL,
-	CurrencyId INT NOT NULL,	
+	Currency CHAR(3) NOT NULL,	
 	IsATM BIT NOT NULL DEFAULT 0,
 	PerformedAt DATETIME DEFAULT GETDATE(),
 	CONSTRAINT BankProfitCheck CHECK(BankProfit >= 0 ),
 	CONSTRAINT AmountCheck CHECK(Amount >= 0 ),
+	CONSTRAINT TransactionCurrencyCheck CHECK(Currency IN('GEL','USD','EUR')),
 	FOREIGN KEY (FromAccountId) REFERENCES  Account(Id),
-	FOREIGN KEY (ToAccountId) REFERENCES  Account(Id),
-	FOREIGN KEY (CurrencyId) REFERENCES  CurrencyType(Id),
+	FOREIGN KEY (ToAccountId) REFERENCES  Account(Id)
 );
 GO
 
-
-INSERT INTO CurrencyType VALUES
-('GEL'),('USD'),('EUR');
 
 
 

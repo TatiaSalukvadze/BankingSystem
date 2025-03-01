@@ -26,9 +26,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             int insertedId = 0;
             if (_connection != null && _transaction != null)
             {
-                var sql = @"INSERT INTO TransactionDetails (BankProfit, Amount, FromAccountId, ToAccountId, CurrencyId, IsATM) 
+                var sql = @"INSERT INTO TransactionDetails (BankProfit, Amount, FromAccountId, ToAccountId, Currency, IsATM) 
                     OUTPUT INSERTED.Id 
-                    VALUES (@BankProfit, @Amount, @FromAccountId, @ToAccountId, @CurrencyId, @IsATM)";
+                    VALUES (@BankProfit, @Amount, @FromAccountId, @ToAccountId, @Currency, @IsATM)";
                 insertedId = await _connection.ExecuteScalarAsync<int>(sql, transaction, _transaction);
             }
 
@@ -58,12 +58,12 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             {
                 var sql = @"
                 SELECT 
-                    CurrencyId AS Currency,
-                    SUM(CASE WHEN TD.PerformedAt > DATEADD(MONTH, -1, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastMonthProfit,
-                    SUM(CASE WHEN TD.PerformedAt > DATEADD(MONTH, -6, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastSixMonthProfit,
-                    SUM(CASE WHEN TD.PerformedAt > DATEADD(YEAR, -1, GETDATE()) THEN TD.BankProfit ELSE 0 END) AS LastYearProfit
-                FROM TransactionDetails TD
-                GROUP BY CurrencyId;";
+                    Currency,
+                    SUM(CASE WHEN PerformedAt > DATEADD(MONTH, -1, GETDATE()) THEN BankProfit ELSE 0 END) AS LastMonthProfit,
+                    SUM(CASE WHEN PerformedAt > DATEADD(MONTH, -6, GETDATE()) THEN BankProfit ELSE 0 END) AS LastSixMonthProfit,
+                    SUM(CASE WHEN PerformedAt > DATEADD(YEAR, -1, GETDATE()) THEN BankProfit ELSE 0 END) AS LastYearProfit
+                FROM TransactionDetails 
+                GROUP BY Currency;";
 
                 var result = await _connection.QueryAsync<BankProfitDTO>(sql, transaction: _transaction);
                 return result.ToList();
@@ -79,12 +79,11 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             {
                 var sql = @"
                 SELECT 
-                    c.[Type] AS Currency,
-                    SUM(td.Amount) AS TotalWithdrawnAmount
-                FROM TransactionDetails td
-                JOIN CurrencyType c ON c.Id = td.CurrencyId
-                WHERE td.IsATM = 1
-                GROUP BY c.[Type];";
+                    Currency,
+                    SUM(Amount) AS TotalWithdrawnAmount
+                FROM TransactionDetails
+                WHERE IsATM = 1
+                GROUP BY Currency;";
 
                 var result = await _connection.QueryAsync<AtmWithdrawDTO>(sql, transaction: _transaction);
                 return result.ToList();
@@ -99,8 +98,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             var result = new Dictionary<string, decimal>();
             if (_connection != null && _transaction != null)
             {
-                var sql = @"SELECT c.Type, ISNULL(AVG(BankProfit), 0) AS AverageProfit FROM TransactionDetails AS t 
-                    RIGHT JOIN CurrencyType AS c ON c.Id = t.CurrencyId GROUP BY c.Type";
+                var sql = @"SELECT Currency, ISNULL(AVG(BankProfit), 0) AS AverageProfit 
+                            FROM TransactionDetails AS t 
+                            GROUP BY Currency";
                 var sqlResult = await _connection.QueryAsync<(string, decimal)>(sql, transaction: _transaction);
                 result = sqlResult.ToDictionary(row => row.Item1, row => row.Item2);
 

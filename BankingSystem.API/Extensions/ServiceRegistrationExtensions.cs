@@ -57,7 +57,6 @@ namespace BankingSystem.API.Extensions
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICardRepository, CardRepository>();
             services.AddScoped<ITransactionDetailsRepository, TransactionDetailsRepository>();
-            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 
             return services;
         }

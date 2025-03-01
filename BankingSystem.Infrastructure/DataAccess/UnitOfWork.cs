@@ -17,7 +17,7 @@ namespace BankingSystem.Infrastructure.DataAccess
 
         public UnitOfWork(IDbTransaction dbTransaction, IPersonRepository personRepository, 
             IAccountRepository accountRepository, ICardRepository cardRepository, 
-            ITransactionDetailsRepository transactionDetailsRepository, ICurrencyRepository currencyRepository)
+            ITransactionDetailsRepository transactionDetailsRepository)
         {
 
             //_connectionString = configuration.GetConnectionString("default") ??
@@ -31,7 +31,6 @@ namespace BankingSystem.Infrastructure.DataAccess
             AccountRepository = accountRepository;
             CardRepository = cardRepository;
             TransactionDetailsRepository = transactionDetailsRepository;
-            CurrencyRepository = currencyRepository;
         }
         //private void RepoSetUp(IPersonRepository personRepository, IAccountRepository accountRepository,
         //   ICardRepository cardRepository,ITransactionDetailsRepository transactionDetailsRepository)
@@ -125,25 +124,7 @@ namespace BankingSystem.Infrastructure.DataAccess
                 }
             }
         }
-        private ICurrencyRepository _currencyRepository;
-        public ICurrencyRepository CurrencyRepository
-        {
-            get
-            {
-                return _currencyRepository;
-            }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException("There is no currency repository present");
-                }
-                else
-                {
-                    _currencyRepository = value;
-                }
-            }
-        }
+
         //public void BeginTransaction()
         //{
         //    if (_connection.State != ConnectionState.Open)

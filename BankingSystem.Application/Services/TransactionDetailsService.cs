@@ -16,19 +16,16 @@ namespace BankingSystem.Application.Services
         private readonly IExchangeRateService _exchangeRateService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
-        private readonly IAccountRepository _accountRepository;
 
-        public TransactionDetailsService(IConfiguration configuration, IUnitOfWork unitOfWork, IExchangeRateService exchangeRateService,
-            IAccountRepository accountRepository)
+        public TransactionDetailsService(IConfiguration configuration, IUnitOfWork unitOfWork, IExchangeRateService exchangeRateService)
         {
             _configuration = configuration;
             _unitOfWork = unitOfWork;
             _exchangeRateService = exchangeRateService;
-            _accountRepository = accountRepository;
         }
 
-        public async Task<(bool Success, string Message, TransactionDetails Data)> CreateTransactionAsync(decimal bankProfit, 
-            decimal amount, int fromAccountId, int toAccountId,int currencyId, bool IsATM = false)
+        public async Task<(bool Success, string Message)> CreateTransactionAsync(decimal bankProfit, 
+            decimal amount, int fromAccountId, int toAccountId, string currency, bool IsATM = false)
         {
             var transaction = new TransactionDetails
             {
@@ -36,37 +33,8 @@ namespace BankingSystem.Application.Services
                 Amount = amount,
                 FromAccountId = fromAccountId,
                 ToAccountId = toAccountId,
-                CurrencyId = currencyId,
+                Currency = currency,
                 IsATM = IsATM,
-            };
-
-            int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
-            if (insertedId <= 0)
-            {
-                return (false, "Transaction could not be created, something happened!", null);
-            }
-
-            transaction.Id = insertedId;
-            _unitOfWork.SaveChanges();
-            return (true, "Transaction was successfull!", transaction);
-        }
-
-        public async Task<(bool, string)> CreateTransactionATMAsync(int accountId, decimal amount, decimal fee, CurrencyType currency)
-        {
-            int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(currency.ToString());
-            if (currencyId <= 0)
-            {
-                return (false, "Currency does not exist in our system.");
-            }
-
-            var transaction = new TransactionDetails
-            {
-                BankProfit = fee,
-                Amount = amount,
-                FromAccountId = accountId,
-                ToAccountId = accountId,
-                CurrencyId = currencyId,
-                IsATM = true
             };
 
             int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
@@ -77,15 +45,44 @@ namespace BankingSystem.Application.Services
 
             transaction.Id = insertedId;
             _unitOfWork.SaveChanges();
-
-            return (true, "");
+            return (true, "Transaction was successfull!");
         }
 
-        public async Task<(bool success, string message, decimal amount, decimal fee, decimal totalAmountToDeduct)> ConvertAndCalculateAsync(decimal amount, CurrencyType fromCurrency, CurrencyType toCurrency)
+        //public async Task<(bool, string)> CreateTransactionATMAsync(int accountId, decimal amount, decimal fee, CurrencyType currency)
+        //{
+        //    //int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(currency.ToString());
+        //    //if (currencyId <= 0)
+        //    //{
+        //    //    return (false, "Currency does not exist in our system.");
+        //    //}
+
+        //    var transaction = new TransactionDetails
+        //    {
+        //        BankProfit = fee,
+        //        Amount = amount,
+        //        FromAccountId = accountId,
+        //        ToAccountId = accountId,
+        //        CurrencyId = currencyId,
+        //        IsATM = true
+        //    };
+
+        //    int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
+        //    if (insertedId <= 0)
+        //    {
+        //        return (false, "Transaction could not be created, something happened!");
+        //    }
+
+        //    transaction.Id = insertedId;
+        //    _unitOfWork.SaveChanges();
+
+        //    return (true, "");
+        //}
+
+        public async Task<(bool success, string message, decimal amount, decimal fee, decimal totalAmountToDeduct)> ConvertAndCalculateAsync(decimal amount, string fromCurrency, string toCurrency)
         {
             if (fromCurrency != toCurrency)
             {
-                decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency.ToString(), toCurrency.ToString());
+                decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
 
                 if (exchangeRate <= 0)
                 {
@@ -177,9 +174,9 @@ namespace BankingSystem.Application.Services
         //}
         //tatia
         public async Task<(decimal bankProfit, decimal amountFromAccount, decimal amountToAccount)> CalculateTransactionAmountAsync(
-            int fromCurrencyId, int toCurrencyId, decimal amountToTransfer, bool isSelfTransfer)
+            string fromCurrency, string toCurrency, decimal amountToTransfer, bool isSelfTransfer)
         {
-            decimal currencyRate = await CalculateCurrencyRateAsync(fromCurrencyId, toCurrencyId);
+            decimal currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
             if (currencyRate <= 0) { return (0, 0, 0); }
 
             decimal fee;
@@ -201,19 +198,20 @@ namespace BankingSystem.Application.Services
         }
 
         //tatia
-        private async Task<decimal> CalculateCurrencyRateAsync(int fromCurrencyId, int toCurrencyId)
-        {
-            decimal currencyRate = 1;
-            if (fromCurrencyId != toCurrencyId)
-            {
-                var fromCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(fromCurrencyId);
-                // ((CurrencyType)fromCurrencyId).ToString();
-                var toCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(toCurrencyId); //((CurrencyType)toCurrencyId).ToString();
-                if (fromCurrency == "" || toCurrency == "") { return 0; }
-                currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
-            }
-            return currencyRate;
-        }
+        //private async Task<decimal> CalculateCurrencyRateAsync(CurrencyType fromCurrency, CurrencyType toCurrency)
+        //{
+        //    decimal currencyRate = 1;
+
+        //    if (fromCurrencyId != toCurrencyId)
+        //    {
+        //        var fromCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(fromCurrencyId);
+        //        // ((CurrencyType)fromCurrencyId).ToString();
+        //        var toCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(toCurrencyId); //((CurrencyType)toCurrencyId).ToString();
+        //        if (fromCurrency == "" || toCurrency == "") { return 0; }
+        //        currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
+        //    }
+        //    return currencyRate;
+        //}
 
             //}
             ////tatia
