@@ -25,7 +25,7 @@ namespace BankingSystem.Application.Services
                 return (false, "Such person doesn't exist in our system!", null);
             }
 
-            bool IBANExists = await _unitOfWork.AccountRepository.IBANExists(createAccountDto.IDNumber);
+            bool IBANExists = await _unitOfWork.AccountRepository.IBANExists(createAccountDto.IBAN);
             if (IBANExists)
             {
                 return (false, "Such IBAN already exist in our system!", null);

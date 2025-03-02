@@ -3,20 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSystem.API", "BankingSystem.API\BankingSystem.API.csproj", "{E7329D34-554E-4F30-BD3A-6D34817C17F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSystem.API", "BankingSystem.API\BankingSystem.API.csproj", "{E7329D34-554E-4F30-BD3A-6D34817C17F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSystem.Contracts", "BankingSystem.Contracts\BankingSystem.Contracts.csproj", "{EA6D3029-53A6-4FB6-8034-68B7B62C0F09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSystem.Contracts", "BankingSystem.Contracts\BankingSystem.Contracts.csproj", "{EA6D3029-53A6-4FB6-8034-68B7B62C0F09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSystem.Application", "BankingSystem.Application\BankingSystem.Application.csproj", "{976BE08F-ED5F-48F0-AF19-40306020BACA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSystem.Application", "BankingSystem.Application\BankingSystem.Application.csproj", "{976BE08F-ED5F-48F0-AF19-40306020BACA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSystem.Domain", "BankingSystem.Domain\BankingSystem.Domain.csproj", "{FCA075EB-3A5A-41EE-BB3E-5777C8A1A1C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSystem.Domain", "BankingSystem.Domain\BankingSystem.Domain.csproj", "{FCA075EB-3A5A-41EE-BB3E-5777C8A1A1C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSystem.Infrastructure", "BankingSystem.Infrastructure\BankingSystem.Infrastructure.csproj", "{B128A8FC-E68F-4945-8D17-A9B68339A8AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSystem.Infrastructure", "BankingSystem.Infrastructure\BankingSystem.Infrastructure.csproj", "{B128A8FC-E68F-4945-8D17-A9B68339A8AC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{971830EC-BCDB-4E4D-B78F-A73531AFF82E}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSystem.UnitTests", "BankingSystem.UnitTests\BankingSystem.UnitTests.csproj", "{4B1E1868-CAC7-4995-9E51-76A2C40EEA97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,10 @@ Global
 		{B128A8FC-E68F-4945-8D17-A9B68339A8AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B128A8FC-E68F-4945-8D17-A9B68339A8AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B128A8FC-E68F-4945-8D17-A9B68339A8AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B1E1868-CAC7-4995-9E51-76A2C40EEA97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B1E1868-CAC7-4995-9E51-76A2C40EEA97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B1E1868-CAC7-4995-9E51-76A2C40EEA97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B1E1868-CAC7-4995-9E51-76A2C40EEA97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
