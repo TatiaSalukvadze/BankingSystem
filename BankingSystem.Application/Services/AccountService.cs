@@ -98,6 +98,7 @@ namespace BankingSystem.Application.Services
             _unitOfWork.SaveChanges();
             return (true, "Account deleted successfully.");
         }
+        #region transactionHelpers
         //for transaction changes
         //tatia
         public async Task<(bool Validated, string Message, Account from, Account to)> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
@@ -178,6 +179,7 @@ namespace BankingSystem.Application.Services
 
             return (true, "Balance updated successfully.");
         }
+        #endregion
 
     }
 }
