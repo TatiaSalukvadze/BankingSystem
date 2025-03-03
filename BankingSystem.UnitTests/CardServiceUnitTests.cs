@@ -180,6 +180,39 @@ namespace BankingSystem.UnitTests
 
         }
         [Fact]
+        public async Task CancelCardAsync_ShouldCancelCard()
+        {
+            string cardNumber = "4998892941729115";
+          
+            _mockUnitOfWork.Setup(u => u.CardRepository.CardNumberExistsAsync(cardNumber)).ReturnsAsync(true);
+            _mockUnitOfWork.Setup(u => u.CardRepository.DeleteCardAsync(cardNumber)).ReturnsAsync(true);
+
+            var (success, message) = await _cardService.CancelCardAsync(cardNumber);
+
+            Assert.True(success);
+            Assert.Equal("Card was successfully canceled!", message);
+
+            _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
+            _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once());
+        }
+
+        [Fact]
+        public async Task CancelCardAsync_ShouldNotCancelNonexistentCard()
+        {
+            string cardNumber = "4998892941729115";
+
+            _mockUnitOfWork.Setup(u => u.CardRepository.CardNumberExistsAsync(cardNumber)).ReturnsAsync(false);
+            _mockUnitOfWork.Setup(u => u.CardRepository.DeleteCardAsync(cardNumber)).ReturnsAsync(false);
+
+            var (success, message) = await _cardService.CancelCardAsync(cardNumber);
+
+            Assert.False(success);
+            Assert.Equal("There is no Card for that Card Number!", message);
+
+            _mockUnitOfWork.Verify(u => u.CardRepository, Times.Once());
+            _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never());
+        }
+        //[Fact]
         //public async Task SeeBalanceAsync_ShouldSeeBalance()
         //{
         //    string cardNumber = "4998892941729115";
