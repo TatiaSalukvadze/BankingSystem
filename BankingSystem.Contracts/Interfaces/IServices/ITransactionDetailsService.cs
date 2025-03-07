@@ -1,8 +1,6 @@
 ﻿using BankingSystem.Contracts.DTOs.ATM;
 using BankingSystem.Contracts.DTOs.Report;
 using BankingSystem.Contracts.DTOs.UserBanking;
-using BankingSystem.Domain.Entities;
-using BankingSystem.Domain.Enums;
 
 namespace BankingSystem.Contracts.Interfaces.IServices
 {
@@ -14,12 +12,9 @@ namespace BankingSystem.Contracts.Interfaces.IServices
         Task<(bool Success, string Message, List<TransactionCountChartDTO> Data)> NumberOfTransactionsChartAsync();
         Task<(bool Success, string Message, Dictionary<string, decimal> Data)> AverageBankProfitAsync();
         Task<(bool Success, string Message, List<BankProfitDTO> Data)> GetBankProfitByTimePeriodAsync();
-        Task<(bool Success, string Message, List<AtmWithdrawDTO> Data)> GetTotalAtmWithdrawalsAsync();
+        Task<(bool Success, string Message, List<TotalAtmWithdrawalDTO> Data)> GetTotalAtmWithdrawalsAsync();
         Task<(bool Success, string Message, IncomeExpenseDTO Data)> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDTO, string email);
         Task<(decimal bankProfit, decimal amountFromAccount, decimal amountToAccount)> CalculateTransactionAmountAsync(
             string fromCurrency, string toCurrency, decimal amountToTransfer, bool isSelfTransfer);
-        //
-        //Task<(bool, string)> CreateTransactionATMAsync(int accountId, decimal amount, decimal fee, CurrencyType currency);
-        Task<(bool success, string message, decimal amount, decimal fee, decimal totalAmountToDeduct)> ConvertAndCalculateAsync(decimal amount, string fromCurrency, string toCurrency);
     }
 }

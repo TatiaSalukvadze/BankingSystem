@@ -5,10 +5,8 @@ using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
-using BankingSystem.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
 
 namespace BankingSystem.Application.Services
 {
@@ -87,14 +85,15 @@ namespace BankingSystem.Application.Services
             {
                 return (false, message, null);
             }
-            var balance = await _unitOfWork.AccountRepository.GetBalanceAsync(cardNumber, pin);
 
-            if (balance is null || balance.Amount == 0 || balance.Currency == 0)
+            var balanceInfo = await _unitOfWork.AccountRepository.GetBalanceAsync(cardNumber, pin);
+
+            if (balanceInfo is null || balanceInfo.Amount == 0 || balanceInfo.Currency == 0)
             {
                 return (false, "Unable to retrieve balance.", null);
             }
 
-            return (true, "Balance retrieved successfully.", balance);
+            return (true, "Balance retrieved successfully.", balanceInfo);
         }
 
         //tatia

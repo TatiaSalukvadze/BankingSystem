@@ -73,7 +73,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         }
 
         //tamr
-        public async Task<List<AtmWithdrawDTO>> GetTotalAtmWithdrawalsAsync()
+        public async Task<List<TotalAtmWithdrawalDTO>> GetTotalAtmWithdrawalsAsync()
         {
             if (_connection != null && _transaction != null)
             {
@@ -85,11 +85,11 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 WHERE IsATM = 1
                 GROUP BY Currency;";
 
-                var result = await _connection.QueryAsync<AtmWithdrawDTO>(sql, transaction: _transaction);
+                var result = await _connection.QueryAsync<TotalAtmWithdrawalDTO>(sql, transaction: _transaction);
                 return result.ToList();
             }
 
-            return new List<AtmWithdrawDTO>();
+            return new List<TotalAtmWithdrawalDTO>();
         }
 
         //tatia

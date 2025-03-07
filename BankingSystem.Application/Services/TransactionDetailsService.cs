@@ -3,10 +3,8 @@ using BankingSystem.Contracts.DTOs.Report;
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
-using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
-using BankingSystem.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 
 namespace BankingSystem.Application.Services
@@ -24,6 +22,7 @@ namespace BankingSystem.Application.Services
             _exchangeRateService = exchangeRateService;
         }
 
+        //both
         public async Task<(bool Success, string Message)> CreateTransactionAsync(decimal bankProfit, 
             decimal amount, int fromAccountId, int toAccountId, string currency, bool IsATM = false)
         {
@@ -48,130 +47,6 @@ namespace BankingSystem.Application.Services
             return (true, "Transaction was successfull!");
         }
 
-        //public async Task<(bool, string)> CreateTransactionATMAsync(int accountId, decimal amount, decimal fee, CurrencyType currency)
-        //{
-        //    //int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(currency.ToString());
-        //    //if (currencyId <= 0)
-        //    //{
-        //    //    return (false, "Currency does not exist in our system.");
-        //    //}
-
-        //    var transaction = new TransactionDetails
-        //    {
-        //        BankProfit = fee,
-        //        Amount = amount,
-        //        FromAccountId = accountId,
-        //        ToAccountId = accountId,
-        //        CurrencyId = currencyId,
-        //        IsATM = true
-        //    };
-
-        //    int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
-        //    if (insertedId <= 0)
-        //    {
-        //        return (false, "Transaction could not be created, something happened!");
-        //    }
-
-        //    transaction.Id = insertedId;
-        //    _unitOfWork.SaveChanges();
-
-        //    return (true, "");
-        //}
-
-        public async Task<(bool success, string message, decimal amount, decimal fee, decimal totalAmountToDeduct)> ConvertAndCalculateAsync(decimal amount, string fromCurrency, string toCurrency)
-        {
-            if (fromCurrency != toCurrency)
-            {
-                decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
-
-                if (exchangeRate <= 0)
-                {
-                    return (false, "Currency conversion failed.",0, 0, 0);
-                }
-
-                amount *= exchangeRate;
-            }
-
-            decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
-            decimal fee = amount * (atmWithdrawalPercent / 100);
-
-            decimal totalAmountToDeduct = amount + fee;
-
-            return (true, "", amount, fee, totalAmountToDeduct);
-        }
-
-        //tatia
-        //public async Task<(bool Success, string Message, TransactionDetails Data)> OnlineTransactionAsync(CreateTransactionDTO createTransactionDto,
-        //    string email, bool isSelfTransfer)
-        //{
-
-
-
-
-        //    var (bankProfit, amountFromAccount, amountToAccount) = await CalculateTransactionAmountAsync(fromAccount.CurrencyId,
-        //        toAccount.CurrencyId, createTransactionDto.Amount, isSelfTransfer);
-        //    if (bankProfit == 0 && amountFromAccount == 0 && amountToAccount == 0) {
-        //        return (false, "One of the account has incorrect currency!", null);
-        //    }
-        //    if (fromAccount.Amount < amountFromAccount)
-        //    {
-        //        return (false, "You don't have enough money to transfer on your account!", null);
-        //    }
-        //    bool accountsUpdated = await UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, amountFromAccount, amountToAccount);
-        //    if(!accountsUpdated) return (false, "Balance couldn't be updated!", null);
-
-        //    var transaction = new TransactionDetails
-        //    {
-        //        BankProfit = bankProfit,
-        //        Amount = createTransactionDto.Amount,
-        //        FromAccountId = fromAccount.Id,
-        //        ToAccountId = toAccount.Id,
-        //        CurrencyId = fromAccount.CurrencyId,
-        //        IsATM = false,
-        //    };
-
-        //    int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
-        //    if (insertedId <= 0)
-        //    {
-        //        return (false, "Transaction could not be created, something happened!", null);
-        //    }
-
-        //    transaction.Id = insertedId;
-        //    _unitOfWork.SaveChanges();
-        //    return (true, "Transaction was successfull!", transaction);
-
-
-        //}
-        //helper methods
-        //tatia
-        //private async Task<(bool Validated, string Message, Account from, Account to)> ValidateAccountsAsync(string fromIBAN,
-        //    string toIBAN, string email, bool isSelfTransfer)
-        //{
-        //    if (fromIBAN == toIBAN)
-        //    {
-        //        return (false, "You can't transfer to same account!", null, null);
-        //    }
-        //    var fromAccount = await _accountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
-        //    Account toAccount;
-        //    if (isSelfTransfer)
-        //    {
-        //        toAccount = await _accountRepository.FindAccountByIBANandEmailAsync(toIBAN, email);
-        //    }
-        //    else
-        //    {
-        //        toAccount = await _accountRepository.FindAccountByIBANAsync(toIBAN);
-        //    }
-        //    if (fromAccount is null || toAccount is null)
-        //    {
-        //        return (false, "There is no account for one or both provided IBANs, check well!", null, null);
-        //    }
-
-        //    //if (fromAccount.Amount < amountToTransfer)
-        //    //{
-        //    //    return (false, "You don't have enough money to transfer on your account!", null, null);
-        //    //}
-        //    return (true, "Accounts validated!", fromAccount, toAccount);
-        //}
         //tatia
         public async Task<(decimal bankProfit, decimal amountFromAccount, decimal amountToAccount)> CalculateTransactionAmountAsync(
             string fromCurrency, string toCurrency, decimal amountToTransfer, bool isSelfTransfer)
@@ -198,37 +73,6 @@ namespace BankingSystem.Application.Services
         }
 
         //tatia
-        //private async Task<decimal> CalculateCurrencyRateAsync(CurrencyType fromCurrency, CurrencyType toCurrency)
-        //{
-        //    decimal currencyRate = 1;
-
-        //    if (fromCurrencyId != toCurrencyId)
-        //    {
-        //        var fromCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(fromCurrencyId);
-        //        // ((CurrencyType)fromCurrencyId).ToString();
-        //        var toCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(toCurrencyId); //((CurrencyType)toCurrencyId).ToString();
-        //        if (fromCurrency == "" || toCurrency == "") { return 0; }
-        //        currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
-        //    }
-        //    return currencyRate;
-        //}
-
-            //}
-            ////tatia
-            //private async Task<bool> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId, 
-            //    decimal amountFromAccount, decimal amountToAccount)
-            //{
-            //    var fromAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(fromAccountId, -amountFromAccount);
-            //    var toAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(toAccountId, amountToAccount);
-
-            //    if (!fromAccountUpdated || !toAccountUpdated)
-            //    {
-            //        return false; 
-            //    }
-            //    return true;
-
-            //}
-            //tatia
         public async Task<(bool Success, string Message, TransactionCountDTO Data)> NumberOfTransactionsAsync()
         {
             TransactionCountDTO transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsAsync();
@@ -269,7 +113,7 @@ namespace BankingSystem.Application.Services
         }
 
         //tamr
-        public async Task<(bool Success, string Message, List<AtmWithdrawDTO> Data)> GetTotalAtmWithdrawalsAsync()
+        public async Task<(bool Success, string Message, List<TotalAtmWithdrawalDTO> Data)> GetTotalAtmWithdrawalsAsync()
         {
             var rawData = await _unitOfWork.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync();
 
@@ -280,10 +124,10 @@ namespace BankingSystem.Application.Services
 
             return (false, "No ATM withdrawal data found.", null);
         }
+
         //both
         public async Task<(bool Success, string Message, IncomeExpenseDTO Data)> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto, string email)
         {
-
             var exactNow = DateTime.Now;
             var now = new DateTime(exactNow.Year, exactNow.Month, exactNow.Day, exactNow.Hour, exactNow.Minute, 0, exactNow.Kind);
             if (dateRangeDto.FromDate >= now || dateRangeDto.ToDate > now)
@@ -302,7 +146,107 @@ namespace BankingSystem.Application.Services
                 Expense = expense
             };
             return (true, "Income and Expense retreived!", incomeExpense);
-
         }
     }
 }
+
+//tatia
+//private async Task<decimal> CalculateCurrencyRateAsync(CurrencyType fromCurrency, CurrencyType toCurrency)
+//{
+//    decimal currencyRate = 1;
+
+//    if (fromCurrencyId != toCurrencyId)
+//    {
+//        var fromCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(fromCurrencyId);
+//        // ((CurrencyType)fromCurrencyId).ToString();
+//        var toCurrency = await _unitOfWork.CurrencyRepository.FindTypeByIdAsync(toCurrencyId); //((CurrencyType)toCurrencyId).ToString();
+//        if (fromCurrency == "" || toCurrency == "") { return 0; }
+//        currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
+//    }
+//    return currencyRate;
+//}
+
+//}
+////tatia
+//private async Task<bool> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId, 
+//    decimal amountFromAccount, decimal amountToAccount)
+//{
+//    var fromAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(fromAccountId, -amountFromAccount);
+//    var toAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(toAccountId, amountToAccount);
+
+//    if (!fromAccountUpdated || !toAccountUpdated)
+//    {
+//        return false; 
+//    }
+//    return true;
+
+//}
+
+//tatia
+//public async Task<(bool Success, string Message, TransactionDetails Data)> OnlineTransactionAsync(CreateTransactionDTO createTransactionDto,
+//    string email, bool isSelfTransfer)
+//{
+//    var (bankProfit, amountFromAccount, amountToAccount) = await CalculateTransactionAmountAsync(fromAccount.CurrencyId,
+//        toAccount.CurrencyId, createTransactionDto.Amount, isSelfTransfer);
+//    if (bankProfit == 0 && amountFromAccount == 0 && amountToAccount == 0) {
+//        return (false, "One of the account has incorrect currency!", null);
+//    }
+//    if (fromAccount.Amount < amountFromAccount)
+//    {
+//        return (false, "You don't have enough money to transfer on your account!", null);
+//    }
+//    bool accountsUpdated = await UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, amountFromAccount, amountToAccount);
+//    if(!accountsUpdated) return (false, "Balance couldn't be updated!", null);
+
+//    var transaction = new TransactionDetails
+//    {
+//        BankProfit = bankProfit,
+//        Amount = createTransactionDto.Amount,
+//        FromAccountId = fromAccount.Id,
+//        ToAccountId = toAccount.Id,
+//        CurrencyId = fromAccount.CurrencyId,
+//        IsATM = false,
+//    };
+
+//    int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
+//    if (insertedId <= 0)
+//    {
+//        return (false, "Transaction could not be created, something happened!", null);
+//    }
+
+//    transaction.Id = insertedId;
+//    _unitOfWork.SaveChanges();
+//    return (true, "Transaction was successfull!", transaction);
+
+
+//}
+//helper methods
+//tatia
+//private async Task<(bool Validated, string Message, Account from, Account to)> ValidateAccountsAsync(string fromIBAN,
+//    string toIBAN, string email, bool isSelfTransfer)
+//{
+//    if (fromIBAN == toIBAN)
+//    {
+//        return (false, "You can't transfer to same account!", null, null);
+//    }
+//    var fromAccount = await _accountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
+//    Account toAccount;
+//    if (isSelfTransfer)
+//    {
+//        toAccount = await _accountRepository.FindAccountByIBANandEmailAsync(toIBAN, email);
+//    }
+//    else
+//    {
+//        toAccount = await _accountRepository.FindAccountByIBANAsync(toIBAN);
+//    }
+//    if (fromAccount is null || toAccount is null)
+//    {
+//        return (false, "There is no account for one or both provided IBANs, check well!", null, null);
+//    }
+
+//    //if (fromAccount.Amount < amountToTransfer)
+//    //{
+//    //    return (false, "You don't have enough money to transfer on your account!", null, null);
+//    //}
+//    return (true, "Accounts validated!", fromAccount, toAccount);
+//}

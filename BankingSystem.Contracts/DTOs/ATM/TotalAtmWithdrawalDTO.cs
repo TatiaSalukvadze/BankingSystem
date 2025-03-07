@@ -2,9 +2,9 @@
 
 namespace BankingSystem.Contracts.DTOs.ATM
 {
-    public class AtmWithdrawDTO
+    public class TotalAtmWithdrawalDTO
     {
-        public CurrencyType Currency { get; set; }
         public decimal TotalWithdrawnAmount { get; set; }
+        public CurrencyType Currency { get; set; }
     }
 }

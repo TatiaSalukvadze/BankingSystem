@@ -1,7 +1,6 @@
 ﻿using BankingSystem.Contracts.DTOs.ATM;
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IServices;
-using BankingSystem.Domain.Entities;
 
 namespace BankingSystem.Application.FacadeServices
 {
@@ -22,7 +21,6 @@ namespace BankingSystem.Application.FacadeServices
         public async Task<(bool Success, string Message)> OnlineTransactionAsync(CreateOnlineTransactionDTO createTransactionDto,
             string email, bool isSelfTransfer)
         {
-
             if (createTransactionDto.Amount <= 0)
             {
                 return (false, "You need to enter more than 0 value!");
@@ -30,7 +28,6 @@ namespace BankingSystem.Application.FacadeServices
             var (validated, message, fromAccount, toAccount) = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
                 createTransactionDto.ToIBAN, email, isSelfTransfer);
             if (!validated) return (validated, message);
-
 
             var (bankProfit, amountFromAccount, amountToAccount) = await _transactionDetailsService.CalculateTransactionAmountAsync(fromAccount.Currency,
                 toAccount.Currency, createTransactionDto.Amount, isSelfTransfer);
@@ -52,25 +49,29 @@ namespace BankingSystem.Application.FacadeServices
         public async Task<(bool success, string message)> WithdrawAsync(WithdrawalDTO withdrawalDto)
         {
             var (cardValidated, cardMessage, card) = await _cardService.AuthorizeCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-            if (!cardValidated) return (false, cardMessage);
+            if (!cardValidated)
+            {
+                return (false, cardMessage);
+            }
 
             if (withdrawalDto.Amount <= 0)
             {
                 return (false, "Withdrawal amount must be greater than zero.");
             }
 
-            var (success, message, balance, currency) = await _accountService.CheckBalanceAndWithdrawalLimitAsync(withdrawalDto.CardNumber, withdrawalDto.PIN, withdrawalDto.Amount);
-            if (!success) return (false, message);
+            var (success, message, fee, amount, currency, totalAmountToDeduct) = await _accountService.ValidateAndCalculateATMWithdrawalAsync(withdrawalDto.CardNumber, withdrawalDto.PIN, withdrawalDto.Amount, withdrawalDto.Currency.ToString());
+            if (!success)
+            {
+                return (false, message);
+            }
 
-            var (conversionSuccess, conversionMessage, amount, fee, totalAmountToDeduct) = await _transactionDetailsService.ConvertAndCalculateAsync(withdrawalDto.Amount, withdrawalDto.Currency.ToString(), currency);
-            if (!conversionSuccess) return (false, conversionMessage);
-            if (balance < totalAmountToDeduct) return (false, "Not enough money.");
-
-            var (isBalanceUpdated, balanceMessage) = await _accountService.UpdateBalanceAsync(card.AccountId, totalAmountToDeduct);
-            if (!isBalanceUpdated) return (false, balanceMessage);
+            var (isBalanceUpdated, balanceMessage) = await _accountService.UpdateBalanceForATMAsync(card.AccountId, totalAmountToDeduct);
+            if (!isBalanceUpdated)
+            {
+                return (false, balanceMessage);
+            }
 
             return await _transactionDetailsService.CreateTransactionAsync(fee, amount, card.AccountId, card.AccountId, currency, IsATM:true);
-            
         }
     }
 }

@@ -8,22 +8,32 @@ using BankingSystem.Domain.Entities;
 using NuGet.Frameworks;
 using BankingSystem.Contracts.DTOs.UserBanking;
 using Microsoft.AspNetCore.Routing;
+using BankingSystem.Contracts.Interfaces.IExternalServices;
+using Microsoft.Extensions.Configuration;
+using BankingSystem.Contracts.DTOs.ATM;
 
 namespace BankingSystem.UnitTests
 {
     public class AccountServiceTests
     {
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+        private readonly Mock<IExchangeRateService> _mockExchangeRateService;
+        private readonly Mock<IConfiguration> _mockConfiguration;
         private readonly AccountService _accountService;
 
         public AccountServiceTests()
         {
             var accountRepositoryMock = new Mock<IAccountRepository>();
             var personRepositoryMock = new Mock<IPersonRepository>();
+
             _mockUnitOfWork = new Mock<IUnitOfWork>();
+            _mockExchangeRateService = new Mock<IExchangeRateService>();
+            _mockConfiguration = new Mock<IConfiguration>();
+
             _mockUnitOfWork.Setup(u => u.PersonRepository).Returns(personRepositoryMock.Object);
             _mockUnitOfWork.Setup(u => u.AccountRepository).Returns(accountRepositoryMock.Object);
-            _accountService = new AccountService(_mockUnitOfWork.Object);
+
+            _accountService = new AccountService(_mockUnitOfWork.Object, _mockExchangeRateService.Object, _mockConfiguration.Object);
         }
 
         [Fact]
@@ -203,14 +213,14 @@ namespace BankingSystem.UnitTests
         }
 
         [Fact]
-        public async Task UpdateBalanceAsync_ShouldUpdateBalance()
+        public async Task UpdateBalanceForATMAsync_ShouldUpdateBalance()
         {
             int accountId = 1;
             decimal amountToDeduct = 50;
 
             _mockUnitOfWork.Setup(u => u.AccountRepository.UpdateAccountBalanceAsync(accountId, amountToDeduct)).ReturnsAsync(true); 
 
-            var (success, message) = await _accountService.UpdateBalanceAsync(accountId, amountToDeduct);
+            var (success, message) = await _accountService.UpdateBalanceForATMAsync(accountId, amountToDeduct);
             Assert.True(success);
             Assert.Equal("Balance updated successfully.", message);
 
@@ -218,14 +228,14 @@ namespace BankingSystem.UnitTests
         }
 
         [Fact]
-        public async Task UpdateBalanceAsync_ShouldNotUpdateBalance()
+        public async Task UpdateBalanceForATMAsync_ShouldNotUpdateBalance()
         {
             int accountId = 1;
             decimal amountToDeduct = 50;
 
             _mockUnitOfWork.Setup(u => u.AccountRepository.UpdateAccountBalanceAsync(accountId, amountToDeduct)).ReturnsAsync(false);
 
-            var (success, message) = await _accountService.UpdateBalanceAsync(accountId, amountToDeduct);
+            var (success, message) = await _accountService.UpdateBalanceForATMAsync(accountId, amountToDeduct);
             Assert.False(success);
             Assert.Equal("Failed to update account balance.", message);
 

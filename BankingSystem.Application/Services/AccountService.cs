@@ -1,18 +1,24 @@
 ﻿using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces;
+using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
-using BankingSystem.Domain.Enums;
+using Microsoft.Extensions.Configuration;
+
 namespace BankingSystem.Application.Services
 {
     public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IExchangeRateService _exchangeRateService;
+        private readonly IConfiguration _configuration;
 
-        public AccountService(IUnitOfWork unitOfWork)
+        public AccountService(IUnitOfWork unitOfWork, IExchangeRateService exchangeRateService, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
+            _exchangeRateService = exchangeRateService;
+            _configuration = configuration;
         }
 
         //tatia
@@ -98,6 +104,7 @@ namespace BankingSystem.Application.Services
             _unitOfWork.SaveChanges();
             return (true, "Account deleted successfully.");
         }
+
         #region transactionHelpers
         //for transaction changes
         //tatia
@@ -143,32 +150,53 @@ namespace BankingSystem.Application.Services
             return true;
         }
 
-        //for atm --- feec unda gvaitvaliswino
-        //tamar 
-        public async Task<(bool success, string message, decimal balance, string currency)> CheckBalanceAndWithdrawalLimitAsync(string cardNumber, string pin, decimal withdrawalAmount)
+        //for atm
+        public async Task<(bool success, string message, decimal fee, decimal balance, string currency, decimal totalAmountToDeduct)>ValidateAndCalculateATMWithdrawalAsync(string cardNumber, string pin, decimal withdrawalAmount, string withdrawalCurrency)
         {
             var result = await _unitOfWork.AccountRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
 
             if (result == null)
             {
-                return (false, "Unable to retrieve account details.", 0, null);
+                return (false, "Unable to retrieve account details.",0, 0, null, 0);
             }
 
-            decimal balance = result.Amount;
+            decimal accountBalance = result.Amount;
             decimal totalWithdrawnIn24Hours = result.WithdrawnAmountIn24Hours;
-            string currency = result.Currency;
+            string accountCurrency = result.Currency;
 
-            decimal newTotal = totalWithdrawnIn24Hours + withdrawalAmount;
+            decimal convertedAmount = withdrawalAmount;
+            if (withdrawalCurrency != accountCurrency)
+            {
+                decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(withdrawalCurrency, accountCurrency);
+
+                if (exchangeRate <= 0)
+                {
+                    return (false, "Currency conversion failed.",0, 0, null, 0);
+                }
+
+                convertedAmount *= exchangeRate;
+            }
+
+            decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
+            decimal fee = convertedAmount * (atmWithdrawalPercent / 100);
+            decimal totalAmountToDeduct = convertedAmount + fee;
+
+            if (accountBalance < totalAmountToDeduct)
+            {
+                return (false, "You don't have enough money",0, 0, null, 0);
+            }
+
+            decimal newTotal = totalWithdrawnIn24Hours + totalAmountToDeduct;
 
             if (newTotal > 10000)
             {
-                return (false, "You can't withdraw more than 10,000 within 24 hours.", balance,currency);
+                return (false, "You can't withdraw more than 10,000 within 24 hours.", 0, 0, null, 0);
             }
 
-            return (true, "", balance,  currency);
+            return (true, "", fee, convertedAmount, accountCurrency, totalAmountToDeduct);
         }
 
-        public async Task<(bool success, string message)> UpdateBalanceAsync(int accountId, decimal amountToDeduct)
+        public async Task<(bool success, string message)> UpdateBalanceForATMAsync(int accountId, decimal amountToDeduct)
         {
             bool isBalanceUpdated = await _unitOfWork.AccountRepository.UpdateAccountBalanceAsync(accountId, amountToDeduct);
 
@@ -180,6 +208,5 @@ namespace BankingSystem.Application.Services
             return (true, "Balance updated successfully.");
         }
         #endregion
-
     }
 }

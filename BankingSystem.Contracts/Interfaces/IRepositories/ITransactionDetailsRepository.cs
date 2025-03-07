@@ -11,7 +11,7 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<List<TransactionCountChartDTO>> NumberOfTransactionsLastMonthAsync();
         Task<Dictionary<string, decimal>>  AverageBankProfitAsyncAsync();
         Task<List<BankProfitDTO>> GetBankProfitByTimePeriodAsync();
-        Task<List<AtmWithdrawDTO>> GetTotalAtmWithdrawalsAsync();
+        Task<List<TotalAtmWithdrawalDTO>> GetTotalAtmWithdrawalsAsync();
         Task<Dictionary<string, decimal>> GetTotalIncomeAsync(DateTime fromDate, DateTime toDate, string email);
         Task<Dictionary<string, decimal>> GetTotalExpenseAsync(DateTime fromDate, DateTime toDate, string email);
     }
