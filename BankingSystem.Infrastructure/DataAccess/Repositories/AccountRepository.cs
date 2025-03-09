@@ -72,7 +72,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<Account> FindAccountByIBANAsync(string IBAN)
         {
             Account account = null;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT TOP 1 * FROM Account WHERE IBAN = @IBAN";
                 account = await _connection.QueryFirstOrDefaultAsync<Account>(sql, new { IBAN });
