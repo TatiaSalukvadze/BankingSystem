@@ -2,7 +2,6 @@
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
-using BankingSystem.Domain.Enums;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -19,7 +18,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             _connection = connection;
             _transaction = transaction;
         }
-        //tatia
+        
         public async Task<int> CreateAccountAsync(Account account)
         {
             int insertedId = 0;
@@ -30,50 +29,43 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                     VALUES (@PersonId, @IBAN, @Amount, @Currency)";
                 insertedId = await _connection.ExecuteScalarAsync<int>(sql, account, _transaction);
             }
-
             return insertedId;
         }
 
         public async Task<bool> IBANExists(string IBAN)
         {
             bool exists = false;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT CASE WHEN EXISTS (SELECT 1 FROM Account WHERE IBAN = @IBAN) THEN 1 ELSE 0 END AS IBANExists";
-                exists = await _connection.ExecuteScalarAsync<bool>(sql, new {IBAN}, _transaction);
+                exists = await _connection.ExecuteScalarAsync<bool>(sql, new {IBAN});
             }
-
             return exists;
-
         }
 
         public async Task<bool> AccountExistForEmail(string email)
         {
             bool exists = false;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = @"SELECT CASE WHEN EXISTS (SELECT 1 FROM Account as a WHERE @email = 
                     (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId)) THEN 1 ELSE 0 END AS AccountExists";
-                exists = await _connection.ExecuteScalarAsync<bool>(sql, new { email }, _transaction);
+                exists = await _connection.ExecuteScalarAsync<bool>(sql, new { email });
             }
-
             return exists;
         }
 
         public async Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email)
         {
             var result = new List<SeeAccountsDTO>();
-
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = @"
                 SELECT IBAN, Currency, Amount 
                 FROM Account AS a
                 WHERE @email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId);";
-
-                result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email }, _transaction)).ToList();
+                result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email })).ToList();
             }
-
             return result;
         }
 
@@ -83,7 +75,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             if (_connection != null && _transaction != null)
             {
                 var sql = "SELECT TOP 1 * FROM Account WHERE IBAN = @IBAN";
-                account = await _connection.QueryFirstOrDefaultAsync<Account>(sql, new { IBAN }, _transaction);
+                account = await _connection.QueryFirstOrDefaultAsync<Account>(sql, new { IBAN });
             }
             return account;
         }
@@ -91,11 +83,11 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<Account> FindAccountByIBANandEmailAsync(string IBAN, string email)
         {
             Account account = null;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = @"SELECT TOP 1 * FROM Account WHERE PersonId = 
                     (SELECT Id FROM Person WHERE Email = @email) AND IBAN = @IBAN";
-                account = await _connection.QueryFirstOrDefaultAsync<Account>(sql, new { email, IBAN }, _transaction);
+                account = await _connection.QueryFirstOrDefaultAsync<Account>(sql, new { email, IBAN });
             }
             return account;
         }
@@ -112,7 +104,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return updated;
         }
 
-
         public async Task<bool> DeleteAccountByIBANAsync(string iban)
         {
             bool deleted = false;
@@ -122,24 +113,22 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 var rowsAffected = await _connection.ExecuteAsync(sql, new { IBAN = iban }, _transaction);
                 deleted = rowsAffected > 0;
             }
-
             return deleted;
         }
 
         public async Task<decimal> GetBalanceByIBANAsync(string iban)
         {
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT Amount FROM Account WHERE IBAN = @IBAN";
-                return await _connection.ExecuteScalarAsync<decimal>(sql, new { IBAN = iban }, _transaction);
+                return await _connection.ExecuteScalarAsync<decimal>(sql, new { IBAN = iban });
             }
             return 0;
         }
 
-        //tamar
         public async Task<SeeBalanceDTO> GetBalanceAsync(string cardNumber, string pin)
         {
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = @"
                 SELECT a.Amount, a.Currency
@@ -147,18 +136,15 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 JOIN Account a ON ca.AccountId = a.Id
                 WHERE ca.CardNumber = @cardNumber
                 AND ca.PIN = @pin";
-
-                var result = await _connection.QueryFirstOrDefaultAsync<SeeBalanceDTO>(sql, new { cardNumber, pin }, _transaction);
-
+                var result = await _connection.QueryFirstOrDefaultAsync<SeeBalanceDTO>(sql, new { cardNumber, pin });
                 return result;
             }
             return null;
         }
 
-        //tamar
         public async Task<BalanceAndWithdrawalDTO> GetBalanceAndWithdrawnAmountAsync(string cardNumber, string pin)
         {
-            if (_connection != null && _transaction != null)
+            if (_connection != null)    
             {
                 var sql = @"
                 SELECT 
@@ -174,13 +160,12 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 WHERE ca.CardNumber = @cardNumber
                 AND ca.PIN = @pin";
 
-                var result = await _connection.QueryFirstOrDefaultAsync<BalanceAndWithdrawalDTO>(sql, new { cardNumber, pin }, _transaction);
+                var result = await _connection.QueryFirstOrDefaultAsync<BalanceAndWithdrawalDTO>(sql, new { cardNumber, pin });
                 return result;
             }
             return null;
         }
 
-        //tamar
         public async Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct)
         {
             if (_connection != null && _transaction != null)
@@ -189,9 +174,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 UPDATE Account
                 SET Amount = Amount - @TotalAmountToDeduct
                 WHERE Id = @AccountId";
-
                 var result = await _connection.ExecuteAsync(sql, new { AccountId = accountId, TotalAmountToDeduct = totalAmountToDeduct }, _transaction);
-
                 return result > 0;
             }
             return false;

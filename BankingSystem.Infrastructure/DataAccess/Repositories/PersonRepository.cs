@@ -2,7 +2,6 @@
 using BankingSystem.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System;
 using System.Data;
 using static Dapper.SqlMapper;
 
@@ -21,28 +20,25 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
         public async Task<Person?> FindByIdentityIdAsync(string identityId)
         {
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT TOP 1 * FROM Person WHERE IdentityUserId = @identityId";
-                return await _connection.QueryFirstOrDefaultAsync<Person>(sql, new { identityId }, _transaction);
+                return await _connection.QueryFirstOrDefaultAsync<Person>(sql, new { identityId });
             }
-
             return null;
         }
 
         public async Task<int> FindIdByIDNumberAsync(string IDNumber)
         {
             int id = 0;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT Id FROM Person WHERE IDNumber = @IDNumber";
-                id = await _connection.ExecuteScalarAsync<int>(sql, new { IDNumber }, _transaction);
+                id = await _connection.ExecuteScalarAsync<int>(sql, new { IDNumber });
             }
-
             return id;
         }
 
-        //tatia
         public async Task<int> RegisterPersonAsync(Person person)
         {
             int addedUserId = 0;
@@ -56,35 +52,34 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return addedUserId;
         }
 
-        //tatia
         public async Task<int> PeopleRegisteredThisYear()
         {
             int count = 0;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT COUNT(*) FROM Person WHERE YEAR(CreatedAt) = YEAR(GETDATE())";
-                count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+                count = await _connection.ExecuteScalarAsync<int>(sql);
             }
             return count;
         }
-        //tamar
+
         public async Task<int> PeopleRegisteredLastOneYear()
         {
             if (_connection != null && _transaction != null)
             {
                 var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt >= DATEADD(YEAR, -1, GETDATE())";
-                var count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+                var count = await _connection.ExecuteScalarAsync<int>(sql);
                 return count;
             }
             return 0;
         }
-        //tamar
+
         public async Task<int> PeopleRegisteredLast30Days()
         {
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt >= DATEADD(DAY, -30, GETDATE())";
-                var count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+                var count = await _connection.ExecuteScalarAsync<int>(sql);
                 return count;
             }
             return 0;

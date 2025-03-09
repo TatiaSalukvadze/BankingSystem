@@ -1,10 +1,8 @@
-﻿using BankingSystem.Contracts.DTOs.ATM;
-using BankingSystem.Contracts.DTOs.UserBanking;
+﻿using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.Identity.Client;
 using System.Data;
 
 namespace BankingSystem.Infrastructure.DataAccess.Repositories
@@ -23,36 +21,35 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<Card> GetCardAsync(string cardNumber)
         {
             Card card = null;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT TOP 1 * FROM Card WHERE CardNumber = @cardNumber";
-                card = await _connection.QueryFirstOrDefaultAsync<Card>(sql, new { cardNumber }, _transaction);
+                card = await _connection.QueryFirstOrDefaultAsync<Card>(sql, new { cardNumber });
             }
             return card;
         }
-        //tatia
+
         public async Task<List<CardWithIBANDTO>> GetCardsForPersonAsync(string email)
         {
             var result = new List<CardWithIBANDTO> { };
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = @"SELECT a.IBAN, p.[Name], p.Surname, c.CardNumber, c.ExpirationDate, c.CVV, c.PIN 
                     FROM Card AS c JOIN Account AS a ON c.AccountId = a.Id
                     JOIN Person AS p ON a.PersonId = p.Id 
                     WHERE @email = p.Email";
-                result = (await _connection.QueryAsync<CardWithIBANDTO>(sql, new { email }, _transaction)).ToList();
+                result = (await _connection.QueryAsync<CardWithIBANDTO>(sql, new { email })).ToList();
             }
-
             return result;
         }
 
         public async Task<bool> CardNumberExistsAsync(string cardNumber)
         {
             bool exists = false;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT CASE WHEN EXISTS (SELECT 1 FROM Card WHERE CardNumber = @CardNumber) THEN 1 ELSE 0 END";
-                exists = await _connection.ExecuteScalarAsync<bool>(sql, new { CardNumber = cardNumber }, _transaction);
+                exists = await _connection.ExecuteScalarAsync<bool>(sql, new { CardNumber = cardNumber });
             }
             return exists;
         }
@@ -82,7 +79,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return updated;
         }
         
-
         public async Task<bool> DeleteCardAsync(string cardNumber)
         {
             bool deleted = false;
