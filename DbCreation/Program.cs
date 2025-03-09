@@ -1,7 +1,8 @@
 ﻿//using Microsoft.AspNetCore.Identity;
 
 using BankingSystem.Infrastructure.Identity;
-using DbCreation;
+using DbCreation.DbSetup;
+using DbCreation.Helpers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,20 +15,12 @@ configurationManager.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("a
 
 
 var serviceCollection = new ServiceCollection()
-    //.AddSingleton<IConfiguration>(configurationManager)
     .AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configurationManager.GetConnectionString("default")))
-     .AddScoped<IDbConnection>((s) => new SqlConnection(configurationManager.GetConnectionString("base")))
-     .AddScoped<DbSetup>();
-//.AddIdentity<IdentityUser, IdentityRole>(options =>
-//        {
-//            options.Password.RequireDigit = true;
-//            options.Password.RequireLowercase = true;
-//            options.Password.RequireUppercase = true;
-//            options.Password.RequireNonAlphanumeric = true;
-//            options.Password.RequiredLength = 8;
-//        }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-
+                options.UseSqlServer(configurationManager.GetConnectionString("dbConnection")))
+     //.AddScoped<IDbConnection>((s) => new SqlConnection(configurationManager.GetConnectionString("base")))
+     .AddScoped<IDbConnectionFactory>((s) => new DbConnectionFactory(
+         configurationManager.GetConnectionString("serverConnection"),configurationManager.GetConnectionString("dbConnection")))
+     .AddScoped<IDbSetup, DbSetup>();
 
 
 
@@ -38,7 +31,7 @@ try
 {
     using (var scope = serviceProvider.CreateScope())
     {
-        var dbSetup = scope.ServiceProvider.GetRequiredService<DbSetup>();
+        var dbSetup = scope.ServiceProvider.GetRequiredService<IDbSetup>();
         await dbSetup.CreateDbAndTables();
 
     }
@@ -48,12 +41,3 @@ catch (Exception ex)
     Console.WriteLine(ex.Message);
 }
 
-
-//async Task ApplyMigrations(ServiceProvider serviceProvider)
-//{
-
-//        var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
-
-//            await dbContext.Database.MigrateAsync();
-
-//    }
