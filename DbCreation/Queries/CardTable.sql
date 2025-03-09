@@ -1,0 +1,13 @@
+CREATE TABLE Card(
+	Id INT IDENTITY(1,1) PRIMARY KEY,  
+    AccountId INT NOT NULL,
+	CardNumber CHAR(16) NOT NULL UNIQUE,
+	ExpirationDate CHAR(5) NOT NULL,
+	CVV CHAR(3) NOT NULL,
+	PIN CHAR(4) NOT NULL,
+	CONSTRAINT CardNumberCheck CHECK(PATINDEX('%[^0-9]%', CardNumber) = 0 ),
+	CONSTRAINT ExpirationDateCheck CHECK(PATINDEX('[0-9][0-9]/[0-9][0-9]', ExpirationDate) = 1),
+	CONSTRAINT CVVCheck CHECK(PATINDEX('%[^0-9]%', CVV) = 0 ),
+	CONSTRAINT PINCheck CHECK(PATINDEX('%[^0-9]%', PIN) = 0 ),
+	FOREIGN KEY (AccountId) REFERENCES Account(Id) ON DELETE CASCADE
+);

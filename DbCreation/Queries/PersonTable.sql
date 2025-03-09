@@ -1,0 +1,13 @@
+﻿CREATE TABLE Person (
+    Id INT IDENTITY(1,1) PRIMARY KEY,  
+    IdentityUserId NVARCHAR(450) NOT NULL UNIQUE, 
+    [Name] NVARCHAR(100) NOT NULL,
+    Surname NVARCHAR(100) NOT NULL,
+	IDNumber CHAR(11) NOT NULL UNIQUE,
+	Birthdate Date NOT NULL,
+    Email NVARCHAR(255) NOT NULL UNIQUE,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+	CONSTRAINT IdNumberCheck CHECK(PATINDEX('%[^0-9]%', IDNumber) = 0 ),
+	CONSTRAINT EmailFormatCheck CHECK(Email LIKE '%_@_%._%'),
+    FOREIGN KEY (IdentityUserId) REFERENCES AspNetUsers(Id) ON DELETE CASCADE
+);
