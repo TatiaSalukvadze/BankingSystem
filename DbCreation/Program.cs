@@ -4,12 +4,16 @@ using DbCreation.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 var configurationManager = new ConfigurationManager();
 configurationManager.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
 
+Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(configurationManager).CreateLogger();
 
 var serviceCollection = new ServiceCollection()
+    .AddLogging(loggingBuilder => loggingBuilder.AddSerilog())
     .AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configurationManager.GetConnectionString("dbConnection")))
      //.AddScoped<IDbConnection>((s) => new SqlConnection(configurationManager.GetConnectionString("base")))

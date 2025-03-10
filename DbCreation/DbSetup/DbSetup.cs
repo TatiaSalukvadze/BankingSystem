@@ -2,6 +2,7 @@
 using Dapper;
 using DbCreation.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Data;
 
 namespace DbCreation.DbSetup
@@ -11,13 +12,15 @@ namespace DbCreation.DbSetup
         private readonly ApplicationDbContext _dbContext;
         private readonly IDbConnection _serverConnection;
         private readonly IDbConnection _dbConnection;
+        private readonly ILogger _logger;
         private string _basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName, "Queries");
         
-        public DbSetup(ApplicationDbContext dbContext, IDbConnectionFactory dbConnectionFactory)
+        public DbSetup(ApplicationDbContext dbContext, IDbConnectionFactory dbConnectionFactory, ILogger<DbSetup> logger)
         {
             _dbContext = dbContext;
             _dbConnection = dbConnectionFactory.CreateDbConnection();
             _serverConnection = dbConnectionFactory.CreateServerConnection();
+            _logger = logger;
         }
 
         public async Task CreateDbAndTables()
@@ -34,6 +37,7 @@ namespace DbCreation.DbSetup
 
             if (dbExists)
             {
+                _logger.LogInformation("Db already exists!");
                 return;
             }
             using (_dbConnection)
@@ -55,6 +59,7 @@ namespace DbCreation.DbSetup
             await _dbConnection.ExecuteAsync(createAccountTable);
             await _dbConnection.ExecuteAsync(createCardTable);
             await _dbConnection.ExecuteAsync(createTransactionDetailsTable);
+            _logger.LogInformation("Custom Tables created!");
         }
 
         private async Task CreateProcedures()
@@ -66,6 +71,7 @@ namespace DbCreation.DbSetup
             await _dbConnection.ExecuteAsync(SelectTotalExpenseProcedure);
             await _dbConnection.ExecuteAsync(SelectTotalIncomeProcedure);
             await _dbConnection.ExecuteAsync(SelectTransactionCountProcedure);
+            _logger.LogInformation("Procedures created!");
         }
     }
 }
