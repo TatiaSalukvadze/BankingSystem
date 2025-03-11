@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankingSystem.Infrastructure.Configuration
+namespace BankingSystem.Infrastructure.ExternalServices.Configuration
 {
     public class CurrencyApiSettings
     {

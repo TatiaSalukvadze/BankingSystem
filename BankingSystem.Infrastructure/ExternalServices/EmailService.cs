@@ -1,10 +1,10 @@
-﻿using BankingSystem.Infrastructure.Configuration;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using System.Net.Mail;
 using System.Net;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using BankingSystem.Infrastructure.ExternalServices.Configuration;
 
 namespace BankingSystem.Infrastructure.ExternalServices
 {

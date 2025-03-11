@@ -1,4 +1,4 @@
-﻿namespace BankingSystem.Infrastructure.Configuration
+﻿namespace BankingSystem.Infrastructure.ExternalServices.Configuration
 {
     public class EmailSettings
     {

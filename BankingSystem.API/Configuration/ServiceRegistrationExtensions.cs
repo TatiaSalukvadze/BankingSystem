@@ -9,10 +9,10 @@ using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Infrastructure.DataAccess.Repositories;
 using BankingSystem.Infrastructure.DataAccess;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
-using BankingSystem.Infrastructure.Configuration;
 using BankingSystem.Infrastructure.ExternalServices;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using BankingSystem.Infrastructure.ExternalServices.Configuration;
 
 namespace BankingSystem.API.Extensions
 {
