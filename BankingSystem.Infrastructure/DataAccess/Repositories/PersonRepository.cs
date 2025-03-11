@@ -58,7 +58,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             if (_connection != null && _transaction != null)
             {
                 var sql = "SELECT COUNT(*) FROM Person WHERE YEAR(CreatedAt) = YEAR(GETDATE())";
-                count = await _connection.ExecuteScalarAsync<int>(sql, _transaction);
+                count = await _connection.ExecuteScalarAsync<int>(sql, transaction:_transaction);
             }
             return count;
         }
@@ -68,7 +68,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             if (_connection != null && _transaction != null)
             {
                 var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt >= DATEADD(YEAR, -1, GETDATE())";
-                var count = await _connection.ExecuteScalarAsync<int>(sql, _transaction);
+                var count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
                 return count;
             }
             return 0;
@@ -79,7 +79,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             if (_connection != null && _transaction != null)
             {
                 var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt >= DATEADD(DAY, -30, GETDATE())";
-                var count = await _connection.ExecuteScalarAsync<int>(sql, _transaction);
+                var count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
                 return count;
             }
             return 0;
