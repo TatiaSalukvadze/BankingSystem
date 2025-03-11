@@ -31,7 +31,7 @@ namespace BankingSystem.API.Extensions
             services.AddScoped((s) => new SqlConnection(configuration.GetConnectionString("Default")));
             services.AddScoped<IDbTransaction>(s =>
             {
-                SqlConnection conn = s.GetRequiredService<SqlConnection>();
+                IDbConnection conn = s.GetRequiredService<SqlConnection>();
                 conn.Open();
                 return conn.BeginTransaction();
             });

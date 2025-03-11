@@ -22,7 +22,6 @@ namespace BankingSystem.API.Controllers.Reports
         [HttpGet]
         public async Task<IActionResult> RegisteredPeopleStatistics()
         {
-            throw new Exception("what just happened");
             var (success, message, data) = await _personService.RegisteredPeopleStatisticsAsync();
             return await HandleResult(success, message, data);
             //if (!success)
