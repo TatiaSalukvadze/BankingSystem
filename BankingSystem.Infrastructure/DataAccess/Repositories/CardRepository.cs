@@ -1,4 +1,5 @@
-﻿using BankingSystem.Contracts.DTOs.UserBanking;
+﻿using BankingSystem.Contracts.DTOs.ATM;
+using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
 using Dapper;
@@ -32,13 +33,13 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<List<CardWithIBANDTO>> GetCardsForPersonAsync(string email)
         {
             var result = new List<CardWithIBANDTO> { };
-            if (_connection != null)
+            if (_connection != null && _transaction != null)
             {
                 var sql = @"SELECT a.IBAN, p.[Name], p.Surname, c.CardNumber, c.ExpirationDate, c.CVV, c.PIN 
                     FROM Card AS c JOIN Account AS a ON c.AccountId = a.Id
                     JOIN Person AS p ON a.PersonId = p.Id 
                     WHERE @email = p.Email";
-                result = (await _connection.QueryAsync<CardWithIBANDTO>(sql, new { email })).ToList();
+                result = (await _connection.QueryAsync<CardWithIBANDTO>(sql, new { email }, _transaction)).ToList();
             }
             return result;
         }
@@ -89,6 +90,22 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 if (rowsAffected > 0) { deleted = true; }
             }
             return deleted;
+        }
+
+        public async Task<SeeBalanceDTO> GetBalanceAsync(CardAuthorizationDTO cardAuthorizationDto)
+        {
+            if (_connection != null)
+            {
+                var sql = @"
+                SELECT a.Amount, a.Currency
+                FROM Card ca
+                JOIN Account a ON ca.AccountId = a.Id
+                WHERE ca.CardNumber = @CardNumber
+                AND ca.PIN = @PIN";
+                var result = await _connection.QueryFirstOrDefaultAsync<SeeBalanceDTO>(sql, cardAuthorizationDto);
+                return result;
+            }
+            return null;
         }
     }
 }

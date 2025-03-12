@@ -24,7 +24,6 @@ namespace BankingSystem.API.Filters
 
             _logger.LogError("Exception Filter Caught Exception: {ExceptionMessage},  Controller: {Controller}, Action: {Action}",
             exception.Message, context.RouteData.Values["Controller"], context.RouteData.Values["Action"]);
-
             context.Result = new BadRequestObjectResult(error);
             context.ExceptionHandled = true;
             await Task.CompletedTask;

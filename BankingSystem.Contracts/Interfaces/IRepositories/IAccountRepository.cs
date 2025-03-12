@@ -21,7 +21,6 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<bool> UpdateAccountAmountAsync(int id,decimal amount);
         Task<bool> DeleteAccountByIBANAsync(string iban);
         Task<decimal> GetBalanceByIBANAsync(string iban);
-        Task<SeeBalanceDTO> GetBalanceAsync(string cardNumber, string pin);
         Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct);
         Task<BalanceAndWithdrawalDTO> GetBalanceAndWithdrawnAmountAsync(string cardNumber, string pin);
     }

@@ -4,15 +4,15 @@ using BankingSystem.Contracts.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace BankingSystem.API.Controllers.ATM
+namespace BankingSystem.API.Controllers
 {
-    [Route("/ATM/[controller]")]
-    public class CardController : WrapperController
+    [Route("/[controller]")]
+    public class ATMController : WrapperController
     {
         private readonly ITransactionOperationService _transactionOperationService;
         private readonly ICardService _cardService;
 
-        public CardController(ITransactionOperationService transactionOperationService, ICardService cardService)
+        public ATMController(ITransactionOperationService transactionOperationService, ICardService cardService)
         {
             _transactionOperationService = transactionOperationService;
             _cardService = cardService;
@@ -20,9 +20,9 @@ namespace BankingSystem.API.Controllers.ATM
 
         //tamar
         [HttpGet("SeeBalance")]
-        public async Task<IActionResult> SeeBalanceAsync([FromQuery] string cardNumber, [FromQuery] string pin)
+        public async Task<IActionResult> SeeBalanceAsync([FromQuery] CardAuthorizationDTO cardAuthorizationDto)// string cardNumber, [FromQuery] string pin)
         {
-            var (success, message, data) = await _cardService.SeeBalanceAsync(cardNumber, pin);
+            var (success, message, data) = await _cardService.SeeBalanceAsync(cardAuthorizationDto);
             return await HandleResult(success, message, data);
             //if (!success)
             //{

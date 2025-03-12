@@ -1,5 +1,6 @@
 using BankingSystem.API.Extensions;
 using BankingSystem.API.Filters;
+using BankingSystem.API.Middlewares;
 using BankingSystem.Infrastructure.Identity;
 using Serilog;
 using System.Text.Json.Serialization;
@@ -30,7 +31,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseMiddleware<ResponseCachingMiddleware>();
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
@@ -40,7 +42,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-using(var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     await seeder.SeedDataAsync();

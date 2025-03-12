@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.DTOs.ATM
 {
-    public class ChangeCardPINDTO 
+    public class CardAuthorizationDTO
     {
         [Required, StringLength(16, MinimumLength = 16)]
         [RegularExpression("^[0-9]{16}$", ErrorMessage = "ბარათის ნომერი უნდა იყოს 16 ციფრისგან შემდგარი.")]
@@ -17,11 +17,5 @@ namespace BankingSystem.Contracts.DTOs.ATM
         [Required, StringLength(4)]
         [RegularExpression("^[0-9]{4}$", ErrorMessage = "PIN კოდი უნდა იყოს 4 ციფრისგან შემდგარი.")]
         public string PIN { get; set; }
-
-
-        [Required, StringLength(4)]
-        [RegularExpression("^[0-9]{4}$", ErrorMessage = "PIN კოდი უნდა იყოს 4 ციფრისგან შემდგარი.")]
-        public string NewPIN { get; set; }
-
     }
 }

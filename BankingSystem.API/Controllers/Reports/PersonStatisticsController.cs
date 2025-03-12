@@ -19,7 +19,7 @@ namespace BankingSystem.API.Controllers.Reports
         }
 
 
-        [HttpGet]
+        [HttpGet("Count")]
         public async Task<IActionResult> RegisteredPeopleStatistics()
         {
             var (success, message, data) = await _personService.RegisteredPeopleStatisticsAsync();

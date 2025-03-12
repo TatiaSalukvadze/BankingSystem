@@ -46,11 +46,11 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<bool> AccountExistForEmail(string email)
         {
             bool exists = false;
-            if (_connection != null)
+            if (_connection != null && _transaction != null)
             {
                 var sql = @"SELECT CASE WHEN EXISTS (SELECT 1 FROM Account as a WHERE @email = 
                     (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId)) THEN 1 ELSE 0 END AS AccountExists";
-                exists = await _connection.ExecuteScalarAsync<bool>(sql, new { email });
+                exists = await _connection.ExecuteScalarAsync<bool>(sql, new { email }, transaction:_transaction);
             }
             return exists;
         }
@@ -58,13 +58,13 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email)
         {
             var result = new List<SeeAccountsDTO>();
-            if (_connection != null)
+            if (_connection != null && _transaction != null)
             {
                 var sql = @"
                 SELECT IBAN, Currency, Amount 
                 FROM Account AS a
                 WHERE @email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId);";
-                result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email })).ToList();
+                result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email },transaction:_transaction)).ToList();
             }
             return result;
         }
@@ -126,21 +126,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return 0;
         }
 
-        public async Task<SeeBalanceDTO> GetBalanceAsync(string cardNumber, string pin)
-        {
-            if (_connection != null)
-            {
-                var sql = @"
-                SELECT a.Amount, a.Currency
-                FROM Card ca
-                JOIN Account a ON ca.AccountId = a.Id
-                WHERE ca.CardNumber = @cardNumber
-                AND ca.PIN = @pin";
-                var result = await _connection.QueryFirstOrDefaultAsync<SeeBalanceDTO>(sql, new { cardNumber, pin });
-                return result;
-            }
-            return null;
-        }
 
         public async Task<BalanceAndWithdrawalDTO> GetBalanceAndWithdrawnAmountAsync(string cardNumber, string pin)
         {

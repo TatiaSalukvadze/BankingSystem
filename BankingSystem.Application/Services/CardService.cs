@@ -78,15 +78,15 @@ namespace BankingSystem.Application.Services
         }
 
         //tamar
-        public async Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(string cardNumber, string pin)
+        public async Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(CardAuthorizationDTO cardAuthorizationDto)
         {
-            var (cardValidated, message, card) = await AuthorizeCardAsync(cardNumber, pin);
+            var (cardValidated, message, card) = await AuthorizeCardAsync(cardAuthorizationDto.CardNumber, cardAuthorizationDto.PIN);
             if (!cardValidated)
             {
                 return (false, message, null);
             }
 
-            var balanceInfo = await _unitOfWork.AccountRepository.GetBalanceAsync(cardNumber, pin);
+            var balanceInfo = await _unitOfWork.CardRepository.GetBalanceAsync(cardAuthorizationDto);
 
             if (balanceInfo is null || balanceInfo.Amount == 0 || balanceInfo.Currency == 0)
             {
@@ -99,7 +99,7 @@ namespace BankingSystem.Application.Services
         //tatia
         public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
         {
-            var (cardValidated, message, card) = await AuthorizeCardAsync(changeCardDtp.CardNumber, changeCardDtp.OldPIN);
+            var (cardValidated, message, card) = await AuthorizeCardAsync(changeCardDtp.CardNumber, changeCardDtp.PIN);
             if (!cardValidated)
             {
                 return (false, message);

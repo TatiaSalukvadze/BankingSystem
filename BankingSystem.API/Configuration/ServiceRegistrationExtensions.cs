@@ -47,6 +47,7 @@ namespace BankingSystem.API.Extensions
             services.AddScoped<ITransactionDetailsService, TransactionDetailsService>();
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<ITransactionOperationService, TransactionOperationService>();
+            services.AddMemoryCache();
 
             return services;
         }
