@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.Interfaces.IRepositories
 {
-    public interface IAccountRepository 
+    public interface IAccountRepository : IRepository
     {
         Task<Account?> FindAccountByIBANAsync(string IBAN);
         Task<Account> FindAccountByIBANandEmailAsync(string IBAN, string email);
@@ -21,7 +21,7 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<bool> UpdateAccountAmountAsync(int id,decimal amount);
         Task<bool> DeleteAccountByIBANAsync(string iban);
         Task<decimal> GetBalanceByIBANAsync(string iban);
-        Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct);
+        //Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct);
         Task<BalanceAndWithdrawalDTO> GetBalanceAndWithdrawnAmountAsync(string cardNumber, string pin);
     }
 }

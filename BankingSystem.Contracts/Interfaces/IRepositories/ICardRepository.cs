@@ -4,7 +4,7 @@ using BankingSystem.Domain.Entities;
 
 namespace BankingSystem.Contracts.Interfaces.IRepositories
 {
-    public interface ICardRepository 
+    public interface ICardRepository : IRepository
     {
         Task<Card> GetCardAsync(string cardNumber);
         Task<List<CardWithIBANDTO>> GetCardsForPersonAsync(string email);

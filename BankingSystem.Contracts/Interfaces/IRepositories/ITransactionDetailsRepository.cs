@@ -4,7 +4,7 @@ using BankingSystem.Domain.Entities;
 
 namespace BankingSystem.Contracts.Interfaces.IRepositories
 {
-    public interface ITransactionDetailsRepository 
+    public interface ITransactionDetailsRepository : IRepository
     {
         Task<int> CreateTransactionAsync(TransactionDetails account);
         Task<TransactionCountDTO> NumberOfTransactionsAsync();

@@ -13,12 +13,15 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         private SqlConnection _connection;
         private IDbTransaction _transaction;
 
-        public TransactionDetailsRepository(SqlConnection connection, IDbTransaction transaction)
+        public TransactionDetailsRepository(SqlConnection connection)//, IDbTransaction transaction)
         {
             _connection = connection;
+            //_transaction = transaction;
+        }
+        public void SetTransaction(IDbTransaction transaction)
+        {
             _transaction = transaction;
         }
-
         public async Task<int> CreateTransactionAsync(TransactionDetails transaction)
         {
             int insertedId = 0;

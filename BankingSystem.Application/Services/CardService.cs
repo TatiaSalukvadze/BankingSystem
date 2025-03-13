@@ -54,7 +54,7 @@ namespace BankingSystem.Application.Services
             }
 
             card.Id = insertedId;
-            _unitOfWork.SaveChanges();
+            //_unitOfWork.SaveChanges();
 
             return (true, "Card was created successfully!", card);
         }
@@ -110,7 +110,7 @@ namespace BankingSystem.Application.Services
             {
                 return (false, "Card PIN could not be updated!");
             }
-            _unitOfWork.SaveChanges();
+            //_unitOfWork.SaveChanges();
             return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
         }
 
@@ -167,7 +167,7 @@ namespace BankingSystem.Application.Services
             {
                 return (false, "Card could not be canceled!");
             }
-            _unitOfWork.SaveChanges();
+            //_unitOfWork.SaveChanges();
             return (true, "Card was successfully canceled!");
         }
     }

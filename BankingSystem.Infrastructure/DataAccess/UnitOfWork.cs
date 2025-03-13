@@ -12,10 +12,10 @@ namespace BankingSystem.Infrastructure.DataAccess
         //private string _connectionString;
         private IDbConnection _connection;
         private IDbTransaction _transaction;
-        //public SqlTransaction Transaction() => _transaction;//no nned
+        public IDbTransaction Transaction() => _transaction;//no nned
         //public IDbConnection Connection() => _connection;//no need
 
-        public UnitOfWork(IDbTransaction dbTransaction, IPersonRepository personRepository, 
+        public UnitOfWork(SqlConnection connection, IPersonRepository personRepository, 
             IAccountRepository accountRepository, ICardRepository cardRepository, 
             ITransactionDetailsRepository transactionDetailsRepository)
         {
@@ -24,8 +24,9 @@ namespace BankingSystem.Infrastructure.DataAccess
             //    throw new ArgumentNullException("There is no default connection string present");
             //_connection = new SqlConnection(_connectionString);
             //_connection.Open();
-            _transaction = dbTransaction;
-            _connection = _transaction.Connection;
+            //_transaction = dbTransaction;
+            _connection = connection;// _transaction.Connection;
+            _connection.Open();
             //RepoSetUp(personRepository, accountRepository, cardRepository, transactionDetailsRepository);
             PersonRepository = personRepository;
             AccountRepository = accountRepository;
@@ -125,15 +126,15 @@ namespace BankingSystem.Infrastructure.DataAccess
             }
         }
 
-        //public void BeginTransaction()
-        //{
-        //    if (_connection.State != ConnectionState.Open)
-        //    {
-        //        _connection.Open();  // Open the connection here, when needed
-        //    }
+        public void BeginTransaction()
+        {
+            if (_connection.State != ConnectionState.Open)
+            {
+                _connection.Open();  // Open the connection here, when needed
+            }
 
-        //    _transaction = (SqlTransaction)_connection.BeginTransaction();
-        //}
+            _transaction = (SqlTransaction)_connection.BeginTransaction();
+        }
 
         //public void Rollback() => _transaction.Rollback();
 

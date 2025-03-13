@@ -13,21 +13,24 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         private SqlConnection _connection;
         private IDbTransaction _transaction;
 
-        public AccountRepository(SqlConnection connection, IDbTransaction transaction)
+        public AccountRepository(SqlConnection connection)//, IDbTransaction transaction)
         {
             _connection = connection;
+            //_transaction = transaction;
+        }
+        public void SetTransaction(IDbTransaction transaction)
+        {
             _transaction = transaction;
         }
-        
         public async Task<int> CreateAccountAsync(Account account)
         {
             int insertedId = 0;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = @"INSERT INTO Account (PersonId, IBAN, Amount, Currency) 
                     OUTPUT INSERTED.Id 
                     VALUES (@PersonId, @IBAN, @Amount, @Currency)";
-                insertedId = await _connection.ExecuteScalarAsync<int>(sql, account, _transaction);
+                insertedId = await _connection.ExecuteScalarAsync<int>(sql, account);
             }
             return insertedId;
         }
@@ -46,11 +49,11 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<bool> AccountExistForEmail(string email)
         {
             bool exists = false;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = @"SELECT CASE WHEN EXISTS (SELECT 1 FROM Account as a WHERE @email = 
                     (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId)) THEN 1 ELSE 0 END AS AccountExists";
-                exists = await _connection.ExecuteScalarAsync<bool>(sql, new { email }, transaction:_transaction);
+                exists = await _connection.ExecuteScalarAsync<bool>(sql, new { email });
             }
             return exists;
         }
@@ -58,13 +61,13 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email)
         {
             var result = new List<SeeAccountsDTO>();
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = @"
                 SELECT IBAN, Currency, Amount 
                 FROM Account AS a
                 WHERE @email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId);";
-                result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email },transaction:_transaction)).ToList();
+                result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email })).ToList();
             }
             return result;
         }
@@ -107,10 +110,10 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<bool> DeleteAccountByIBANAsync(string iban)
         {
             bool deleted = false;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "DELETE FROM Account WHERE IBAN = @IBAN";
-                var rowsAffected = await _connection.ExecuteAsync(sql, new { IBAN = iban }, _transaction);
+                var rowsAffected = await _connection.ExecuteAsync(sql, new { IBAN = iban });
                 deleted = rowsAffected > 0;
             }
             return deleted;
@@ -126,7 +129,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return 0;
         }
 
-
+        //cardshi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         public async Task<BalanceAndWithdrawalDTO> GetBalanceAndWithdrawnAmountAsync(string cardNumber, string pin)
         {
             if (_connection != null)    
@@ -151,18 +154,19 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return null;
         }
 
-        public async Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct)
-        {
-            if (_connection != null && _transaction != null)
-            {
-                var sql = @"
-                UPDATE Account
-                SET Amount = Amount - @TotalAmountToDeduct
-                WHERE Id = @AccountId";
-                var result = await _connection.ExecuteAsync(sql, new { AccountId = accountId, TotalAmountToDeduct = totalAmountToDeduct }, _transaction);
-                return result > 0;
-            }
-            return false;
-        }
+        //public async Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct)
+        //{
+        //    if (_connection != null && _transaction != null)
+        //    {
+        //        var sql = @"
+        //        UPDATE Account
+        //        SET Amount = Amount - @TotalAmountToDeduct
+        //        WHERE Id = @AccountId";
+        //        var result = await _connection.ExecuteAsync(sql, new { AccountId = accountId, TotalAmountToDeduct = totalAmountToDeduct }, _transaction);
+        //        return result > 0;
+        //    }
+        //    return false;
+        //}
+
     }
 }

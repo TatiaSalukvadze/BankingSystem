@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.Interfaces.IRepositories
 {
-    public interface IPersonRepository 
+    public interface IPersonRepository : IRepository
     {
         Task<Person?> FindByIdentityIdAsync(string identityId);
         Task<int> FindIdByIDNumberAsync(string IDNumber);

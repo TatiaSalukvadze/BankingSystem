@@ -49,7 +49,7 @@ namespace BankingSystem.Application.Services
             {
                 return (false, "Adding user in physical person system failed!", null);
             }
-            _unitOfWork.SaveChanges();
+            //_unitOfWork.SaveChanges();
            
             return (true, "User was registered successfully!",new { IdentityUserId, CustomUserId = personId });
         }

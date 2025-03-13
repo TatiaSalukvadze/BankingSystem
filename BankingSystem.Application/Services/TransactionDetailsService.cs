@@ -35,7 +35,7 @@ namespace BankingSystem.Application.Services
                 Currency = currency,
                 IsATM = IsATM,
             };
-
+            _unitOfWork.TransactionDetailsRepository.SetTransaction(_unitOfWork.Transaction());
             int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
             if (insertedId <= 0)
             {

@@ -17,7 +17,7 @@ builder.Services.AddSwaggerConfiguration();
 
 builder.Services.InjectApplicationDbContext(builder.Configuration).ConfigureIdentity()
     .InjectAuthentication(builder.Configuration).InjectAuthorization()
-    .InjectConnectionAndTransaction(builder.Configuration);
+    .InjectDbConnection(builder.Configuration);
 
 builder.Services.InjectServices().InjectRepositories().InjectExternalServices(builder.Configuration);
 

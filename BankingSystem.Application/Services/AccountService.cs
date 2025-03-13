@@ -56,7 +56,7 @@ namespace BankingSystem.Application.Services
             }
             account.Id = insertedId;
 
-            _unitOfWork.SaveChanges();
+            //_unitOfWork.SaveChanges();
             return (true, "Account was created successfully!", account);
         }
 
@@ -101,7 +101,7 @@ namespace BankingSystem.Application.Services
                 return (false, "Failed to delete account.");
             }
 
-            _unitOfWork.SaveChanges();
+            //_unitOfWork.SaveChanges();
             return (true, "Account deleted successfully.");
         }
 
@@ -140,6 +140,8 @@ namespace BankingSystem.Application.Services
         public async Task<bool> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
             decimal amountFromAccount, decimal amountToAccount)
         {
+            _unitOfWork.BeginTransaction();
+            _unitOfWork.AccountRepository.SetTransaction(_unitOfWork.Transaction());
             var fromAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(fromAccountId, -amountFromAccount);
             var toAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(toAccountId, amountToAccount);
 
@@ -198,7 +200,9 @@ namespace BankingSystem.Application.Services
 
         public async Task<(bool success, string message)> UpdateBalanceForATMAsync(int accountId, decimal amountToDeduct)
         {
-            bool isBalanceUpdated = await _unitOfWork.AccountRepository.UpdateAccountBalanceAsync(accountId, amountToDeduct);
+            _unitOfWork.BeginTransaction();
+            _unitOfWork.AccountRepository.SetTransaction(_unitOfWork.Transaction());
+            bool isBalanceUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(accountId, -amountToDeduct);
 
             if (!isBalanceUpdated)
             {

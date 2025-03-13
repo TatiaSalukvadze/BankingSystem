@@ -25,16 +25,16 @@ namespace BankingSystem.API.Extensions
 
             return services;
         }
-        public static IServiceCollection InjectConnectionAndTransaction(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection InjectDbConnection(this IServiceCollection services, IConfiguration configuration)
         {
             //for db operations(unitofwork and repos)
             services.AddScoped((s) => new SqlConnection(configuration.GetConnectionString("Default")));
-            services.AddScoped<IDbTransaction>(s =>
-            {
-                IDbConnection conn = s.GetRequiredService<SqlConnection>();
-                conn.Open();
-                return conn.BeginTransaction();
-            });
+            //services.AddScoped<IDbTransaction>(s =>
+            //{
+            //    IDbConnection conn = s.GetRequiredService<SqlConnection>();
+            //    conn.Open();
+            //    return conn.BeginTransaction();
+            //});
 
             return services;
         }

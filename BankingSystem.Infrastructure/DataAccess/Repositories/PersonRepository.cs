@@ -12,12 +12,15 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         private SqlConnection _connection;
         private IDbTransaction _transaction;
 
-        public PersonRepository(SqlConnection connection, IDbTransaction transaction)
+        public PersonRepository(SqlConnection connection)//, IDbTransaction transaction)
         {
             _connection = connection;
+            //_transaction = transaction;
+        }
+        public void SetTransaction(IDbTransaction transaction)
+        {
             _transaction = transaction;
         }
-
         public async Task<Person?> FindByIdentityIdAsync(string identityId)
         {
             if (_connection != null)
@@ -42,12 +45,12 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<int> RegisterPersonAsync(Person person)
         {
             int addedUserId = 0;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = @"INSERT INTO Person(IdentityUserId, [Name], Surname, IDNumber, Birthdate, Email)
                      OUTPUT INSERTED.Id
                      VALUES (@IdentityUserId,@Name, @Surname, @IDNumber, @Birthdate, @Email)";
-                addedUserId =  await _connection.ExecuteScalarAsync<int>(sql, person, _transaction);
+                addedUserId =  await _connection.ExecuteScalarAsync<int>(sql, person);
             }
             return addedUserId;
         }
@@ -55,20 +58,20 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         public async Task<int> PeopleRegisteredThisYear()
         {
             int count = 0;
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT COUNT(*) FROM Person WHERE YEAR(CreatedAt) = YEAR(GETDATE())";
-                count = await _connection.ExecuteScalarAsync<int>(sql, transaction:_transaction);
+                count = await _connection.ExecuteScalarAsync<int>(sql);
             }
             return count;
         }
 
         public async Task<int> PeopleRegisteredLastOneYear()
         {
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt >= DATEADD(YEAR, -1, GETDATE())";
-                var count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+                var count = await _connection.ExecuteScalarAsync<int>(sql);
                 return count;
             }
             return 0;
@@ -76,10 +79,10 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 
         public async Task<int> PeopleRegisteredLast30Days()
         {
-            if (_connection != null && _transaction != null)
+            if (_connection != null)
             {
                 var sql = "SELECT COUNT(*) FROM Person WHERE CreatedAt >= DATEADD(DAY, -30, GETDATE())";
-                var count = await _connection.ExecuteScalarAsync<int>(sql, transaction: _transaction);
+                var count = await _connection.ExecuteScalarAsync<int>(sql);
                 return count;
             }
             return 0;
