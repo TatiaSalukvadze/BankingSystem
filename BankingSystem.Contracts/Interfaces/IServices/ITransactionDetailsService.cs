@@ -16,5 +16,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
         Task<(bool Success, string Message, IncomeExpenseDTO Data)> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDTO, string email);
         Task<(decimal bankProfit, decimal amountFromAccount, decimal amountToAccount)> CalculateTransactionAmountAsync(
             string fromCurrency, string toCurrency, decimal amountToTransfer, bool isSelfTransfer);
+        Task<(bool success, string message, AtmWithdrawalCalculationDTO Data)> CalculateATMWithdrawalTransactionAsync(
+            string cardNumber, string pin, decimal withdrawalAmount, string withdrawalCurrency);
     }
 }

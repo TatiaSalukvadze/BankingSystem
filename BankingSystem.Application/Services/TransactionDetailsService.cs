@@ -72,6 +72,62 @@ namespace BankingSystem.Application.Services
             return (bankProfit, amountFromAccount, amountToAccount);
         }
 
+        //tamr
+        //for atm
+        public async Task<(bool success, string message, AtmWithdrawalCalculationDTO Data)> CalculateATMWithdrawalTransactionAsync(string cardNumber, string pin, decimal withdrawalAmount, string withdrawalCurrency)
+        {
+            var accountInfo = await _unitOfWork.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
+
+            if (accountInfo == null)
+            {
+                return (false, "Unable to retrieve account details.", null);
+            }
+
+            decimal accountBalance = accountInfo.Amount;
+            decimal totalWithdrawnIn24Hours = accountInfo.WithdrawnAmountIn24Hours;
+            string accountCurrency = accountInfo.Currency;
+
+            decimal convertedAmount = withdrawalAmount;
+            if (withdrawalCurrency != accountCurrency)
+            {
+                decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(withdrawalCurrency, accountCurrency);
+
+                if (exchangeRate <= 0)
+                {
+                    return (false, "Currency conversion failed.", null);
+                }
+
+                convertedAmount *= exchangeRate;
+            }
+
+            decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
+            decimal fee = convertedAmount * (atmWithdrawalPercent / 100);
+            decimal totalAmountToDeduct = convertedAmount + fee;
+
+            if (accountBalance < totalAmountToDeduct)
+            {
+                return (false, "You don't have enough money", null);
+            }
+
+            decimal newTotalWithdrawnIn24Hours = totalWithdrawnIn24Hours + totalAmountToDeduct;
+            decimal atmWithdrawalLimit = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalLimitForDay");
+
+            if (newTotalWithdrawnIn24Hours > atmWithdrawalLimit)
+            {
+                return (false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours.", null);
+            }
+
+            var withdrawalData = new AtmWithdrawalCalculationDTO
+            {
+                Fee = fee,
+                Balance = convertedAmount,
+                Currency = accountCurrency,
+                TotalAmountToDeduct = totalAmountToDeduct
+            };
+
+            return (true, "", withdrawalData);
+        }
+
         //tatia
         public async Task<(bool Success, string Message, TransactionCountDTO Data)> NumberOfTransactionsAsync()
         {

@@ -13,8 +13,6 @@ namespace BankingSystem.Contracts.Interfaces.IServices
             string toIBAN, string email, bool isSelfTransfer);
         Task<bool> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
             decimal amountFromAccount, decimal amountToAccount);
-        Task<(bool success, string message, decimal fee, decimal balance, string currency, decimal totalAmountToDeduct)>ValidateAndCalculateATMWithdrawalAsync(string cardNumber, string pin, decimal withdrawalAmount, string withdrawalCurrency);
         Task<(bool success, string message)> UpdateBalanceForATMAsync(int accountId, decimal amountToDeduct);
     }
-
 }

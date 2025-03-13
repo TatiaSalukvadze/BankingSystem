@@ -129,31 +129,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return 0;
         }
 
-        //cardshi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        public async Task<BalanceAndWithdrawalDTO> GetBalanceAndWithdrawnAmountAsync(string cardNumber, string pin)
-        {
-            if (_connection != null)    
-            {
-                var sql = @"
-                SELECT 
-                    a.Amount, 
-                    a.Currency, 
-                    (SELECT COALESCE(SUM(td.Amount), 0) 
-                     FROM TransactionDetails td
-                     WHERE td.FromAccountId = a.Id
-                     AND td.IsATM = 1
-                     AND td.PerformedAt >= DATEADD(HOUR, -24, GETDATE())) AS WithdrawnAmountIn24Hours
-                FROM Card ca
-                JOIN Account a ON ca.AccountId = a.Id
-                WHERE ca.CardNumber = @cardNumber
-                AND ca.PIN = @pin";
-
-                var result = await _connection.QueryFirstOrDefaultAsync<BalanceAndWithdrawalDTO>(sql, new { cardNumber, pin });
-                return result;
-            }
-            return null;
-        }
-
         //public async Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct)
         //{
         //    if (_connection != null && _transaction != null)
