@@ -16,7 +16,7 @@ using BankingSystem.Infrastructure.ExternalServices.Configuration;
 
 namespace BankingSystem.API.Extensions
 {
-    public static class ServiceRegistrationExtensions
+    public static class ServiceRegistration
     {
         public static IServiceCollection InjectApplicationDbContext(this IServiceCollection services, IConfiguration configuration)
         {

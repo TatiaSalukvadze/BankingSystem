@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BankingSystem.API.Extensions
 {
-    public static class IdentityExtensions
+    public static class IdentityConfiguration
     {
         public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
         {

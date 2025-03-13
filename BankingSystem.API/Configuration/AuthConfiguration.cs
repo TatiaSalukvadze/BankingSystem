@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BankingSystem.API.Extensions
 {
-    public static class AuthExtensions
+    public static class AuthConfiguration
     {
         public static IServiceCollection InjectAuthentication(this IServiceCollection services, IConfiguration configuration)
         {

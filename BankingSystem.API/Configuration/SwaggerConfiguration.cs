@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 
 namespace BankingSystem.API.Extensions
 {
-    public static class SwaggerExtensions
+    public static class SwaggerConfiguration
     {
         public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
         {
