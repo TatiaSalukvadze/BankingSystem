@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Contracts.DTOs.ATM
 {
@@ -18,10 +12,8 @@ namespace BankingSystem.Contracts.DTOs.ATM
         [RegularExpression("^[0-9]{4}$", ErrorMessage = "PIN კოდი უნდა იყოს 4 ციფრისგან შემდგარი.")]
         public string PIN { get; set; }
 
-
         [Required, StringLength(4)]
         [RegularExpression("^[0-9]{4}$", ErrorMessage = "PIN კოდი უნდა იყოს 4 ციფრისგან შემდგარი.")]
         public string NewPIN { get; set; }
-
     }
 }

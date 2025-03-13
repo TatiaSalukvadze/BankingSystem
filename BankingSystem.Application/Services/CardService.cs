@@ -97,7 +97,7 @@ namespace BankingSystem.Application.Services
         }
 
         //tatia
-        public async Task<(bool success, string message)> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
+        public async Task<(bool success, string message)> ChangeCardPINAsync(ChangeCardPINDTO changeCardDtp)
         {
             var (cardValidated, message, card) = await AuthorizeCardAsync(changeCardDtp.CardNumber, changeCardDtp.PIN);
             if (!cardValidated)
