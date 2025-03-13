@@ -10,19 +10,20 @@ namespace BankingSystem.Infrastructure
 {
     public class AuthService : IAuthService
     {
-        private readonly SymmetricSecurityKey _key;
-
+       // private readonly SymmetricSecurityKey _key;
+        private readonly IConfiguration _configuration;
         public AuthService(IConfiguration config)
         {
-            _key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config["JwtSettings:PrivateKey"]!));
+            _configuration = config;
+           // _key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config["JwtSettings:PrivateKey"]!));
         }
 
         public string GenerateToken(IdentityUser user, string role)
         {
             var handler = new JwtSecurityTokenHandler();
-            //var key = Encoding.ASCII.GetBytes(AuthSettings.PrivateKey);
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JwtSettings:PrivateKey"]!));//var key = Encoding.ASCII.GetBytes(AuthSettings.PrivateKey);
             var credentials = new SigningCredentials(
-                _key,
+                key,
                 SecurityAlgorithms.HmacSha256Signature);
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -30,6 +31,8 @@ namespace BankingSystem.Infrastructure
                 Subject = GenerateClaims(user, role),
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = credentials,
+                Issuer = _configuration["JwtSettings:Issuer"],
+                Audience = _configuration["JwtSettings:Audience"]
             };
 
             var token = handler.CreateToken(tokenDescriptor);

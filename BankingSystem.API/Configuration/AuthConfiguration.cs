@@ -22,8 +22,10 @@ namespace BankingSystem.API.Extensions
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtSettings:PrivateKey"]!)),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateIssuer = true,
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = configuration["JwtSettings:Audience"]
                 };
             });
 
