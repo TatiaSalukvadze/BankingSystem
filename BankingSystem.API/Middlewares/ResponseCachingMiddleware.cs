@@ -56,8 +56,10 @@ namespace BankingSystem.API.Middlewares
             bool fromMemory = false;
             if (controller == "UserBanking" && (action == "SeeAccounts" || action == "SeeCards"))
             {
+                _logger.LogInformation("Response of the sent request might be in MemoryCache!");
                 if (_memoryCache.TryGetValue(action, out var response) && response != "")
                 {
+                    _logger.LogInformation("Getting request response from MemoryCache!");
                     context.Response.StatusCode = StatusCodes.Status200OK;
                     context.Response.ContentType = "application/json";
                     var jsonResponse = JsonSerializer.Deserialize<object>(response.ToString());
@@ -74,6 +76,7 @@ namespace BankingSystem.API.Middlewares
                 }
                 else
                 {
+                    _logger.LogInformation("Getting original response from db and saving it in MemoryCache!");
                     var originalBodyStream = context.Response.Body;
 
                     await using var memoryStream = new MemoryStream();
