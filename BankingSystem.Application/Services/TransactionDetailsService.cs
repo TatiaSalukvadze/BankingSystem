@@ -4,6 +4,7 @@ using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
+using BankingSystem.Contracts.Response;
 using BankingSystem.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 
@@ -23,9 +24,10 @@ namespace BankingSystem.Application.Services
         }
 
         //both
-        public async Task<(bool Success, string Message)> CreateTransactionAsync(decimal bankProfit, 
+        public async Task<SimpleResponse> CreateTransactionAsync(decimal bankProfit, 
             decimal amount, int fromAccountId, int toAccountId, string currency, bool IsATM = false)
         {
+            var response = new SimpleResponse();
             var transaction = new TransactionDetails
             {
                 BankProfit = bankProfit,
@@ -39,79 +41,85 @@ namespace BankingSystem.Application.Services
             int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
             if (insertedId <= 0)
             {
-                return (false, "Transaction could not be created, something happened!");
+                return response.Set(false, "Transaction could not be created, something happened!");
             }
 
             transaction.Id = insertedId;
             _unitOfWork.SaveChanges();
-            return (true, "Transaction was successfull!");
+            return response.Set(true, "Transaction was successfull!");
         }
         
         //tatia
-        public async Task<(bool Success, string Message, TransactionCountDTO Data)> NumberOfTransactionsAsync()
+        public async Task<Response<TransactionCountDTO>> NumberOfTransactionsAsync()
         {
+            var response = new Response<TransactionCountDTO>(); 
             TransactionCountDTO transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsAsync();
             if (transactionCountDTO is not null)
-                return (true, "Transaction Count retreived!", transactionCountDTO);
-            else return (false, "Transaction Count couldn't be retreived!", null);
+                return response.Set(true, "Transaction Count retreived!", transactionCountDTO);
+            else return response.Set(false, "Transaction Count couldn't be retreived!");
         }
 
         //tamar
-        public async Task<(bool Success, string Message, List<BankProfitDTO> Data)> GetBankProfitByTimePeriodAsync()
+        public async Task<Response<List<BankProfitDTO>>> GetBankProfitByTimePeriodAsync()
         {
+            var response = new Response<List<BankProfitDTO>>();
             List<BankProfitDTO> profitData = await _unitOfWork.TransactionDetailsRepository.GetBankProfitByTimePeriodAsync();
 
             if (profitData.Any())
             {
-                return (true, "Bank profit retrieved successfully.", profitData);
+                return response.Set(true, "Bank profit retrieved successfully.", profitData);
             }
 
-            return (false, "No bank profit data found.", null);
+            return response.Set(false, "No bank profit data found.");
         }
 
         //tatia
-        public async Task<(bool Success, string Message, Dictionary<string, decimal> Data)> AverageBankProfitAsync()
+        public async Task<Response<Dictionary<string, decimal>>> AverageBankProfitAsync()
         {
+            var response = new Response<Dictionary<string, decimal>>();
             var averageBankProfits = await _unitOfWork.TransactionDetailsRepository.AverageBankProfitAsyncAsync();
             if (averageBankProfits is not null && averageBankProfits.Count != 0)
-                return (true, "Bank profit Count retreived!", averageBankProfits);
-            else return (false, "Bank profit couldn't be retreived!", null);
+                return response.Set(true, "Bank profit Count retreived!", averageBankProfits);
+            else return response.Set(false, "Bank profit couldn't be retreived!");
         }
 
         //tatia
-        public async Task<(bool Success, string Message, List<TransactionCountChartDTO> Data)> NumberOfTransactionsChartAsync()
+        public async Task<Response<List<TransactionCountChartDTO>>> NumberOfTransactionsChartAsync()
         {
+            var response = new Response<List<TransactionCountChartDTO>>();
             List<TransactionCountChartDTO> transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync();
             if (transactionCountDTO is not null)
-                return (true, "Transaction Count retreived!", transactionCountDTO);
-            else return (false, "Transaction Count couldn't be retreived!", null);
+                return response.Set(true, "Transaction Count retreived!", transactionCountDTO);
+            else return response.Set(false, "Transaction Count couldn't be retreived!");
         }
 
         //tamr
-        public async Task<(bool Success, string Message, List<TotalAtmWithdrawalDTO> Data)> GetTotalAtmWithdrawalsAsync()
+        public async Task<Response<List<TotalAtmWithdrawalDTO>>> GetTotalAtmWithdrawalsAsync()
         {
+            var response = new Response<List<TotalAtmWithdrawalDTO>>();
             var rawData = await _unitOfWork.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync();
 
             if (rawData != null && rawData.Any())
             {
-                return (true, "ATM withdrawals data retrieved successfully.", rawData);
+                return response.Set(true, "ATM withdrawals data retrieved successfully.", rawData);
             }
 
-            return (false, "No ATM withdrawal data found.", null);
+            return response.Set(false, "No ATM withdrawal data found.");
         }
 
         //both
-        public async Task<(bool Success, string Message, IncomeExpenseDTO Data)> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto, string email)
+        public async Task<Response<IncomeExpenseDTO>> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto, string email)
         {
+            var response = new Response<IncomeExpenseDTO>();
             var exactNow = DateTime.Now;
             var now = new DateTime(exactNow.Year, exactNow.Month, exactNow.Day, exactNow.Hour, exactNow.Minute, 0, exactNow.Kind);
             if (dateRangeDto.FromDate >= now || dateRangeDto.ToDate > now)
             {
-                return (false, "Provide correct time, not future time!", null);
+                return response.Set(false, "Provide correct time, not future time!");
             }
             if(dateRangeDto.ToDate <= dateRangeDto.FromDate)
             {
-                return (false, "Provide correct time, toDate cannot be yearlier than fromDate!", null);
+                return response.Set(false, "Provide correct time, toDate cannot be yearlier than fromDate!");
             }
             var income = await _unitOfWork.TransactionDetailsRepository.GetTotalIncomeAsync(dateRangeDto.FromDate, dateRangeDto.ToDate, email);
             var expense = await _unitOfWork.TransactionDetailsRepository.GetTotalExpenseAsync(dateRangeDto.FromDate, dateRangeDto.ToDate, email);
@@ -120,16 +128,17 @@ namespace BankingSystem.Application.Services
                 Income = income,
                 Expense = expense
             };
-            return (true, "Income and Expense retreived!", incomeExpense);
+            return response.Set(true, "Income and Expense retreived!", incomeExpense);
         }
 
         #region transactionHelpers
         //tatia
-        public async Task<(bool Success, string Message, TransferAmountCalculationDTO Data)> CalculateTransferAmountAsync(
+        public async Task<Response<TransferAmountCalculationDTO>> CalculateTransferAmountAsync(
             string fromCurrency, string toCurrency, decimal amountToTransfer, bool isSelfTransfer)
         {
+            var response = new Response<TransferAmountCalculationDTO>();
             decimal currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
-            if (currencyRate <= 0) { return (false, "One of the account has incorrect currency!", null); }
+            if (currencyRate <= 0) { return response.Set(false, "One of the account has incorrect currency!"); }
 
             decimal fee;
             decimal extraFeeValue = 0;
@@ -146,18 +155,19 @@ namespace BankingSystem.Application.Services
             transferAmounts.BankProfit = amountToTransfer * fee / 100 + extraFeeValue;
             transferAmounts.AmountFromAccount = amountToTransfer + transferAmounts.BankProfit;
             transferAmounts.AmountToAccount = amountToTransfer * currencyRate;
-            return (true,"", transferAmounts);
+            return response.Set(true, "", transferAmounts);
         }
 
         //tamr
         //for atm
-        public async Task<(bool success, string message, AtmWithdrawalCalculationDTO Data)> CalculateATMWithdrawalTransactionAsync(string cardNumber, string pin, decimal withdrawalAmount, string withdrawalCurrency)
+        public async Task<Response<AtmWithdrawalCalculationDTO>> CalculateATMWithdrawalTransactionAsync(string cardNumber, string pin, decimal withdrawalAmount, string withdrawalCurrency)
         {
+            var response = new Response<AtmWithdrawalCalculationDTO>();
             var accountInfo = await _unitOfWork.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
 
             if (accountInfo == null)
             {
-                return (false, "Unable to retrieve account details.", null);
+                return response.Set(false, "Unable to retrieve account details.");
             }
 
             decimal accountBalance = accountInfo.Amount;
@@ -171,7 +181,7 @@ namespace BankingSystem.Application.Services
 
                 if (exchangeRate <= 0)
                 {
-                    return (false, "Currency conversion failed.", null);
+                    return response.Set(false, "Currency conversion failed.");
                 }
 
                 convertedAmount *= exchangeRate;
@@ -183,7 +193,7 @@ namespace BankingSystem.Application.Services
 
             if (accountBalance < totalAmountToDeduct)
             {
-                return (false, "You don't have enough money", null);
+                return response.Set(false, "You don't have enough money");
             }
 
             decimal newTotalWithdrawnIn24Hours = totalWithdrawnIn24Hours + totalAmountToDeduct;
@@ -191,7 +201,7 @@ namespace BankingSystem.Application.Services
 
             if (newTotalWithdrawnIn24Hours > atmWithdrawalLimit)
             {
-                return (false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours.", null);
+                return response.Set(false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours.");
             }
 
             var withdrawalData = new AtmWithdrawalCalculationDTO
@@ -202,7 +212,7 @@ namespace BankingSystem.Application.Services
                 TotalAmountToDeduct = totalAmountToDeduct
             };
 
-            return (true, "", withdrawalData);
+            return response.Set(true, "", withdrawalData);
         }
         #endregion
     }

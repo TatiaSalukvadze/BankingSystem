@@ -1,6 +1,7 @@
 ﻿using BankingSystem.Contracts.DTOs.Auth;
 using BankingSystem.Contracts.DTOs.Identity;
 using BankingSystem.Contracts.DTOs.OnlineBank;
+using BankingSystem.Contracts.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,11 @@ namespace BankingSystem.Contracts.Interfaces.IServices
 {
     public interface IIdentityService
     {
-        Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto);
-        Task<(bool Success, string Message, string? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto);
-        Task<(bool Success, string Message)> ConfirmEmailAsync(EmailConfirmationDTO emailConfirmationDto
+        Task<Response<object>> LoginPersonAsync(LoginDTO loginDto);
+        Task<Response<string>> RegisterPersonAsync(RegisterPersonDTO registerDto);
+        Task<SimpleResponse> ConfirmEmailAsync(EmailConfirmationDTO emailConfirmationDto
             );
-        Task<(bool Success, string Message)> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO);
-        Task<(bool Success, string Message)> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
+        Task<SimpleResponse> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO);
+        Task<SimpleResponse> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
     }
 }

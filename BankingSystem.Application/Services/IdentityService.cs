@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using BankingSystem.Contracts.DTOs.Auth;
 using BankingSystem.Contracts.DTOs.Identity;
 using BankingSystem.Contracts.DTOs.OnlineBank;
+using BankingSystem.Contracts.Response;
 
 namespace BankingSystem.Application.Services
 {
@@ -35,12 +36,13 @@ namespace BankingSystem.Application.Services
         }
 
         //tamar
-        public async Task<(bool Success, string Message, object? Data)> LoginPersonAsync(LoginDTO loginDto)
+        public async Task<Response<object>> LoginPersonAsync(LoginDTO loginDto)
         {
+            var response = new Response<object>();
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username!.ToLower());
             if (user == null)
             {
-                return (false, "Invalid username!", null);
+                return response.Set(false, "Invalid username!");
             }
 
             //if (!user.EmailConfirmed)
@@ -51,7 +53,7 @@ namespace BankingSystem.Application.Services
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password!, false);
             if (!result.Succeeded)
             {
-                return (false, "Invalid username or password!", null);
+                return response.Set(false, "Invalid username or password!");
             }
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -66,17 +68,17 @@ namespace BankingSystem.Application.Services
 
             var token = _authService.GenerateToken(user, role);
 
-            return (true, "Login successful!", new { token });//, customUser });
+            return response.Set(true, "Login successful!", new { token });//, customUser });
         }
 
         //tatia
-        public async Task<(bool Success, string Message, string? Data)> RegisterPersonAsync(RegisterPersonDTO registerDto)
+        public async Task<Response<string>> RegisterPersonAsync(RegisterPersonDTO registerDto)
         {
-
+            var response = new Response<string>();
             var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
             if (existingUser != null)
             {
-                return (false, "A user with this email already exists!", null);
+                return response.Set(false, "A user with this email already exists!");
             }
             var user = new IdentityUser
             {
@@ -86,12 +88,12 @@ namespace BankingSystem.Application.Services
             var createdUser = await _userManager.CreateAsync(user, registerDto.Password);
             if (!createdUser.Succeeded)
             {
-                return (false, "Adding user in identity system failed!", null);
+                return response.Set(false, "Adding user in identity system failed!");
             }
             var roleResult = await _userManager.AddToRoleAsync(user, "User");
             if (!roleResult.Succeeded)
             {
-                return (false, "Adding user corresponding role  in system failed!", null);
+                return response.Set(false, "Adding user corresponding role  in system failed!");
             }
 
 
@@ -106,7 +108,7 @@ namespace BankingSystem.Application.Services
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             await _emailService.SendTokenEmailAsync(token, registerDto.Email, registerDto.ClientUrl, "Email Confirmation Token");
             //await GenerateEmailConfirmationTokenAsync(user, registerDto.Email, registerDto.ClientUrl);
-            return (true, "User was registered successfully!",  user.Id );
+            return response.Set(true, "User was registered successfully!",  user.Id );
 
             //async Task GenerateEmailConfirmationTokenAsync(IdentityUser identityUser, string email, string ClientUrl)
             //{
@@ -122,30 +124,32 @@ namespace BankingSystem.Application.Services
 
         }
 
-        public async Task<(bool Success, string Message)> ConfirmEmailAsync(EmailConfirmationDTO emailConfirmationDto)
+        public async Task<SimpleResponse> ConfirmEmailAsync(EmailConfirmationDTO emailConfirmationDto)
         {
+            var response = new SimpleResponse();
             var user = await _userManager.FindByEmailAsync(emailConfirmationDto.Email);
 
             if (user == null)
             {
-                return (false, "Email confirmation request is invalid, user was not found!");
+                return response.Set(false, "Email confirmation request is invalid, user was not found!");
             }
 
             var confirmEmail = await _userManager.ConfirmEmailAsync(user, emailConfirmationDto.Token);
             if (!confirmEmail.Succeeded)
             {
-                return (false, "Email confirmation request is invalid!");
+                return response.Set(false, "Email confirmation request is invalid!");
             }
-            return (true, "Email was successfully confirmed!");
+            return response.Set(true, "Email was successfully confirmed!");
         }
 
 
-        public async Task<(bool Success, string Message)> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO)
+        public async Task<SimpleResponse> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO)
         {
+            var response = new SimpleResponse();
             var user = await _userManager.FindByEmailAsync(forgotPasswordDTO.Email);
             if (user == null)
             {
-                return (false, "User not found!");
+                return response.Set(false, "User not found!");
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -159,24 +163,25 @@ namespace BankingSystem.Application.Services
 
             //var url = QueryHelpers.AddQueryString(forgotPasswordDTO.ClientUrl, tokenEmail);
             //await _emailService.SendEmailPlaint(forgotPasswordDTO.Email, "Reset password token", url);
-            return (true, "Check email to reset password!");
+            return response.Set(true, "Check email to reset password!");
         }
 
-        public async Task<(bool Success, string Message)> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
+        public async Task<SimpleResponse> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
         {
+            var response = new SimpleResponse();
             var user = await _userManager.FindByEmailAsync(resetPasswordDTO.Email);
             if (user == null)
             {
-                return (false, "User not found!");
+                return response.Set(false, "User not found!");
             }
 
             var result = await _userManager.ResetPasswordAsync(user, resetPasswordDTO.Token, resetPasswordDTO.Password);
             if (!result.Succeeded)
             {
-                return (false, "Password reset failed! Please try again.");
+                return response.Set(false, "Password reset failed! Please try again.");
             }
 
-            return (true, "Password reset successful!");
+            return response.Set(true, "Password reset successful!");
         }
     }
 }

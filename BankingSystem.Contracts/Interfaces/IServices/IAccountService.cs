@@ -12,8 +12,8 @@ namespace BankingSystem.Contracts.Interfaces.IServices
         Task<SimpleResponse> DeleteAccountAsync(string iban);
         Task<Response<TransferAccountsDTO>> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
             string toIBAN, string email, bool isSelfTransfer);
-        Task<(bool success, string message)> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
+        Task<SimpleResponse> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
             decimal amountFromAccount, decimal amountToAccount);
-        Task<(bool success, string message)> UpdateBalanceForATMAsync(int accountId, decimal amountToDeduct);
+        Task<SimpleResponse> UpdateBalanceForATMAsync(int accountId, decimal amountToDeduct);
     }
 }

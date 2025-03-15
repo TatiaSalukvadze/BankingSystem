@@ -142,9 +142,10 @@ namespace BankingSystem.Application.Services
             return response.Set(true, "Accounts validated!", fromToAccounts);
         }
         //tatia
-        public async Task<(bool success, string message)> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
+        public async Task<SimpleResponse> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
             decimal amountFromAccount, decimal amountToAccount)
         {
+            var response = new SimpleResponse();
             _unitOfWork.BeginTransaction();
             _unitOfWork.AccountRepository.SetTransaction(_unitOfWork.Transaction());
             var fromAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(fromAccountId, -amountFromAccount);
@@ -152,23 +153,24 @@ namespace BankingSystem.Application.Services
 
             if (!fromAccountUpdated || !toAccountUpdated)
             {
-                return (false, "Balance couldn't be updated!");
+                return response.Set(false, "Balance couldn't be updated!");
             }
-            return (true,"Balance updated successfully!");
+            return response.Set(true,"Balance updated successfully!");
         }
 
-        public async Task<(bool success, string message)> UpdateBalanceForATMAsync(int accountId, decimal amountToDeduct)
+        public async Task<SimpleResponse> UpdateBalanceForATMAsync(int accountId, decimal amountToDeduct)
         {
+            var response = new SimpleResponse();
             _unitOfWork.BeginTransaction();
             _unitOfWork.AccountRepository.SetTransaction(_unitOfWork.Transaction());
             bool isBalanceUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(accountId, -amountToDeduct);
 
             if (!isBalanceUpdated)
             {
-                return (false, "Failed to update account balance.");
+                return response.Set(false, "Failed to update account balance.");
             }
 
-            return (true, "Balance updated successfully.");
+            return response.Set(true, "Balance updated successfully.");
         }
         #endregion
     }
