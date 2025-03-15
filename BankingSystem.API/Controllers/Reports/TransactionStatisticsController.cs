@@ -22,7 +22,8 @@ namespace BankingSystem.API.Controllers.Reports
         public async Task<IActionResult> TransactionsCount()
         {
 
-            var (success, message, data) = await _transactionService.NumberOfTransactionsAsync();
+            var response = await _transactionService.NumberOfTransactionsAsync();
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -35,7 +36,8 @@ namespace BankingSystem.API.Controllers.Reports
         [HttpGet("BankProfitByTimePeriod")] //and currency
         public async Task<IActionResult> GetBankProfitByTimePeriodAsync()
         {
-            var (success, message, data) = await _transactionService.GetBankProfitByTimePeriodAsync();
+            var response = await _transactionService.GetBankProfitByTimePeriodAsync();
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //    return BadRequest(new { message });
@@ -48,7 +50,8 @@ namespace BankingSystem.API.Controllers.Reports
         public async Task<IActionResult> TransactionsCountChart()
         {
 
-            var (success, message, data) = await _transactionService.NumberOfTransactionsChartAsync();
+            var response = await _transactionService.NumberOfTransactionsChartAsync();
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -62,7 +65,8 @@ namespace BankingSystem.API.Controllers.Reports
         public async Task<IActionResult> AverageProfit()
         {
 
-            var (success, message, data) = await _transactionService.AverageBankProfitAsync();
+            var response = await _transactionService.AverageBankProfitAsync();
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -75,7 +79,8 @@ namespace BankingSystem.API.Controllers.Reports
         [HttpGet("AtmWithdrawals")]
         public async Task<IActionResult> GetAtmWithdrawals()
         {
-            var (success, message, data) = await _transactionService.GetTotalAtmWithdrawalsAsync();
+            var response = await _transactionService.GetTotalAtmWithdrawalsAsync();
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{

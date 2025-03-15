@@ -21,7 +21,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromForm] LoginDTO loginDto)
         {
-            var (success, message, data) = await _identityService.LoginPersonAsync(loginDto);
+            var response = await _identityService.LoginPersonAsync(loginDto);
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -35,7 +36,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpGet("EmailConfirmation")]
         public async Task<IActionResult> EmailConfirmation([FromQuery] EmailConfirmationDTO emailConfirmationDto)//string email, [FromQuery] string token)
         {
-            var (success, message) = await _identityService.ConfirmEmailAsync(emailConfirmationDto);
+            var response = await _identityService.ConfirmEmailAsync(emailConfirmationDto);
+            var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
             //if (!success)
             //{
@@ -48,7 +50,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromForm] ForgotPasswordDTO forgotPasswordDTO)
         {
-            var (success, message) = await _identityService.ForgotPasswordAsync(forgotPasswordDTO);
+            var response = await _identityService.ForgotPasswordAsync(forgotPasswordDTO);
+            var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
          
             //if (!success)
@@ -62,7 +65,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordDTO resetPasswordDTO)
         {
-            var (success, message) = await _identityService.ResetPasswordAsync(resetPasswordDTO);
+            var response = await _identityService.ResetPasswordAsync(resetPasswordDTO);
+            var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
             //if (!success)
             //{

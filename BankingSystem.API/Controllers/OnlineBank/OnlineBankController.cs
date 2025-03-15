@@ -29,12 +29,13 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpPost("RegisterPerson")]
         public async Task<IActionResult> RegisterPerson([FromForm] RegisterPersonDTO registerDto)
         {
-            var (success, message, data) = await _identityService.RegisterPersonAsync(registerDto);
-            if (!success) {
-                return BadRequest(message);
+            var response = await _identityService.RegisterPersonAsync(registerDto);        
+            if (!response.Success) {
+                return BadRequest(response.Message);
             }
-            var (finalSuccess, finalMessage, finalData) = await _personService.RegisterCustomPersonAsync(registerDto, data);
-            return await HandleResult(finalSuccess, finalMessage, finalData);
+            var finalResponse = await _personService.RegisterCustomPersonAsync(registerDto, response.Data);
+            var (success, message, data) = (finalResponse.Success, finalResponse.Message, finalResponse.Data);
+            return await HandleResult(success, message, data);
             //if (!finalSuccess)
             //{
             //    return BadRequest(finalMessage);
@@ -45,7 +46,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateAccount([FromForm] CreateAccountDTO createAccountDto)
         {
-            var (success, message, data) = await _accountService.CreateAccountAsync(createAccountDto);
+            var response = await _accountService.CreateAccountAsync(createAccountDto);
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -57,7 +59,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpDelete("DeleteAccount")]
         public async Task<IActionResult> DeleteAccount(string iban)
         {
-            var (success, message) = await _accountService.DeleteAccountAsync(iban);
+            var response = await _accountService.DeleteAccountAsync(iban);
+            var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
             //if (!success)
             //{
@@ -71,7 +74,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpPost("CreateCard")]
         public async Task<IActionResult> CreateCard([FromForm] CreateCardDTO createCardDto)
         {
-            var (success, message, data) = await _cardService.CreateCardAsync(createCardDto);
+            var response = await _cardService.CreateCardAsync(createCardDto);
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -83,7 +87,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpDelete("Card")]
         public async Task<IActionResult> CancelCard([FromForm] string cardNumber)
         {
-            var (success, message) = await _cardService.CancelCardAsync(cardNumber);
+            var response = await _cardService.CancelCardAsync(cardNumber);
+            var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
             //if (!success)
             //{

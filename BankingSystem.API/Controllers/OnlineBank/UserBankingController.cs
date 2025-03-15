@@ -32,7 +32,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             //string email = User.Identity.Name; 
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _accountService.SeeAccountsAsync(userEmail);
+            var response = await _accountService.SeeAccountsAsync(userEmail);
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -46,7 +47,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> SeeCards()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _cardService.SeeCardsAsync(userEmail);
+            var response = await _cardService.SeeCardsAsync(userEmail);
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -59,7 +61,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> TransferToOwnAccount([FromForm] CreateOnlineTransactionDTO createTransactionDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message) = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: true);
+            var response = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: true);
+            var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
             //if (!success)
             //{
@@ -72,7 +75,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> TransferToOtherAccount([FromForm] CreateOnlineTransactionDTO createTransactionDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message) = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
+            var response = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
+            var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
             //if (!success)
             //{
@@ -85,7 +89,8 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> TotalIncomeExpense([FromQuery] DateRangeDTO dateRangeDto)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var (success, message, data) = await _transactionService.TotalIncomeExpenseAsync(dateRangeDto, userEmail);
+            var response = await _transactionService.TotalIncomeExpenseAsync(dateRangeDto, userEmail);
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{

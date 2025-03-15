@@ -22,7 +22,8 @@ namespace BankingSystem.API.Controllers
         [HttpGet("SeeBalance")]
         public async Task<IActionResult> SeeBalanceAsync([FromQuery] CardAuthorizationDTO cardAuthorizationDto)// string cardNumber, [FromQuery] string pin)
         {
-            var (success, message, data) = await _cardService.SeeBalanceAsync(cardAuthorizationDto);
+            var response = await _cardService.SeeBalanceAsync(cardAuthorizationDto);
+            var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
             //if (!success)
             //{
@@ -35,7 +36,8 @@ namespace BankingSystem.API.Controllers
         [HttpPost("Withdraw")]
         public async Task<IActionResult> WithdrawAsync([FromForm] WithdrawalDTO withdrawalDto)
         {
-            var (success, message) = await _transactionOperationService.WithdrawAsync(withdrawalDto);
+            var response = await _transactionOperationService.WithdrawAsync(withdrawalDto);
+            var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
             //if (!success)
             //{
@@ -49,7 +51,8 @@ namespace BankingSystem.API.Controllers
         [HttpPut("PIN")]
         public async Task<IActionResult> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
         {
-            var (success, message) = await _cardService.ChangeCardPINAsync(changeCardDtp);
+            var response = await _cardService.ChangeCardPINAsync(changeCardDtp);
+            var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
             //if (!success)
             //{
