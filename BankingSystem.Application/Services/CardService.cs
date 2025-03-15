@@ -84,10 +84,10 @@ namespace BankingSystem.Application.Services
         public async Task<Response<SeeBalanceDTO>> SeeBalanceAsync(CardAuthorizationDTO cardAuthorizationDto)
         {
             var response = new Response<SeeBalanceDTO>();
-            var (cardValidated, message, card) = await AuthorizeCardAsync(cardAuthorizationDto.CardNumber, cardAuthorizationDto.PIN);
-            if (!cardValidated)
+            var cardValidateResponse = await AuthorizeCardAsync(cardAuthorizationDto.CardNumber, cardAuthorizationDto.PIN);
+            if (!cardValidateResponse.Success)
             {
-                return response.Set(false, message);
+                return response.Set(false, cardValidateResponse.Message);
             }
 
             var balanceInfo = await _unitOfWork.CardRepository.GetBalanceAsync(cardAuthorizationDto);
@@ -104,12 +104,12 @@ namespace BankingSystem.Application.Services
         public async Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardDtp)
         {
             var response = new SimpleResponse();
-            var (cardValidated, message, card) = await AuthorizeCardAsync(changeCardDtp.CardNumber, changeCardDtp.PIN);
-            if (!cardValidated)
+            var cardValidateResponse = await AuthorizeCardAsync(changeCardDtp.CardNumber, changeCardDtp.PIN);
+            if (!cardValidateResponse.Success)
             {
-                return response.Set(false, message);
+                return response.Set(false, cardValidateResponse.Message);
             }
-
+            var card = cardValidateResponse.Data;
             bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardDtp.NewPIN);
             if (!updated)
             {

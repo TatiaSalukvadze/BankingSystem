@@ -2,6 +2,8 @@
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Contracts.Response;
+using Microsoft.AspNetCore.Components.Forms;
+using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Application.FacadeServices
 {
@@ -27,27 +29,31 @@ namespace BankingSystem.Application.FacadeServices
             {
                 return response.Set(false, "You need to enter more than 0 value!");
             }
-            var (validated, validationMessage, transferAccounts) = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
+            //(validated, validationMessage, transferAccounts)
+            var  validateAccountsResponse = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
                 createTransactionDto.ToIBAN, email, isSelfTransfer);
-            if (!validated)
+            if (!validateAccountsResponse.Success)
             {
-                return response.Set(validated, validationMessage);
+                return response.Set(false, validateAccountsResponse.Message);
             }
+            var transferAccounts = validateAccountsResponse.Data;
             var (fromAccount, toAccount) = (transferAccounts.From, transferAccounts.To);
-            var (success, message, transferAmounts) = await _transactionDetailsService.CalculateTransferAmountAsync(fromAccount.Currency,
+            //(success, message, transferAmounts)
+            var calculationResponse = await _transactionDetailsService.CalculateTransferAmountAsync(fromAccount.Currency,
                 toAccount.Currency, createTransactionDto.Amount, isSelfTransfer);
-            if (!success)
+            if (!calculationResponse.Success)
             {
-                return response.Set(success, message);
+                return response.Set(false, calculationResponse.Message);
             }
+            var transferAmounts = calculationResponse.Data;
             if (fromAccount.Amount < transferAmounts.AmountFromAccount)
             {
                 return response.Set(false, "You don't have enough money to transfer on your account!");
             }
-            var (accountsUpdated, updateMessage) = await _accountService.UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, transferAmounts.AmountFromAccount, transferAmounts.AmountToAccount);
-            if (!accountsUpdated)
+            var updateAccountsResponse = await _accountService.UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, transferAmounts.AmountFromAccount, transferAmounts.AmountToAccount);
+            if (!updateAccountsResponse.Success)
             {
-                return response.Set(accountsUpdated, updateMessage);
+                return response.Set(false, updateAccountsResponse.Message);
             }
 
             return await _transactionDetailsService.CreateTransactionAsync(transferAmounts.BankProfit, createTransactionDto.Amount, fromAccount.Id, toAccount.Id,
