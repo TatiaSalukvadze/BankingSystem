@@ -11,9 +11,10 @@ namespace BankingSystem.Contracts.Response
         public bool Success { get; set; }
         public string Message { get; set; }
 
-        public SimpleResponse(bool success, string message) {
+        public SimpleResponse Set(bool success, string message) {
             Success = success;
             Message = message;
+            return this;
         }
     }
 }

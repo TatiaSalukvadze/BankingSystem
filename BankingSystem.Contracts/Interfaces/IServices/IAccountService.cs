@@ -8,9 +8,9 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     public interface IAccountService
     {
         Task<Response<Account>> CreateAccountAsync(CreateAccountDTO createAccountDto);
-        Task<(bool success, string message, List<SeeAccountsDTO>? data)> SeeAccountsAsync(string email);
-        Task<(bool success, string message)> DeleteAccountAsync(string iban);
-        Task<(bool Validated, string Message, TransferAccountsDTO Accounts)> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
+        Task<Response<List<SeeAccountsDTO>>> SeeAccountsAsync(string email);
+        Task<SimpleResponse> DeleteAccountAsync(string iban);
+        Task<Response<TransferAccountsDTO>> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
             string toIBAN, string email, bool isSelfTransfer);
         Task<(bool success, string message)> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
             decimal amountFromAccount, decimal amountToAccount);
