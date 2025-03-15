@@ -57,27 +57,28 @@ namespace BankingSystem.Application.FacadeServices
         public async Task<SimpleResponse> WithdrawAsync(WithdrawalDTO withdrawalDto)
         {
             var response = new SimpleResponse(); 
-            var (cardValidated, cardMessage, card) = await _cardService.AuthorizeCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
-            if (!cardValidated)
+            var validateCardResponse = await _cardService.AuthorizeCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
+            if (!validateCardResponse.Success)
             {
-                return response.Set(false, cardMessage);
+                return response.Set(false, validateCardResponse.Message);
             }
-
             if (withdrawalDto.Amount <= 0)
             {
                 return response.Set(false, "Withdrawal amount must be greater than zero.");
             }
-
-            var (success, message, withdrawalData) = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(withdrawalDto.CardNumber, withdrawalDto.PIN, withdrawalDto.Amount, withdrawalDto.Currency.ToString());
-            if (!success)
+    
+            var calculationResponse = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(withdrawalDto.CardNumber, withdrawalDto.PIN, withdrawalDto.Amount, withdrawalDto.Currency.ToString());
+            if (!calculationResponse.Success)
             {
-                return response.Set(false, message);
+                return response.Set(false, calculationResponse.Message);
             }
 
-            var (isBalanceUpdated, balanceMessage) = await _accountService.UpdateBalanceForATMAsync(card.AccountId, withdrawalData.TotalAmountToDeduct);
-            if (!isBalanceUpdated)
+            var card = validateCardResponse.Data;
+            var withdrawalData = calculationResponse.Data;
+            var updateAccountResponse = await _accountService.UpdateBalanceForATMAsync(card.AccountId, withdrawalData.TotalAmountToDeduct);
+            if (!updateAccountResponse.Success)
             {
-                return response.Set(false, balanceMessage);
+                return response.Set(false, updateAccountResponse.Message);
             }
 
             return await _transactionDetailsService.CreateTransactionAsync(withdrawalData.Fee, withdrawalData.Balance, card.AccountId, card.AccountId, withdrawalData.Currency, IsATM:true);
