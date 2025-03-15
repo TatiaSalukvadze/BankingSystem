@@ -20,7 +20,6 @@ namespace BankingSystem.Application.Services
 
     public class IdentityService : IIdentityService
     {
-        //private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthService _authService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;

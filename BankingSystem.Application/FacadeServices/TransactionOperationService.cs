@@ -29,7 +29,7 @@ namespace BankingSystem.Application.FacadeServices
             {
                 return response.Set(false, "You need to enter more than 0 value!");
             }
-            //(validated, validationMessage, transferAccounts)
+
             var  validateAccountsResponse = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
                 createTransactionDto.ToIBAN, email, isSelfTransfer);
             if (!validateAccountsResponse.Success)
@@ -38,7 +38,7 @@ namespace BankingSystem.Application.FacadeServices
             }
             var transferAccounts = validateAccountsResponse.Data;
             var (fromAccount, toAccount) = (transferAccounts.From, transferAccounts.To);
-            //(success, message, transferAmounts)
+
             var calculationResponse = await _transactionDetailsService.CalculateTransferAmountAsync(fromAccount.Currency,
                 toAccount.Currency, createTransactionDto.Amount, isSelfTransfer);
             if (!calculationResponse.Success)
@@ -53,7 +53,7 @@ namespace BankingSystem.Application.FacadeServices
             var updateAccountsResponse = await _accountService.UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, transferAmounts.AmountFromAccount, transferAmounts.AmountToAccount);
             if (!updateAccountsResponse.Success)
             {
-                return response.Set(false, updateAccountsResponse.Message);
+                return updateAccountsResponse;
             }
 
             return await _transactionDetailsService.CreateTransactionAsync(transferAmounts.BankProfit, createTransactionDto.Amount, fromAccount.Id, toAccount.Id,
@@ -84,7 +84,7 @@ namespace BankingSystem.Application.FacadeServices
             var updateAccountResponse = await _accountService.UpdateBalanceForATMAsync(card.AccountId, withdrawalData.TotalAmountToDeduct);
             if (!updateAccountResponse.Success)
             {
-                return response.Set(false, updateAccountResponse.Message);
+                return updateAccountResponse;
             }
 
             return await _transactionDetailsService.CreateTransactionAsync(withdrawalData.Fee, withdrawalData.Balance, card.AccountId, card.AccountId, withdrawalData.Currency, IsATM:true);
