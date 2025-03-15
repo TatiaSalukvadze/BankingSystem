@@ -25,17 +25,17 @@ namespace BankingSystem.Application.Services
         //tatia
         public async Task<Response<Account>> CreateAccountAsync(CreateAccountDTO createAccountDto)
         {
-
+            var response = new Response<Account>();
             int personId = await _unitOfWork.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber);
             if (personId <= 0)
             {
-                return new Response<Account>(false, "Such person doesn't exist in our system!");
+                return response.Set(false, "Such person doesn't exist in our system!");
             }
 
             bool IBANExists = await _unitOfWork.AccountRepository.IBANExists(createAccountDto.IBAN);
             if (IBANExists)
             {
-                return new Response<Account>(false, "Such IBAN already exist in our system!");
+                return response.Set(false, "Such IBAN already exist in our system!");
             }
             //int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(createAccountDto.Currency.ToString());
             //if (currencyId <= 0)
@@ -53,68 +53,71 @@ namespace BankingSystem.Application.Services
             int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);
             if (insertedId <= 0)
             {
-                return new Response<Account>(false, "Account could not be created, something happened!");
+                return response.Set(false, "Account could not be created, something happened!");
             }
             account.Id = insertedId;
 
             //_unitOfWork.SaveChanges();
-            return new Response<Account>(true, "Account was created successfully!", account);
+            return response.Set(true, "Account was created successfully!", account);
         }
 
         //tamar
-        public async Task<(bool success, string message, List<SeeAccountsDTO>? data)> SeeAccountsAsync(string email)
+        public async Task<Response<List<SeeAccountsDTO>>> SeeAccountsAsync(string email)
         {
+            var response = new Response<List<SeeAccountsDTO>>();
             bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
 
             if (!accountsExist)
             {
-                return (false, "You don't have any accounts!", null);
+                return response.Set(false, "You don't have any accounts!");
             }
 
             var accounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email);
 
             if (accounts == null || accounts.Count == 0)
             {
-                return (false, "No accounts found!", null);
+                return response.Set(false, "No accounts found!");
             }
 
-            return (true, "Accounts retrieved successfully!", accounts);
+            return response.Set(true, "Accounts retrieved successfully!", accounts);
         }
 
         //tamar
-        public async Task<(bool success, string message)> DeleteAccountAsync(string iban)
+        public async Task<SimpleResponse> DeleteAccountAsync(string iban)
         {
+            var response = new SimpleResponse();
             bool exists = await _unitOfWork.AccountRepository.IBANExists(iban);
             if (!exists)
             {
-                return (false, "Account not found.");
+                return response.Set(false, "Account not found.");
             }
 
             var balance = await _unitOfWork.AccountRepository.GetBalanceByIBANAsync(iban);
             if (balance > 0)
             {
-                return (false, "Account cannot be deleted while it has a balance.");
+                return response.Set(false, "Account cannot be deleted while it has a balance.");
             }
 
             bool deleted = await _unitOfWork.AccountRepository.DeleteAccountByIBANAsync(iban);
             if (!deleted)
             {
-                return (false, "Failed to delete account.");
+                return response.Set(false, "Failed to delete account.");
             }
 
             //_unitOfWork.SaveChanges();
-            return (true, "Account deleted successfully.");
+            return response.Set(true, "Account deleted successfully.");
         }
 
         #region transactionHelpers
         //for transaction changes
         //tatia
-        public async Task<(bool Validated, string Message, TransferAccountsDTO Accounts)> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
+        public async Task<Response<TransferAccountsDTO>> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
             string toIBAN, string email, bool isSelfTransfer)
         {
+            var response = new Response<TransferAccountsDTO>();
             if (fromIBAN == toIBAN)
             {
-                return (false, "You can't transfer to same account!", null);
+                return response.Set(false, "You can't transfer to same account!");
             }
             var fromToAccounts = new TransferAccountsDTO();
             fromToAccounts.From = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
@@ -129,14 +132,14 @@ namespace BankingSystem.Application.Services
             }
             if (fromToAccounts.From is null || fromToAccounts.To is null)
             {
-                return (false, "There is no account for one or both provided IBANs, check well!", null);
+                return response.Set(false, "There is no account for one or both provided IBANs, check well!");
             }
 
             //if (fromAccount.Amount < amountToTransfer)
             //{
             //    return (false, "You don't have enough money to transfer on your account!", null, null);
             //}
-            return (true, "Accounts validated!", fromToAccounts);
+            return response.Set(true, "Accounts validated!", fromToAccounts);
         }
         //tatia
         public async Task<(bool success, string message)> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,

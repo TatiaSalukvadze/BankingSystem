@@ -12,10 +12,11 @@ namespace BankingSystem.Contracts.Response
         public string Message { get; set; }
         public T Data { get; set; }
 
-        public Response(bool success, string message, T data = null) {
+        public Response<T> Set(bool success, string message, T data = null) {
             Success = success;
             Message = message;
             Data = data;
+            return this;
         }
     }
 }
