@@ -1,17 +1,8 @@
 ﻿using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.Interfaces;
-using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
+using BankingSystem.Contracts.Response;
 using BankingSystem.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankingSystem.Application.Services
 {
@@ -19,19 +10,14 @@ namespace BankingSystem.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
-
         public PersonService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-
         }
 
-        
-        //tatia
-        public async Task<(bool Success, string Message, object? Data)> RegisterCustomPersonAsync(RegisterPersonDTO registerDto, string IdentityUserId)
+        public async Task<Response<object>> RegisterCustomPersonAsync(RegisterPersonDTO registerDto, string IdentityUserId)
         {
-
-            
+            var response = new Response<object>();
             var person = new Person
                 {
                     IdentityUserId = IdentityUserId,
@@ -47,16 +33,15 @@ namespace BankingSystem.Application.Services
             var personId = await _unitOfWork.PersonRepository.RegisterPersonAsync(person);
             if (personId <= 0)
             {
-                return (false, "Adding user in physical person system failed!", null);
+                return response.Set(false, "Adding user in physical person system failed!");
             }
             //_unitOfWork.SaveChanges();
-           
-            return (true, "User was registered successfully!",new { IdentityUserId, CustomUserId = personId });
+            return response.Set(true, "User was registered successfully!",new { IdentityUserId, CustomUserId = personId });
         }
 
-        //both
-        public async Task<(bool Success, string Message, Dictionary<string, int> statistics)> RegisteredPeopleStatisticsAsync()
+        public async Task<Response<Dictionary<string, int>>> RegisteredPeopleStatisticsAsync()
         {
+            var response = new Response<Dictionary<string, int>>();
             Task<int> PeopleRegisteredThisYear = _unitOfWork.PersonRepository.PeopleRegisteredThisYear();
             Task<int> PeopleRegisteredLast1Year = _unitOfWork.PersonRepository.PeopleRegisteredLastOneYear();
             Task<int> PeopleRegisteredLast30Days = _unitOfWork.PersonRepository.PeopleRegisteredLast30Days();
@@ -66,7 +51,7 @@ namespace BankingSystem.Application.Services
             //    = (result[0], result[1], result[2]);
             if (result is null || result.Count() != 3)
             {
-                return (false, "Person Statistics couldn't be retrieved!", null);
+                return response.Set(false, "Person Statistics couldn't be retrieved!");
             }
 
             var personStatistics = new Dictionary<string, int>()
@@ -87,7 +72,7 @@ namespace BankingSystem.Application.Services
             //int peopleRegisteredLast30Days = await _unitOfWork.PersonRepository.PeopleRegisteredLast30Days();
             //personStatistics.Add("People Registered Last 30 Days", peopleRegisteredLast30Days);
 
-            return (true, "Statistics are retrieved!", personStatistics);
+            return response.Set(true, "Statistics are retrieved!", personStatistics);
         }
     }
 }

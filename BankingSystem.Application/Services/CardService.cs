@@ -4,6 +4,7 @@ using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
+using BankingSystem.Contracts.Response;
 using BankingSystem.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -24,18 +25,19 @@ namespace BankingSystem.Application.Services
         }
 
         //tamar
-        public async Task<(bool success, string message, Card? data)> CreateCardAsync(CreateCardDTO createCardDto)
+        public async Task<Response<Card>> CreateCardAsync(CreateCardDTO createCardDto)
         {
+            var response = new Response<Card>();
             var account = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN);
             if (account == null)
             {
-                return (false, "Account does not exist in the system!", null);
+                return response.Set(false, "Account does not exist in the system!");
             }
 
             bool cardNumberExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(createCardDto.CardNumber);
             if (cardNumberExists)
             {
-                return (false, "Card number already exists!", null);
+                return response.Set(false, "Card number already exists!");
             }
 
             var card = new Card
@@ -50,88 +52,92 @@ namespace BankingSystem.Application.Services
             int insertedId = await _unitOfWork.CardRepository.CreateCardAsync(card);
             if (insertedId <= 0)
             {
-                return (false, "Card could not be created, something went wrong!", null);
+                return response.Set(false, "Card could not be created, something went wrong!");
             }
 
             card.Id = insertedId;
             //_unitOfWork.SaveChanges();
 
-            return (true, "Card was created successfully!", card);
+            return response.Set(true, "Card was created successfully!", card);
         }
 
         //tatia
-        public async Task<(bool success, string message, List<CardWithIBANDTO> data)> SeeCardsAsync(string email)
+        public async Task<Response<List<CardWithIBANDTO>>> SeeCardsAsync(string email)
         {
+            var response = new Response<List<CardWithIBANDTO>>();
             bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
             if (!accountsExist)
             {
-                return (false, "You don't have accounts!", null);
+                return response.Set(false, "You don't have accounts!");
             }
 
             var cards = await _unitOfWork.CardRepository.GetCardsForPersonAsync(email);
             if (cards == null || cards.Count == 0)
             {
-                return (false, "You don't have cards!", null);
+                return response.Set(false, "You don't have cards!");
             }
 
-            return (true, "Cards For Account (IBAN) were found!", cards);          
+            return response.Set(true, "Cards For Account (IBAN) were found!", cards);          
         }
 
         //tamar
-        public async Task<(bool success, string message, SeeBalanceDTO data)> SeeBalanceAsync(CardAuthorizationDTO cardAuthorizationDto)
+        public async Task<Response<SeeBalanceDTO>> SeeBalanceAsync(CardAuthorizationDTO cardAuthorizationDto)
         {
+            var response = new Response<SeeBalanceDTO>();
             var (cardValidated, message, card) = await AuthorizeCardAsync(cardAuthorizationDto.CardNumber, cardAuthorizationDto.PIN);
             if (!cardValidated)
             {
-                return (false, message, null);
+                return response.Set(false, message);
             }
 
             var balanceInfo = await _unitOfWork.CardRepository.GetBalanceAsync(cardAuthorizationDto);
 
             if (balanceInfo is null || balanceInfo.Amount == 0 || balanceInfo.Currency == 0)
             {
-                return (false, "Unable to retrieve balance.", null);
+                return response.Set(false, "Unable to retrieve balance.");
             }
 
-            return (true, "Balance retrieved successfully.", balanceInfo);
+            return response.Set(true, "Balance retrieved successfully.", balanceInfo);
         }
 
         //tatia
-        public async Task<(bool success, string message)> ChangeCardPINAsync(ChangeCardPINDTO changeCardDtp)
+        public async Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardDtp)
         {
+            var response = new SimpleResponse();
             var (cardValidated, message, card) = await AuthorizeCardAsync(changeCardDtp.CardNumber, changeCardDtp.PIN);
             if (!cardValidated)
             {
-                return (false, message);
+                return response.Set(false, message);
             }
 
             bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardDtp.NewPIN);
             if (!updated)
             {
-                return (false, "Card PIN could not be updated!");
+                return response.Set(false, "Card PIN could not be updated!");
             }
             //_unitOfWork.SaveChanges();
-            return (true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
+            return response.Set(true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
         }
 
         //both
-        public async Task<(bool success, string message, Card card)> AuthorizeCardAsync(string CardNumber, string PIN)
+        public async Task<Response<Card>> AuthorizeCardAsync(string CardNumber, string PIN)
         {
+            var response = new Response<Card>();
             Card card = await _unitOfWork.CardRepository.GetCardAsync(CardNumber);
 
             if (card is null)
             {
-                return (false, "Card was not found!",null);
+                return response.Set(false, "Card was not found!");
             }
             if (card.PIN != PIN)
             {
-                return (false, "Incorrect PIN!", null);
+                return response.Set(false, "Incorrect PIN!");
             }
             if (CheckCardExpired(card.ExpirationDate))
             {
-                return (false, "Card is expired!", null);
+                return response.Set(false, "Card is expired!");
             }
-            return (true, "Card validated", card);
+            return response.Set(true, "Card validated", card);
         }
 
         //tatia
@@ -154,21 +160,22 @@ namespace BankingSystem.Application.Services
             return true;
         }
 
-        public async Task<(bool success, string message)> CancelCardAsync(string cardNumber)
+        public async Task<SimpleResponse> CancelCardAsync(string cardNumber)
         {
+            var response = new SimpleResponse();
             var cardExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(cardNumber);
             if (!cardExists)
             {
-                return (false, "There is no Card for that Card Number!");
+                return response.Set(false, "There is no Card for that Card Number!");
             }
 
             var cardDeleted = await _unitOfWork.CardRepository.DeleteCardAsync(cardNumber);
             if (!cardDeleted)
             {
-                return (false, "Card could not be canceled!");
+                return response.Set(false, "Card could not be canceled!");
             }
             //_unitOfWork.SaveChanges();
-            return (true, "Card was successfully canceled!");
+            return response.Set(true, "Card was successfully canceled!");
         }
     }
 }
