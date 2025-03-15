@@ -25,24 +25,24 @@ namespace BankingSystem.Application.FacadeServices
             {
                 return (false, "You need to enter more than 0 value!");
             }
-            var (validated, message, fromAccount, toAccount) = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
+            var (validated, validationMessage, transferAccounts) = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
                 createTransactionDto.ToIBAN, email, isSelfTransfer);
-            if (!validated) return (validated, message);
-
-            var (bankProfit, amountFromAccount, amountToAccount) = await _transactionDetailsService.CalculateTransactionAmountAsync(fromAccount.Currency,
+            if (!validated) return (validated, validationMessage);
+            var (fromAccount, toAccount) = (transferAccounts.From, transferAccounts.To);
+            var (success, message, transferAmounts) = await _transactionDetailsService.CalculateTransferAmountAsync(fromAccount.Currency,
                 toAccount.Currency, createTransactionDto.Amount, isSelfTransfer);
-            if (bankProfit == 0 && amountFromAccount == 0 && amountToAccount == 0)
+            if (!success)
             {
-                return (false, "One of the account has incorrect currency!");
+                return (success, message);
             }
-            if (fromAccount.Amount < amountFromAccount)
+            if (fromAccount.Amount < transferAmounts.AmountFromAccount)
             {
                 return (false, "You don't have enough money to transfer on your account!");
             }
-            bool accountsUpdated = await _accountService.UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, amountFromAccount, amountToAccount);
-            if (!accountsUpdated) return (false, "Balance couldn't be updated!");
+            var (accountsUpdated, updateMessage) = await _accountService.UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, transferAmounts.AmountFromAccount, transferAmounts.AmountToAccount);
+            if (!accountsUpdated) return (accountsUpdated, updateMessage);
 
-            return await _transactionDetailsService.CreateTransactionAsync(bankProfit, createTransactionDto.Amount, fromAccount.Id, toAccount.Id,
+            return await _transactionDetailsService.CreateTransactionAsync(transferAmounts.BankProfit, createTransactionDto.Amount, fromAccount.Id, toAccount.Id,
                 fromAccount.Currency);
         }
 

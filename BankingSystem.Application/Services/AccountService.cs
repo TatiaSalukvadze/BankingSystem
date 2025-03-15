@@ -3,6 +3,7 @@ using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
+using BankingSystem.Contracts.Response;
 using BankingSystem.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 
@@ -22,19 +23,19 @@ namespace BankingSystem.Application.Services
         }
 
         //tatia
-        public async Task<(bool Success, string Message, Account? Data)> CreateAccountAsync(CreateAccountDTO createAccountDto)
+        public async Task<Response<Account>> CreateAccountAsync(CreateAccountDTO createAccountDto)
         {
 
             int personId = await _unitOfWork.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber);
             if (personId <= 0)
             {
-                return (false, "Such person doesn't exist in our system!", null);
+                return new Response<Account>(false, "Such person doesn't exist in our system!");
             }
 
             bool IBANExists = await _unitOfWork.AccountRepository.IBANExists(createAccountDto.IBAN);
             if (IBANExists)
             {
-                return (false, "Such IBAN already exist in our system!", null);
+                return new Response<Account>(false, "Such IBAN already exist in our system!");
             }
             //int currencyId = await _unitOfWork.CurrencyRepository.FindIdByTypeAsync(createAccountDto.Currency.ToString());
             //if (currencyId <= 0)
@@ -52,12 +53,12 @@ namespace BankingSystem.Application.Services
             int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);
             if (insertedId <= 0)
             {
-                return (false, "Account could not be created, something happened!", null);
+                return new Response<Account>(false, "Account could not be created, something happened!");
             }
             account.Id = insertedId;
 
             //_unitOfWork.SaveChanges();
-            return (true, "Account was created successfully!", account);
+            return new Response<Account>(true, "Account was created successfully!", account);
         }
 
         //tamar
@@ -108,36 +109,37 @@ namespace BankingSystem.Application.Services
         #region transactionHelpers
         //for transaction changes
         //tatia
-        public async Task<(bool Validated, string Message, Account from, Account to)> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
+        public async Task<(bool Validated, string Message, TransferAccountsDTO Accounts)> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
             string toIBAN, string email, bool isSelfTransfer)
         {
             if (fromIBAN == toIBAN)
             {
-                return (false, "You can't transfer to same account!", null, null);
+                return (false, "You can't transfer to same account!", null);
             }
-            var fromAccount = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
+            var fromToAccounts = new TransferAccountsDTO();
+            fromToAccounts.From = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
             Account toAccount;
             if (isSelfTransfer)
             {
-                toAccount = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(toIBAN, email);
+                fromToAccounts.To = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(toIBAN, email);
             }
             else
             {
-                toAccount = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(toIBAN);
+                fromToAccounts.To = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(toIBAN);
             }
-            if (fromAccount is null || toAccount is null)
+            if (fromToAccounts.From is null || fromToAccounts.To is null)
             {
-                return (false, "There is no account for one or both provided IBANs, check well!", null, null);
+                return (false, "There is no account for one or both provided IBANs, check well!", null);
             }
 
             //if (fromAccount.Amount < amountToTransfer)
             //{
             //    return (false, "You don't have enough money to transfer on your account!", null, null);
             //}
-            return (true, "Accounts validated!", fromAccount, toAccount);
+            return (true, "Accounts validated!", fromToAccounts);
         }
         //tatia
-        public async Task<bool> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
+        public async Task<(bool success, string message)> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
             decimal amountFromAccount, decimal amountToAccount)
         {
             _unitOfWork.BeginTransaction();
@@ -147,9 +149,9 @@ namespace BankingSystem.Application.Services
 
             if (!fromAccountUpdated || !toAccountUpdated)
             {
-                return false;
+                return (false, "Balance couldn't be updated!");
             }
-            return true;
+            return (true,"Balance updated successfully!");
         }
 
         public async Task<(bool success, string message)> UpdateBalanceForATMAsync(int accountId, decimal amountToDeduct)

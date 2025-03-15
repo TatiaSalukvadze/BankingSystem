@@ -46,88 +46,7 @@ namespace BankingSystem.Application.Services
             _unitOfWork.SaveChanges();
             return (true, "Transaction was successfull!");
         }
-
-        //tatia
-        public async Task<(decimal bankProfit, decimal amountFromAccount, decimal amountToAccount)> CalculateTransactionAmountAsync(
-            string fromCurrency, string toCurrency, decimal amountToTransfer, bool isSelfTransfer)
-        {
-            decimal currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
-            if (currencyRate <= 0) { return (0, 0, 0); }
-
-            decimal fee;
-            decimal extraFeeValue = 0;
-            if (isSelfTransfer)
-            {
-                fee = _configuration.GetValue<decimal>("TransactionFees:SelfTransferPercent");
-            }
-            else
-            {
-                fee = _configuration.GetValue<decimal>("TransactionFees:StandartTransferPercent");
-                extraFeeValue = _configuration.GetValue<decimal>("TransactionFees:StandartTransferValue");
-            }
-
-            var bankProfit = amountToTransfer * fee / 100 + extraFeeValue;
-            var amountFromAccount = amountToTransfer + bankProfit;
-            var amountToAccount = amountToTransfer * currencyRate;
-            return (bankProfit, amountFromAccount, amountToAccount);
-        }
-
-        //tamr
-        //for atm
-        public async Task<(bool success, string message, AtmWithdrawalCalculationDTO Data)> CalculateATMWithdrawalTransactionAsync(string cardNumber, string pin, decimal withdrawalAmount, string withdrawalCurrency)
-        {
-            var accountInfo = await _unitOfWork.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
-
-            if (accountInfo == null)
-            {
-                return (false, "Unable to retrieve account details.", null);
-            }
-
-            decimal accountBalance = accountInfo.Amount;
-            decimal totalWithdrawnIn24Hours = accountInfo.WithdrawnAmountIn24Hours;
-            string accountCurrency = accountInfo.Currency;
-
-            decimal convertedAmount = withdrawalAmount;
-            if (withdrawalCurrency != accountCurrency)
-            {
-                decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(withdrawalCurrency, accountCurrency);
-
-                if (exchangeRate <= 0)
-                {
-                    return (false, "Currency conversion failed.", null);
-                }
-
-                convertedAmount *= exchangeRate;
-            }
-
-            decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
-            decimal fee = convertedAmount * (atmWithdrawalPercent / 100);
-            decimal totalAmountToDeduct = convertedAmount + fee;
-
-            if (accountBalance < totalAmountToDeduct)
-            {
-                return (false, "You don't have enough money", null);
-            }
-
-            decimal newTotalWithdrawnIn24Hours = totalWithdrawnIn24Hours + totalAmountToDeduct;
-            decimal atmWithdrawalLimit = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalLimitForDay");
-
-            if (newTotalWithdrawnIn24Hours > atmWithdrawalLimit)
-            {
-                return (false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours.", null);
-            }
-
-            var withdrawalData = new AtmWithdrawalCalculationDTO
-            {
-                Fee = fee,
-                Balance = convertedAmount,
-                Currency = accountCurrency,
-                TotalAmountToDeduct = totalAmountToDeduct
-            };
-
-            return (true, "", withdrawalData);
-        }
-
+        
         //tatia
         public async Task<(bool Success, string Message, TransactionCountDTO Data)> NumberOfTransactionsAsync()
         {
@@ -203,6 +122,89 @@ namespace BankingSystem.Application.Services
             };
             return (true, "Income and Expense retreived!", incomeExpense);
         }
+
+        #region transactionHelpers
+        //tatia
+        public async Task<(bool Success, string Message, TransferAmountCalculationDTO Data)> CalculateTransferAmountAsync(
+            string fromCurrency, string toCurrency, decimal amountToTransfer, bool isSelfTransfer)
+        {
+            decimal currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
+            if (currencyRate <= 0) { return (false, "One of the account has incorrect currency!", null); }
+
+            decimal fee;
+            decimal extraFeeValue = 0;
+            if (isSelfTransfer)
+            {
+                fee = _configuration.GetValue<decimal>("TransactionFees:SelfTransferPercent");
+            }
+            else
+            {
+                fee = _configuration.GetValue<decimal>("TransactionFees:StandartTransferPercent");
+                extraFeeValue = _configuration.GetValue<decimal>("TransactionFees:StandartTransferValue");
+            }
+            var transferAmounts = new TransferAmountCalculationDTO();
+            transferAmounts.BankProfit = amountToTransfer * fee / 100 + extraFeeValue;
+            transferAmounts.AmountFromAccount = amountToTransfer + transferAmounts.BankProfit;
+            transferAmounts.AmountToAccount = amountToTransfer * currencyRate;
+            return (true,"", transferAmounts);
+        }
+
+        //tamr
+        //for atm
+        public async Task<(bool success, string message, AtmWithdrawalCalculationDTO Data)> CalculateATMWithdrawalTransactionAsync(string cardNumber, string pin, decimal withdrawalAmount, string withdrawalCurrency)
+        {
+            var accountInfo = await _unitOfWork.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
+
+            if (accountInfo == null)
+            {
+                return (false, "Unable to retrieve account details.", null);
+            }
+
+            decimal accountBalance = accountInfo.Amount;
+            decimal totalWithdrawnIn24Hours = accountInfo.WithdrawnAmountIn24Hours;
+            string accountCurrency = accountInfo.Currency;
+
+            decimal convertedAmount = withdrawalAmount;
+            if (withdrawalCurrency != accountCurrency)
+            {
+                decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(withdrawalCurrency, accountCurrency);
+
+                if (exchangeRate <= 0)
+                {
+                    return (false, "Currency conversion failed.", null);
+                }
+
+                convertedAmount *= exchangeRate;
+            }
+
+            decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
+            decimal fee = convertedAmount * (atmWithdrawalPercent / 100);
+            decimal totalAmountToDeduct = convertedAmount + fee;
+
+            if (accountBalance < totalAmountToDeduct)
+            {
+                return (false, "You don't have enough money", null);
+            }
+
+            decimal newTotalWithdrawnIn24Hours = totalWithdrawnIn24Hours + totalAmountToDeduct;
+            decimal atmWithdrawalLimit = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalLimitForDay");
+
+            if (newTotalWithdrawnIn24Hours > atmWithdrawalLimit)
+            {
+                return (false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours.", null);
+            }
+
+            var withdrawalData = new AtmWithdrawalCalculationDTO
+            {
+                Fee = fee,
+                Balance = convertedAmount,
+                Currency = accountCurrency,
+                TotalAmountToDeduct = totalAmountToDeduct
+            };
+
+            return (true, "", withdrawalData);
+        }
+        #endregion
     }
 }
 
