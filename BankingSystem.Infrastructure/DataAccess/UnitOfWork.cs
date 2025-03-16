@@ -3,48 +3,42 @@ using BankingSystem.Contracts.Interfaces.IRepositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 
 namespace BankingSystem.Infrastructure.DataAccess
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
-        //private string _connectionString;
         private IDbConnection _connection;
         private IDbTransaction _transaction;
-        public IDbTransaction Transaction() => _transaction;//no nned
-        //public IDbConnection Connection() => _connection;//no need
+        public IDbTransaction Transaction() => _transaction;
 
         public UnitOfWork(SqlConnection connection, IPersonRepository personRepository, 
             IAccountRepository accountRepository, ICardRepository cardRepository, 
-            ITransactionDetailsRepository transactionDetailsRepository)
+            ITransactionDetailsRepository transactionDetailsRepository)//IServiceProvider _serviceProvider) 
         {
-
-            //_connectionString = configuration.GetConnectionString("default") ??
-            //    throw new ArgumentNullException("There is no default connection string present");
-            //_connection = new SqlConnection(_connectionString);
-            //_connection.Open();
-            //_transaction = dbTransaction;
-            _connection = connection;// _transaction.Connection;
+            _connection = connection;
             _connection.Open();
-            //RepoSetUp(personRepository, accountRepository, cardRepository, transactionDetailsRepository);
             PersonRepository = personRepository;
             AccountRepository = accountRepository;
             CardRepository = cardRepository;
             TransactionDetailsRepository = transactionDetailsRepository;
+            //_personRepository = new Lazy<IPersonRepository>(() => _serviceProvider.GetRequiredService<IPersonRepository>());
+            //_accountRepository = new Lazy<IAccountRepository>(() => _serviceProvider.GetRequiredService<IAccountRepository>());
+            //_cardRepository = new Lazy<ICardRepository>(() => _serviceProvider.GetRequiredService<ICardRepository>());
+            //_transactionDetailsRepository = new Lazy<ITransactionDetailsRepository>(() => _serviceProvider.GetRequiredService<ITransactionDetailsRepository>());
+
         }
-        //private void RepoSetUp(IPersonRepository personRepository, IAccountRepository accountRepository,
-        //   ICardRepository cardRepository,ITransactionDetailsRepository transactionDetailsRepository)
-        //{
-        //    PersonRepository = personRepository;
-        //    PersonRepository.GiveCommandData(_connection, _transaction);
-        //    AccountRepository = accountRepository;
-        //    AccountRepository.GiveCommandData(_connection, _transaction);
-        //    CardRepository = cardRepository;
-        //    CardRepository.GiveCommandData(_connection, _transaction);
-        //    TransactionDetailsRepository = transactionDetailsRepository;    
-        //    TransactionDetailsRepository.GiveCommandData(_connection, _transaction);
-        //}
+        //private Lazy<IPersonRepository> _personRepository;
+        //private Lazy<IAccountRepository> _accountRepository;
+        //private Lazy<ICardRepository> _cardRepository;
+        //private Lazy<ITransactionDetailsRepository> _transactionDetailsRepository;
+
+        //public IPersonRepository PersonRepository => _personRepository.Value;
+        //public IAccountRepository AccountRepository => _accountRepository.Value;
+        //public ICardRepository CardRepository => _cardRepository.Value;
+        //public ITransactionDetailsRepository TransactionDetailsRepository => _transactionDetailsRepository.Value;
 
         private IPersonRepository _personRepository;
         public IPersonRepository PersonRepository
@@ -130,26 +124,12 @@ namespace BankingSystem.Infrastructure.DataAccess
         {
             if (_connection.State != ConnectionState.Open)
             {
-                _connection.Open();  // Open the connection here, when needed
+                _connection.Open();  
             }
 
             _transaction = (SqlTransaction)_connection.BeginTransaction();
         }
 
-        //public void Rollback() => _transaction.Rollback();
-
-        //public void Dispose()
-        //{
-        //    _transaction?.Dispose();
-        //    _connection?.Close();
-        //}
-
-        //public IDbCommand CreateCommand()
-        //{
-        //    var command = _connection.CreateCommand();
-        //    command.Transaction = _transaction;
-        //    return command;
-        //}
 
         public void SaveChanges()
         {
