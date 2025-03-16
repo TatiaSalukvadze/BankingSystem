@@ -43,7 +43,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             //return Ok(new { finalMessage, finalData });
         }
         //tatia
-        [HttpPost("CreateAccount")]
+        [HttpPost("Account")]
         public async Task<IActionResult> CreateAccount([FromForm] CreateAccountDTO createAccountDto)
         {
             var response = await _accountService.CreateAccountAsync(createAccountDto);
@@ -56,7 +56,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             //return Ok(new { message, data });
         }
 
-        [HttpDelete("DeleteAccount")]
+        [HttpDelete("Account")]
         public async Task<IActionResult> DeleteAccount(string iban)
         {
             var response = await _accountService.DeleteAccountAsync(iban);
@@ -71,7 +71,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         }
 
         //tamar
-        [HttpPost("CreateCard")]
+        [HttpPost("Card")]
         public async Task<IActionResult> CreateCard([FromForm] CreateCardDTO createCardDto)
         {
             var response = await _cardService.CreateCardAsync(createCardDto);

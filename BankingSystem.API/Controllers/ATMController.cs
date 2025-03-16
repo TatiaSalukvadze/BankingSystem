@@ -19,7 +19,7 @@ namespace BankingSystem.API.Controllers
         }
 
         //tamar
-        [HttpGet("SeeBalance")]
+        [HttpGet("Balance")]
         public async Task<IActionResult> SeeBalanceAsync([FromQuery] CardAuthorizationDTO cardAuthorizationDto)// string cardNumber, [FromQuery] string pin)
         {
             var response = await _cardService.SeeBalanceAsync(cardAuthorizationDto);

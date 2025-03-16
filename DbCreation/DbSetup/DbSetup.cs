@@ -43,8 +43,9 @@ namespace DbCreation.DbSetup
             using (_dbConnection)
             {
                 _dbConnection.Open();
-                await CreateCustomTables();
-                await CreateProcedures();
+                await CreateCustomTablesAsync();
+                await CreateProceduresAsync();
+                await CreateViewsAsync();
             }
         }
 
@@ -64,14 +65,21 @@ namespace DbCreation.DbSetup
 
         private async Task CreateProceduresAsync()
         {
-            var SelectTotalExpenseProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalExpenseProcedure.sql"));
-            var SelectTotalIncomeProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalIncomeProcedure.sql"));
-            var SelectTransactionCountProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTransactionCountProcedure.sql"));
+            var selectTotalExpenseProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalExpenseProcedure.sql"));
+            var selectTotalIncomeProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalIncomeProcedure.sql"));
+            var selectTransactionCountProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTransactionCountProcedure.sql"));
 
-            await _dbConnection.ExecuteAsync(SelectTotalExpenseProcedure);
-            await _dbConnection.ExecuteAsync(SelectTotalIncomeProcedure);
-            await _dbConnection.ExecuteAsync(SelectTransactionCountProcedure);
+            await _dbConnection.ExecuteAsync(selectTotalExpenseProcedure);
+            await _dbConnection.ExecuteAsync(selectTotalIncomeProcedure);
+            await _dbConnection.ExecuteAsync(selectTransactionCountProcedure);
             _logger.LogInformation("Procedures created!");
+        }
+        private async Task CreateViewsAsync()
+        {
+            var bankProfitView = await File.ReadAllTextAsync(Path.Combine(_basePath, "BankProfitView.sql"));
+
+            await _dbConnection.ExecuteAsync(bankProfitView);
+            _logger.LogInformation("Views created!");
         }
     }
 }
