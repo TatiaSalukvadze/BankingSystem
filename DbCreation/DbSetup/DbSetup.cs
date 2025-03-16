@@ -40,45 +40,58 @@ namespace DbCreation.DbSetup
                 _logger.LogInformation("Db already exists!");
                 return;
             }
+  
             using (_dbConnection)
             {
                 _dbConnection.Open();
-                await CreateCustomTablesAsync();
-                await CreateProceduresAsync();
-                await CreateViewsAsync();
+                using var transaction = _dbConnection.BeginTransaction();
+                try
+                {
+                    await CreateCustomTablesAsync(transaction);
+                    await CreateProceduresAsync(transaction);
+                    await CreateViewsAsync(transaction);
+                    transaction.Commit();
+                    _logger.LogInformation("Database setup completed successfully.");
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    _logger.LogError("exception happened during db setupt: {ExceptionMessage},{StackTrace}", ex.Message, ex.StackTrace);
+                }
             }
+        
         }
 
-        private async Task CreateCustomTablesAsync()
+        private async Task CreateCustomTablesAsync(IDbTransaction transaction)
         {
             var createPersonTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "PersonTable.sql"));
             var createAccountTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "AccountTable.sql"));
             var createCardTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "CardTable.sql"));
             var createTransactionDetailsTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "TransactionDetailsTable.sql"));
 
-            var res = await _dbConnection.ExecuteAsync(createPersonTable);
-            await _dbConnection.ExecuteAsync(createAccountTable);
-            await _dbConnection.ExecuteAsync(createCardTable);
-            await _dbConnection.ExecuteAsync(createTransactionDetailsTable);
+            await _dbConnection.ExecuteAsync(createPersonTable, transaction: transaction);
+            await _dbConnection.ExecuteAsync(createAccountTable, transaction: transaction);
+            await _dbConnection.ExecuteAsync(createCardTable, transaction: transaction);
+            await _dbConnection.ExecuteAsync(createTransactionDetailsTable, transaction: transaction);
             _logger.LogInformation("Custom Tables created!");
         }
 
-        private async Task CreateProceduresAsync()
+        private async Task CreateProceduresAsync(IDbTransaction transaction)
         {
             var selectTotalExpenseProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalExpenseProcedure.sql"));
             var selectTotalIncomeProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalIncomeProcedure.sql"));
             var selectTransactionCountProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTransactionCountProcedure.sql"));
 
-            await _dbConnection.ExecuteAsync(selectTotalExpenseProcedure);
-            await _dbConnection.ExecuteAsync(selectTotalIncomeProcedure);
-            await _dbConnection.ExecuteAsync(selectTransactionCountProcedure);
+            await _dbConnection.ExecuteAsync(selectTotalExpenseProcedure, transaction: transaction);
+            await _dbConnection.ExecuteAsync(selectTotalIncomeProcedure, transaction: transaction);
+            await _dbConnection.ExecuteAsync(selectTransactionCountProcedure, transaction: transaction);
             _logger.LogInformation("Procedures created!");
         }
-        private async Task CreateViewsAsync()
+        private async Task CreateViewsAsync(IDbTransaction transaction)
         {
             var bankProfitView = await File.ReadAllTextAsync(Path.Combine(_basePath, "BankProfitView.sql"));
 
-            await _dbConnection.ExecuteAsync(bankProfitView);
+            await _dbConnection.ExecuteAsync(bankProfitView, transaction: transaction);
             _logger.LogInformation("Views created!");
         }
     }
