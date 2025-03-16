@@ -1,4 +1,5 @@
-﻿using BankingSystem.Infrastructure.Identity;
+﻿using BankingSystem.Contracts.Interfaces;
+using BankingSystem.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -20,7 +21,7 @@ namespace BankingSystem.API.Extensions
                 options.Password.RequiredLength = 8;
             }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             
-            services.AddTransient<DataSeeder>();
+            services.AddTransient<IDataSeeder,DataSeeder>();
 
             return services;
         }

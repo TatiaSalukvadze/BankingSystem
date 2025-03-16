@@ -2,7 +2,6 @@
 using BankingSystem.Application.FacadeServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Contracts.Interfaces;
-using BankingSystem.Infrastructure;
 using BankingSystem.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using BankingSystem.Contracts.Interfaces.IRepositories;
@@ -13,6 +12,8 @@ using BankingSystem.Infrastructure.ExternalServices;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using BankingSystem.Infrastructure.ExternalServices.Configuration;
+using BankingSystem.Infrastructure.Auth;
+using BankingSystem.Application.BackgroundServices;
 
 namespace BankingSystem.API.Extensions
 {
@@ -48,6 +49,7 @@ namespace BankingSystem.API.Extensions
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<ITransactionOperationService, TransactionOperationService>();
             services.AddMemoryCache();
+            services.AddHostedService<DataSeedHostedService>();
 
             return services;
         }
