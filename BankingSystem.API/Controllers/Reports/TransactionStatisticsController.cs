@@ -76,7 +76,7 @@ namespace BankingSystem.API.Controllers.Reports
             //return Ok(new { message, data });
         }
 
-        [HttpGet("AtmWithdrawals")]
+        [HttpGet("TotalAtmWithdrawals")]
         public async Task<IActionResult> GetAtmWithdrawals()
         {
             var response = await _transactionService.GetTotalAtmWithdrawalsAsync();
