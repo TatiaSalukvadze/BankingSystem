@@ -54,7 +54,7 @@ namespace BankingSystem.API.Middlewares
             var controller = context.GetRouteData().Values["Controller"].ToString();
             var action = context.GetRouteData().Values["Action"].ToString();
             bool fromMemory = false;
-            if (controller == "UserBanking" && (action == "SeeAccounts" || action == "SeeCards"))
+            if (context.Request.Method == HttpMethods.Get && controller != "Auth")//controller == "UserBanking" && (action == "SeeAccounts" || action == "SeeCards"))
             {
                 _logger.LogInformation("Response of the sent request might be in MemoryCache!");
                 if (_memoryCache.TryGetValue(action, out var response) && response != "")

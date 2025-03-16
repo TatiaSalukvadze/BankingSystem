@@ -23,7 +23,7 @@ namespace DbCreation.DbSetup
             _logger = logger;
         }
 
-        public async Task CreateDbAndTables()
+        public async Task CreateDbAndTablesAsync()
         {
             bool dbExists = false;
             using (_serverConnection)
@@ -48,7 +48,7 @@ namespace DbCreation.DbSetup
             }
         }
 
-        private async Task CreateCustomTables()
+        private async Task CreateCustomTablesAsync()
         {
             var createPersonTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "PersonTable.sql"));
             var createAccountTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "AccountTable.sql"));
@@ -62,7 +62,7 @@ namespace DbCreation.DbSetup
             _logger.LogInformation("Custom Tables created!");
         }
 
-        private async Task CreateProcedures()
+        private async Task CreateProceduresAsync()
         {
             var SelectTotalExpenseProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalExpenseProcedure.sql"));
             var SelectTotalIncomeProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalIncomeProcedure.sql"));

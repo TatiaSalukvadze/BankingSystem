@@ -28,7 +28,7 @@ try
     using (var scope = serviceProvider.CreateScope())
     {
         var dbSetup = scope.ServiceProvider.GetRequiredService<IDbSetup>();
-        await dbSetup.CreateDbAndTables();
+        await dbSetup.CreateDbAndTablesAsync();
     }
 }
 catch (Exception ex)
