@@ -12,8 +12,8 @@ namespace BankingSystem.Contracts.Interfaces.IServices
         Task<Response<TransactionCountDTO>> NumberOfTransactionsAsync();
         Task<Response<List<TransactionCountChartDTO>>> NumberOfTransactionsChartAsync();
         Task<Response<Dictionary<string, decimal>>> AverageBankProfitAsync();
-        Task<Response<List<BankProfitDTO>>> GetBankProfitByTimePeriodAsync();
-        Task<Response<List<TotalAtmWithdrawalDTO>>> GetTotalAtmWithdrawalsAsync();
+        Task<Response<List<BankProfitDTO>>> BankProfitByTimePeriodAsync();
+        Task<Response<List<TotalAtmWithdrawalDTO>>> TotalAtmWithdrawalsAsync();
         Task<Response<IncomeExpenseDTO>> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDTO, string email);
         Task<Response<TransferAmountCalculationDTO>> CalculateTransferAmountAsync(
             string fromCurrency, string toCurrency, decimal amountToTransfer, bool isSelfTransfer);

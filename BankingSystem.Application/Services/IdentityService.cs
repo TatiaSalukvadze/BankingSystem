@@ -1,14 +1,7 @@
 ﻿using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Contracts.Interfaces;
-using BankingSystem.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BankingSystem.Contracts.DTOs.Auth;
 using BankingSystem.Contracts.DTOs.Identity;
@@ -17,7 +10,6 @@ using BankingSystem.Contracts.Response;
 
 namespace BankingSystem.Application.Services
 {
-
     public class IdentityService : IIdentityService
     {
         private readonly IAuthService _authService;
@@ -34,7 +26,6 @@ namespace BankingSystem.Application.Services
             _emailService = emailService;
         }
 
-        //tamar
         public async Task<Response<object>> LoginPersonAsync(LoginDTO loginDto)
         {
             var response = new Response<object>();
@@ -44,11 +35,6 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "Invalid username!");
             }
 
-            //if (!user.EmailConfirmed)
-            //{
-            //    return (false, "Email is not confirmed. Please verify your email before logging in.", null);
-            //}
-
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password!, false);
             if (!result.Succeeded)
             {
@@ -57,20 +43,11 @@ namespace BankingSystem.Application.Services
 
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? "";
-
-            //var customUser = await _unitOfWork.PersonRepository.FindByIdentityIdAsync(user.Id);
-
-            //if (role == "User" && customUser == null)
-            //{
-            //    return (false, "Custom user data not found for this account!", null);
-            //}
-
             var token = _authService.GenerateToken(user, role);
 
-            return response.Set(true, "Login successful!", new { token });//, customUser });
+            return response.Set(true, "Login successful!", new { token });
         }
 
-        //tatia
         public async Task<Response<string>> RegisterPersonAsync(RegisterPersonDTO registerDto)
         {
             var response = new Response<string>();
@@ -79,55 +56,35 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, "A user with this email already exists!");
             }
+
             var user = new IdentityUser
             {
                 UserName = registerDto.Email,
                 Email = registerDto.Email,
             };
+
             var createdUser = await _userManager.CreateAsync(user, registerDto.Password);
             if (!createdUser.Succeeded)
             {
                 return response.Set(false, "Adding user in identity system failed!");
             }
+
             var roleResult = await _userManager.AddToRoleAsync(user, "User");
             if (!roleResult.Succeeded)
             {
                 return response.Set(false, "Adding user corresponding role  in system failed!");
             }
 
-
-            //var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            //var tokenEmail = new Dictionary<string, string?>()
-            //{
-            //    {"email", registerDto.Email},
-            //    {"token", token }
-            //};
-            //var verificationUrl = QueryHelpers.AddQueryString(registerDto.ClientUrl!, tokenEmail);
-            //await _emailService.SendEmailPlaint(registerDto.Email, "Email Confirmation Token", verificationUrl);
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             await _emailService.SendTokenEmailAsync(token, registerDto.Email, registerDto.ClientUrl, "Email Confirmation Token");
-            //await GenerateEmailConfirmationTokenAsync(user, registerDto.Email, registerDto.ClientUrl);
+
             return response.Set(true, "User was registered successfully!",  user.Id );
-
-            //async Task GenerateEmailConfirmationTokenAsync(IdentityUser identityUser, string email, string ClientUrl)
-            //{
-            //    var token = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
-            //    var tokenEmail = new Dictionary<string, string?>()
-            //    {
-            //        {"email", email},
-            //        {"token", token }
-            //    };
-            //    var verificationUrl = QueryHelpers.AddQueryString(ClientUrl!, tokenEmail);
-            //    await _emailService.SendEmailPlaint(email, "Email Confirmation Token", verificationUrl);
-            //}
-
         }
 
         public async Task<SimpleResponse> ConfirmEmailAsync(EmailConfirmationDTO emailConfirmationDto)
         {
             var response = new SimpleResponse();
             var user = await _userManager.FindByEmailAsync(emailConfirmationDto.Email);
-
             if (user == null)
             {
                 return response.Set(false, "Email confirmation request is invalid, user was not found!");
@@ -138,9 +95,9 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, "Email confirmation request is invalid!");
             }
+
             return response.Set(true, "Email was successfully confirmed!");
         }
-
 
         public async Task<SimpleResponse> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO)
         {
@@ -154,14 +111,6 @@ namespace BankingSystem.Application.Services
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             await _emailService.SendTokenEmailAsync(token, forgotPasswordDTO.Email, forgotPasswordDTO.ClientUrl, "Reset password token");
 
-            //var tokenEmail = new Dictionary<string, string>()
-            //{
-            //    { "email", forgotPasswordDTO.Email },
-            //    { "token", token }
-            //};
-
-            //var url = QueryHelpers.AddQueryString(forgotPasswordDTO.ClientUrl, tokenEmail);
-            //await _emailService.SendEmailPlaint(forgotPasswordDTO.Email, "Reset password token", url);
             return response.Set(true, "Check email to reset password!");
         }
 

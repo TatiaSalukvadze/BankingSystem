@@ -2,8 +2,6 @@
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Contracts.Response;
-using Microsoft.AspNetCore.Components.Forms;
-using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Application.FacadeServices
 {
@@ -20,7 +18,6 @@ namespace BankingSystem.Application.FacadeServices
             _transactionDetailsService = transactionDetailsService;
         }
 
-        //tatia
         public async Task<SimpleResponse> OnlineTransactionAsync(CreateOnlineTransactionDTO createTransactionDto,
             string email, bool isSelfTransfer)
         {
@@ -36,44 +33,49 @@ namespace BankingSystem.Application.FacadeServices
             {
                 return response.Set(false, validateAccountsResponse.Message);
             }
+
             var transferAccounts = validateAccountsResponse.Data;
             var (fromAccount, toAccount) = (transferAccounts.From, transferAccounts.To);
-
             var calculationResponse = await _transactionDetailsService.CalculateTransferAmountAsync(fromAccount.Currency,
                 toAccount.Currency, createTransactionDto.Amount, isSelfTransfer);
             if (!calculationResponse.Success)
             {
                 return response.Set(false, calculationResponse.Message);
             }
+
             var transferAmounts = calculationResponse.Data;
             if (fromAccount.Amount < transferAmounts.AmountFromAccount)
             {
                 return response.Set(false, "You don't have enough money to transfer on your account!");
             }
+
             var updateAccountsResponse = await _accountService.UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, transferAmounts.AmountFromAccount, transferAmounts.AmountToAccount);
             if (!updateAccountsResponse.Success)
             {
                 return updateAccountsResponse;
             }
 
-            return await _transactionDetailsService.CreateTransactionAsync(transferAmounts.BankProfit, createTransactionDto.Amount, fromAccount.Id, toAccount.Id,
-                fromAccount.Currency);
+            return await _transactionDetailsService.CreateTransactionAsync(transferAmounts.BankProfit, createTransactionDto.Amount, 
+                fromAccount.Id, toAccount.Id, fromAccount.Currency);
         }
 
         public async Task<SimpleResponse> WithdrawAsync(WithdrawalDTO withdrawalDto)
         {
             var response = new SimpleResponse(); 
+
             var validateCardResponse = await _cardService.AuthorizeCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
             if (!validateCardResponse.Success)
             {
                 return response.Set(false, validateCardResponse.Message);
             }
+
             if (withdrawalDto.Amount <= 0)
             {
                 return response.Set(false, "Withdrawal amount must be greater than zero.");
             }
     
-            var calculationResponse = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(withdrawalDto.CardNumber, withdrawalDto.PIN, withdrawalDto.Amount, withdrawalDto.Currency.ToString());
+            var calculationResponse = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(withdrawalDto.CardNumber, withdrawalDto.PIN,
+                withdrawalDto.Amount, withdrawalDto.Currency.ToString());
             if (!calculationResponse.Success)
             {
                 return response.Set(false, calculationResponse.Message);
@@ -87,7 +89,8 @@ namespace BankingSystem.Application.FacadeServices
                 return updateAccountResponse;
             }
 
-            return await _transactionDetailsService.CreateTransactionAsync(withdrawalData.Fee, withdrawalData.Balance, card.AccountId, card.AccountId, withdrawalData.Currency, IsATM:true);
+            return await _transactionDetailsService.CreateTransactionAsync(withdrawalData.Fee, withdrawalData.Balance, card.AccountId, 
+                card.AccountId, withdrawalData.Currency, IsATM:true);
         }
     }
 }

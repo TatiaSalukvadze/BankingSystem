@@ -26,7 +26,7 @@ namespace BankingSystem.API.Controllers.Reports
         [HttpGet("BankProfitByTimePeriod")] 
         public async Task<IActionResult> GetBankProfitByTimePeriodAsync()
         {
-            var response = await _transactionService.GetBankProfitByTimePeriodAsync();
+            var response = await _transactionService.BankProfitByTimePeriodAsync();
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
         }
@@ -52,7 +52,7 @@ namespace BankingSystem.API.Controllers.Reports
         [HttpGet("TotalAtmWithdrawals")]
         public async Task<IActionResult> TotalAtmWithdrawals()
         {
-            var response = await _transactionService.GetTotalAtmWithdrawalsAsync();
+            var response = await _transactionService.TotalAtmWithdrawalsAsync();
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
         }
