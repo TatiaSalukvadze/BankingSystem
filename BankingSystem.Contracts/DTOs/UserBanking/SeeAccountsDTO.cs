@@ -1,11 +1,5 @@
 ﻿using BankingSystem.Domain.Enums;
-using BankingSystem.Domain.Validation;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.DTOs.UserBanking
 {
@@ -21,5 +15,4 @@ namespace BankingSystem.Contracts.DTOs.UserBanking
         [Required]
         public CurrencyType Currency { get; set; }
     }
-
 }

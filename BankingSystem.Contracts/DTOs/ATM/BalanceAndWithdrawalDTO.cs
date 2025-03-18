@@ -1,6 +1,4 @@
-﻿using BankingSystem.Domain.Enums;
-
-namespace BankingSystem.Contracts.DTOs.ATM
+﻿namespace BankingSystem.Contracts.DTOs.ATM
 {
     public class BalanceAndWithdrawalDTO
     {
