@@ -59,7 +59,6 @@ namespace DbCreation.DbSetup
                     _logger.LogError("exception happened during db setupt: {ExceptionMessage},{StackTrace}", ex.Message, ex.StackTrace);
                 }
             }
-        
         }
 
         private async Task CreateCustomTablesAsync(IDbTransaction transaction)
