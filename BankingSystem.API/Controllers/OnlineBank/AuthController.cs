@@ -8,12 +8,10 @@ namespace BankingSystem.API.Controllers.OnlineBank
     [Route("OnlineBank/[Controller]")]
     public class AuthController : WrapperController
     {
-        private readonly IPersonService _personService;
         private readonly IIdentityService _identityService;
 
-        public AuthController(IPersonService personService, IIdentityService identityService)
+        public AuthController(IIdentityService identityService)
         {
-            _personService = personService;
             _identityService = identityService;
         }
 
@@ -49,6 +47,5 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
         }
-
     }
 }
