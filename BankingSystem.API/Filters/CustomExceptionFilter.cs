@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BankingSystem.API.Filters
 {
     public class CustomExceptionFilter : IAsyncExceptionFilter
     {
         private readonly ILogger<CustomExceptionFilter> _logger;
+
         public CustomExceptionFilter(ILogger<CustomExceptionFilter> logger)
         {
             _logger = logger;
         }
+
         public async Task OnExceptionAsync(ExceptionContext context)
         {
             var exception = context.Exception;

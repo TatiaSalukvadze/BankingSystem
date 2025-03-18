@@ -1,5 +1,4 @@
-﻿
-namespace BankingSystem.API.Middlewares
+﻿namespace BankingSystem.API.Middlewares
 {
     public class ExceptionHandlerMiddleware 
     {
@@ -28,7 +27,7 @@ namespace BankingSystem.API.Middlewares
                 var errorResponse = new { Message = $"An unhandled exception occured before reaching controller or while inner exception handling: {ex.Message}" };
 
                 await context.Response.WriteAsJsonAsync(errorResponse);
-                }
+            }
         }
     }
 }
