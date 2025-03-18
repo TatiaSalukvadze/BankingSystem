@@ -91,11 +91,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return result;
         }
 
-        //SELECT(CAST (PerformedAt AS DATE)) as [Date],  COUNT(*) AS TransactionCount FROM TransactionDetails
-        //WHERE PerformedAt > CAST(DATEADD(MONTH, -1, GETDATE()) AS DATE) 
-        //    AND PerformedAt<CAST(GETDATE() AS DATE)
-        //GROUP BY(CAST (PerformedAt AS DATE)) 
-        //ORDER BY[Date]
         public async Task<List<TransactionCountChartDTO>> NumberOfTransactionsLastMonthAsync()
         {
             var result = new List<TransactionCountChartDTO>();
