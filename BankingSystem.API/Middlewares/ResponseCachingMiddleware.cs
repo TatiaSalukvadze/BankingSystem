@@ -57,7 +57,9 @@ namespace BankingSystem.API.Middlewares
             if (context.Request.Method == HttpMethods.Get && controller != "Auth")//controller == "UserBanking" && (action == "SeeAccounts" || action == "SeeCards"))
             {
                 _logger.LogInformation("Response of the sent request might be in MemoryCache!");
-                if (_memoryCache.TryGetValue(action, out var response) && response != "")
+                string queryString = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : "";
+                var cacheKey = $"{action}{queryString}";
+                if (_memoryCache.TryGetValue(cacheKey, out var response) && response != "")
                 {
                     _logger.LogInformation("Getting request response from MemoryCache!");
                     context.Response.StatusCode = StatusCodes.Status200OK;
@@ -89,7 +91,7 @@ namespace BankingSystem.API.Middlewares
                     memoryStream.Seek(0, SeekOrigin.Begin);
 
                     var cacheOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(15));
-                    _memoryCache.Set(action, serviceResponse, cacheOptions);
+                    _memoryCache.Set(cacheKey, serviceResponse, cacheOptions);
 
                     context.Response.Body = originalBodyStream;
                     await context.Response.Body.WriteAsync(memoryStream.ToArray());
