@@ -1,5 +1,4 @@
-﻿using BankingSystem.Domain.Enums;
-using BankingSystem.Domain.Validation;
+﻿using BankingSystem.Domain.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Domain.Entities
@@ -22,5 +21,4 @@ namespace BankingSystem.Domain.Entities
         [Required]
         public string Currency { get; set; }
     }
-
 }
