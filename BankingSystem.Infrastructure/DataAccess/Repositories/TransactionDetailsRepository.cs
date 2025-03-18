@@ -101,8 +101,13 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             var result = new List<TransactionCountChartDTO>();
             if (_connection != null)
             {
-                var sqlResult = await _connection.QueryAsync<(DateTime,int)>("SelectTransactionCountLastMonth", 
-                    commandType: CommandType.StoredProcedure);
+                var sql = @"SELECT(CAST (PerformedAt AS DATE)) as [Date],  COUNT(*) AS TransactionCount 
+                            FROM TransactionDetails
+                            WHERE PerformedAt > CAST(DATEADD(MONTH, -1, GETDATE()) AS DATE) 
+                                AND PerformedAt < CAST(GETDATE() AS DATE)
+                            GROUP BY (CAST (PerformedAt AS DATE)) 
+                            ORDER BY [Date]";
+                var sqlResult = await _connection.QueryAsync<(DateTime,int)>(sql);
                 result = sqlResult.Select(row => new TransactionCountChartDTO { Date = DateOnly.FromDateTime(row.Item1), 
                     Count = row.Item2 }).ToList();
             }

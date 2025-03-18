@@ -79,11 +79,9 @@ namespace DbCreation.DbSetup
         {
             var selectTotalExpenseProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalExpenseProcedure.sql"));
             var selectTotalIncomeProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTotalIncomeProcedure.sql"));
-            var selectTransactionCountProcedure = await File.ReadAllTextAsync(Path.Combine(_basePath, "SelectTransactionCountProcedure.sql"));
 
             await _dbConnection.ExecuteAsync(selectTotalExpenseProcedure, transaction: transaction);
             await _dbConnection.ExecuteAsync(selectTotalIncomeProcedure, transaction: transaction);
-            await _dbConnection.ExecuteAsync(selectTransactionCountProcedure, transaction: transaction);
             _logger.LogInformation("Procedures created!");
         }
         private async Task CreateViewsAsync(IDbTransaction transaction)
