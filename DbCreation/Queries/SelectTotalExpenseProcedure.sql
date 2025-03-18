@@ -10,5 +10,4 @@ BEGIN
         AND  td.FromAccountId != td.ToAccountId) OR IsATM = 1)
         AND td.PerformedAt >= @fromDate AND td.PerformedAt <= @toDate
         GROUP BY a.Currency
-		
 END

@@ -1,5 +1,4 @@
-﻿
-Use BankingSystem
+﻿Use BankingSystem
 Go
 
 CREATE TABLE Person (
@@ -15,7 +14,6 @@ CREATE TABLE Person (
 	CONSTRAINT EmailFormatCheck CHECK(Email LIKE '%_@_%._%'),
     FOREIGN KEY (IdentityUserId) REFERENCES AspNetUsers(Id) ON DELETE CASCADE
 );
-
 
 GO
 CREATE TABLE Account(
@@ -44,9 +42,7 @@ CREATE TABLE Card(
 	FOREIGN KEY (AccountId) REFERENCES Account(Id) ON DELETE CASCADE
 );
 
-
 GO
-
 CREATE TABLE TransactionDetails(
 	Id INT IDENTITY(1,1) PRIMARY KEY,  
 	BankProfit DECIMAL(18,2) NOT NULL,
@@ -62,6 +58,7 @@ CREATE TABLE TransactionDetails(
 	FOREIGN KEY (FromAccountId) REFERENCES  Account(Id),
 	FOREIGN KEY (ToAccountId) REFERENCES  Account(Id)
 );
+
 GO
 
 
