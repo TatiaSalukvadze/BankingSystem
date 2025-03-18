@@ -1,6 +1,4 @@
-﻿using BankingSystem.Infrastructure.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 
 namespace BankingSystem.API.Extensions
 {
@@ -12,7 +10,6 @@ namespace BankingSystem.API.Extensions
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
-                //c.SwaggerDoc("v1", new OpenApiInfo { Title = "AuthCore API", Version = "v1" });
                 var securityScheme = new OpenApiSecurityScheme
                 {
                     Name = "JWT Authentication",

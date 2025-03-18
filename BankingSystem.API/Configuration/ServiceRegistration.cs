@@ -10,7 +10,6 @@ using BankingSystem.Infrastructure.DataAccess;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Infrastructure.ExternalServices;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using BankingSystem.Infrastructure.ExternalServices.Configuration;
 using BankingSystem.Infrastructure.Auth;
 using BankingSystem.Application.BackgroundServices;
@@ -26,19 +25,14 @@ namespace BankingSystem.API.Extensions
 
             return services;
         }
+
         public static IServiceCollection InjectDbConnection(this IServiceCollection services, IConfiguration configuration)
         {
-            //for db operations(unitofwork and repos)
             services.AddScoped((s) => new SqlConnection(configuration.GetConnectionString("Default")));
-            //services.AddScoped<IDbTransaction>(s =>
-            //{
-            //    IDbConnection conn = s.GetRequiredService<SqlConnection>();
-            //    conn.Open();
-            //    return conn.BeginTransaction();
-            //});
-
+    
             return services;
         }
+
         public static IServiceCollection InjectServices(this IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>();
@@ -53,6 +47,7 @@ namespace BankingSystem.API.Extensions
 
             return services;
         }
+
         public static IServiceCollection InjectRepositories(this IServiceCollection services)
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -63,6 +58,7 @@ namespace BankingSystem.API.Extensions
 
             return services;
         }
+
         public static IServiceCollection InjectExternalServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<CurrencyApiSettings>(configuration.GetSection("CurrencyApiSettings"));

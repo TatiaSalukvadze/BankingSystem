@@ -34,18 +34,17 @@ namespace BankingSystem.API.Extensions
 
         public static IServiceCollection InjectAuthorization(this IServiceCollection services)
         {
-
             services.AddAuthorization(
                 options =>
                 {
                     options.AddPolicy("ManagerOnly", policy =>
-                    policy.RequireClaim(ClaimTypes.Role, "Manager"));
+                        policy.RequireClaim(ClaimTypes.Role, "Manager"));
                     options.AddPolicy("OperatorOnly", policy =>
                         policy.RequireClaim(ClaimTypes.Role, "Operator"));
                     options.AddPolicy("UserOnly", policy =>
                         policy.RequireClaim(ClaimTypes.Role, "User"));
                 }
-                );
+            );
 
             return services;
         }

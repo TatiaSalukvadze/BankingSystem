@@ -1,10 +1,6 @@
 ﻿using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Infrastructure.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Text;
 
 namespace BankingSystem.API.Extensions
 {
@@ -25,7 +21,5 @@ namespace BankingSystem.API.Extensions
 
             return services;
         }
-
-       
     }
 }

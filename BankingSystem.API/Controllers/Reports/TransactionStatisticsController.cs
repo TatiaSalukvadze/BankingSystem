@@ -1,6 +1,4 @@
-﻿using BankingSystem.Application.Services;
-using BankingSystem.Contracts.Interfaces.IServices;
-using Microsoft.AspNetCore.Authorization;
+﻿using BankingSystem.Contracts.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.Reports
@@ -9,8 +7,6 @@ namespace BankingSystem.API.Controllers.Reports
     [Route("/Report/[controller]")]
     public class TransactionStatisticsController : WrapperController
     {
-
-
         private readonly ITransactionDetailsService _transactionService;
 
         public TransactionStatisticsController(ITransactionDetailsService transactionService)
@@ -25,26 +21,15 @@ namespace BankingSystem.API.Controllers.Reports
             var response = await _transactionService.NumberOfTransactionsAsync();
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
-            //if (!success)
-            //{
-            //    return BadRequest(new { message });
-            //}
-
-            //return Ok(new { message, data });
         }
 
-        [HttpGet("BankProfitByTimePeriod")] //and currency
+        [HttpGet("BankProfitByTimePeriod")] 
         public async Task<IActionResult> GetBankProfitByTimePeriodAsync()
         {
             var response = await _transactionService.GetBankProfitByTimePeriodAsync();
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
-            //if (!success)
-            //    return BadRequest(new { message });
-
-            //return Ok(new { message, data });
         }
-
 
         [HttpGet("CountChart")]
         public async Task<IActionResult> TransactionsCountChart()
@@ -53,12 +38,6 @@ namespace BankingSystem.API.Controllers.Reports
             var response = await _transactionService.NumberOfTransactionsChartAsync();
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
-            //if (!success)
-            //{
-            //    return BadRequest(new { message });
-            //}
-
-            //return Ok(new { message, data });
         }
 
         [HttpGet("AverageProfit")]
@@ -68,26 +47,14 @@ namespace BankingSystem.API.Controllers.Reports
             var response = await _transactionService.AverageBankProfitAsync();
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
-            //if (!success)
-            //{
-            //    return BadRequest(new { message });
-            //}
-
-            //return Ok(new { message, data });
         }
 
         [HttpGet("TotalAtmWithdrawals")]
-        public async Task<IActionResult> GetAtmWithdrawals()
+        public async Task<IActionResult> TotalAtmWithdrawals()
         {
             var response = await _transactionService.GetTotalAtmWithdrawalsAsync();
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
-            //if (!success)
-            //{
-            //    return BadRequest(new { message });
-            //}
-
-            //return Ok(new { message, data });
         }
     }
 }

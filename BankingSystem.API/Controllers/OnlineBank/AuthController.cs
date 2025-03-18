@@ -17,34 +17,21 @@ namespace BankingSystem.API.Controllers.OnlineBank
             _identityService = identityService;
         }
 
-        //tamar
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromForm] LoginDTO loginDto)
         {
             var response = await _identityService.LoginPersonAsync(loginDto);
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
-            //if (!success)
-            //{
-            //    return BadRequest(message);
-            //}
-
-            //return Ok(new { message, data });
         }
-        //tatia
+
         //https://fusionauth.io/dev-tools/url-encoder-decoder used for decode
         [HttpGet("EmailConfirmation")]
-        public async Task<IActionResult> EmailConfirmation([FromQuery] EmailConfirmationDTO emailConfirmationDto)//string email, [FromQuery] string token)
+        public async Task<IActionResult> EmailConfirmation([FromQuery] EmailConfirmationDTO emailConfirmationDto)
         {
             var response = await _identityService.ConfirmEmailAsync(emailConfirmationDto);
             var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
-            //if (!success)
-            //{
-            //    return BadRequest(message);
-            //}
-
-            //return Ok(new { message});
         }
 
         [HttpPost("ForgotPassword")]
@@ -53,13 +40,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var response = await _identityService.ForgotPasswordAsync(forgotPasswordDTO);
             var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
-         
-            //if (!success)
-            //{
-            //    return BadRequest(message);
-            //}
-
-                //return Ok(new { message });
         }
 
         [HttpPost("ResetPassword")]
@@ -68,12 +48,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var response = await _identityService.ResetPasswordAsync(resetPasswordDTO);
             var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
-            //if (!success)
-            //{
-            //    return BadRequest(message);
-            //}
-
-            //return Ok(new { message });
         }
 
     }

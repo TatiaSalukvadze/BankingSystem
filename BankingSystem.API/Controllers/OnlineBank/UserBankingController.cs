@@ -30,17 +30,10 @@ namespace BankingSystem.API.Controllers.OnlineBank
         [HttpGet("Accounts")]
         public async Task<IActionResult> SeeAccounts()
         {
-            //string email = User.Identity.Name; 
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _accountService.SeeAccountsAsync(userEmail);
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
-            //if (!success)
-            //{
-            //    return BadRequest(new { message });
-            //}
-
-            //return Ok(new { message, data });
         }
 
         [HttpGet("Cards")]
@@ -50,11 +43,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var response = await _cardService.SeeCardsAsync(userEmail);
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
-            //if (!success)
-            //{
-            //    return BadRequest(message);
-            //}
-            //return Ok(new { message, data });
         }
 
         [HttpPost("TransferToOwnAccount")]
@@ -64,11 +52,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var response = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: true);
             var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
-            //if (!success)
-            //{
-            //    return BadRequest(message);
-            //}
-            //return Ok(new { message, data });
         }
 
         [HttpPost("TransferToOtherAccount")]
@@ -78,11 +61,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var response = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
             var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
-            //if (!success)
-            //{
-            //    return BadRequest(message);
-            //}
-            //return Ok(new { message, data });
         }
 
         [HttpGet("TotalIncomeExpense")]
@@ -92,11 +70,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var response = await _transactionService.TotalIncomeExpenseAsync(dateRangeDto, userEmail);
             var (success, message, data) = (response.Success, response.Message, response.Data);
             return await HandleResult(success, message, data);
-            //if (!success)
-            //{
-            //    return BadRequest(message);
-            //}
-            //return Ok(new { message, data });
         }
 
     }
