@@ -1,9 +1,6 @@
 ﻿using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 
 namespace BankingSystem.Infrastructure.DataAccess
@@ -28,8 +25,8 @@ namespace BankingSystem.Infrastructure.DataAccess
             //_accountRepository = new Lazy<IAccountRepository>(() => _serviceProvider.GetRequiredService<IAccountRepository>());
             //_cardRepository = new Lazy<ICardRepository>(() => _serviceProvider.GetRequiredService<ICardRepository>());
             //_transactionDetailsRepository = new Lazy<ITransactionDetailsRepository>(() => _serviceProvider.GetRequiredService<ITransactionDetailsRepository>());
-
         }
+
         //private Lazy<IPersonRepository> _personRepository;
         //private Lazy<IAccountRepository> _accountRepository;
         //private Lazy<ICardRepository> _cardRepository;
@@ -129,7 +126,6 @@ namespace BankingSystem.Infrastructure.DataAccess
 
             _transaction = (SqlTransaction)_connection.BeginTransaction();
         }
-
 
         public void SaveChanges()
         {

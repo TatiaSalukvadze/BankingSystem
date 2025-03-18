@@ -13,15 +13,16 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         private SqlConnection _connection;
         private IDbTransaction _transaction;
 
-        public CardRepository(SqlConnection connection)//, IDbTransaction transaction)
+        public CardRepository(SqlConnection connection)
         {
             _connection = connection;
-            //_transaction = transaction;
         }
+
         public void SetTransaction(IDbTransaction transaction)
         {
             _transaction = transaction;
         }
+
         public async Task<Card> GetCardAsync(string cardNumber)
         {
             Card card = null;

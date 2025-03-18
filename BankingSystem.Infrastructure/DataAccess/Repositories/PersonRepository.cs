@@ -12,15 +12,16 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         private SqlConnection _connection;
         private IDbTransaction _transaction;
 
-        public PersonRepository(SqlConnection connection)//, IDbTransaction transaction)
+        public PersonRepository(SqlConnection connection)
         {
             _connection = connection;
-            //_transaction = transaction;
         }
+
         public void SetTransaction(IDbTransaction transaction)
         {
             _transaction = transaction;
         }
+
         public async Task<Person?> FindByIdentityIdAsync(string identityId)
         {
             if (_connection != null)

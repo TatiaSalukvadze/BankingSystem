@@ -10,12 +10,10 @@ namespace BankingSystem.Infrastructure.Auth
 {
     public class AuthService : IAuthService
     {
-        // private readonly SymmetricSecurityKey _key;
         private readonly IConfiguration _configuration;
         public AuthService(IConfiguration config)
         {
             _configuration = config;
-            // _key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config["JwtSettings:PrivateKey"]!));
         }
 
         public string GenerateToken(IdentityUser user, string role)

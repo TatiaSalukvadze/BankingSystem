@@ -1,5 +1,4 @@
-﻿using BankingSystem.Contracts.DTOs.ATM;
-using BankingSystem.Contracts.DTOs.UserBanking;
+﻿using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
 using Dapper;
@@ -13,15 +12,16 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         private SqlConnection _connection;
         private IDbTransaction _transaction;
 
-        public AccountRepository(SqlConnection connection)//, IDbTransaction transaction)
+        public AccountRepository(SqlConnection connection)
         {
             _connection = connection;
-            //_transaction = transaction;
         }
+
         public void SetTransaction(IDbTransaction transaction)
         {
             _transaction = transaction;
         }
+
         public async Task<int> CreateAccountAsync(Account account)
         {
             int insertedId = 0;
@@ -128,20 +128,5 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return 0;
         }
-
-        //public async Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct)
-        //{
-        //    if (_connection != null && _transaction != null)
-        //    {
-        //        var sql = @"
-        //        UPDATE Account
-        //        SET Amount = Amount - @TotalAmountToDeduct
-        //        WHERE Id = @AccountId";
-        //        var result = await _connection.ExecuteAsync(sql, new { AccountId = accountId, TotalAmountToDeduct = totalAmountToDeduct }, _transaction);
-        //        return result > 0;
-        //    }
-        //    return false;
-        //}
-
     }
 }

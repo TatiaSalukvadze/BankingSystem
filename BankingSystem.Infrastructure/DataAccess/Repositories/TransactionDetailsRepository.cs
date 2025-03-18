@@ -5,8 +5,6 @@ using BankingSystem.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Text.RegularExpressions;
 
 namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
@@ -15,15 +13,16 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
         private SqlConnection _connection;
         private IDbTransaction _transaction;
 
-        public TransactionDetailsRepository(SqlConnection connection)//, IDbTransaction transaction)
+        public TransactionDetailsRepository(SqlConnection connection)
         {
             _connection = connection;
-            //_transaction = transaction;
         }
+
         public void SetTransaction(IDbTransaction transaction)
         {
             _transaction = transaction;
         }
+
         public async Task<int> CreateTransactionAsync(TransactionDetails transaction)
         {
             int insertedId = 0;
@@ -55,13 +54,6 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             if (_connection != null)
             {
                 var sql = @"SELECT * FROM BankProfitView";
-                //SELECT 
-                //    Currency,
-                //    SUM(CASE WHEN PerformedAt > DATEADD(MONTH, -1, GETDATE()) THEN BankProfit ELSE 0 END) AS LastMonthProfit,
-                //    SUM(CASE WHEN PerformedAt > DATEADD(MONTH, -6, GETDATE()) THEN BankProfit ELSE 0 END) AS LastSixMonthProfit,
-                //    SUM(CASE WHEN PerformedAt > DATEADD(YEAR, -1, GETDATE()) THEN BankProfit ELSE 0 END) AS LastYearProfit
-                //FROM TransactionDetails 
-                //GROUP BY Currency;";
                 var result = await _connection.QueryAsync<BankProfitDTO>(sql);
                 return result.ToList();
             }
