@@ -2,7 +2,6 @@
 using System.Net.Mail;
 using System.Net;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using BankingSystem.Infrastructure.ExternalServices.Configuration;
 
@@ -17,7 +16,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
             _emailSettings = emailSettings.Value;
         }
 
-        public async Task SendEmailPlaint(string email, string subject, string message)
+        public async Task SendEmail(string email, string subject, string message)
         {
             var mail = new MailMessage
             {
@@ -44,7 +43,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
                     {"token", token }
                 };
             var verificationUrl = QueryHelpers.AddQueryString(ClientUrl!, tokenEmail);
-            await SendEmailPlaint(email, subject, verificationUrl);
+            await SendEmail(email, subject, verificationUrl);
         }
     }
 }

@@ -1,11 +1,5 @@
 ﻿using BankingSystem.Contracts.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankingSystem.Infrastructure.Identity
 {
@@ -19,10 +13,12 @@ namespace BankingSystem.Infrastructure.Identity
             _userManager = userManager;
             _roleManager = roleManager;
         }
+
         public async Task SeedDataAsync()
         {
             await SeedInitialDataAsync();
         }
+
         private async Task SeedInitialDataAsync()
         {
             var roles = new List<string>() { "Manager", "Operator", "User" };
@@ -35,7 +31,6 @@ namespace BankingSystem.Infrastructure.Identity
             }
             await AddEmployeeAsync("Manager@gmail.com", roles[0], "Manager1*");
             await AddEmployeeAsync("Operator@gmail.com", roles[1], "Operator1*");
-
         }
 
         private async Task AddEmployeeAsync(string email, string role, string password)
@@ -47,13 +42,13 @@ namespace BankingSystem.Infrastructure.Identity
                     UserName = email,
                     Email = email
                 };
+
                 var employeeAdded = await _userManager.CreateAsync(employee, password);
                 if (employeeAdded.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(employee, role);
                 }
             }
-
         }
     }
 }

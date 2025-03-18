@@ -58,9 +58,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         }
 
         [HttpDelete("Card")]
-        public async Task<IActionResult> CancelCard([FromForm] string cardNumber)
+        public async Task<IActionResult> DeleteCard([FromForm] string cardNumber)
         {
-            var response = await _cardService.CancelCardAsync(cardNumber);
+            var response = await _cardService.DeleteCardAsync(cardNumber);
             var (success, message) = (response.Success, response.Message);
             return await HandleResult(success, message);
         }
