@@ -1,12 +1,5 @@
-﻿using BankingSystem.Contracts.DTOs.ATM;
-using BankingSystem.Contracts.DTOs.UserBanking;
+﻿using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Domain.Entities;
-using BankingSystem.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.Interfaces.IRepositories
 {
@@ -21,6 +14,5 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<bool> UpdateAccountAmountAsync(int id,decimal amount);
         Task<bool> DeleteAccountByIBANAsync(string iban);
         Task<decimal> GetBalanceByIBANAsync(string iban);
-        //Task<bool> UpdateAccountBalanceAsync(int accountId, decimal totalAmountToDeduct);
     }
 }

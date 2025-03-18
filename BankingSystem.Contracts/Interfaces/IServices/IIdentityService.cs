@@ -2,11 +2,6 @@
 using BankingSystem.Contracts.DTOs.Identity;
 using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.Response;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankingSystem.Contracts.Interfaces.IServices
 {
@@ -14,8 +9,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     {
         Task<Response<object>> LoginPersonAsync(LoginDTO loginDto);
         Task<Response<string>> RegisterPersonAsync(RegisterPersonDTO registerDto);
-        Task<SimpleResponse> ConfirmEmailAsync(EmailConfirmationDTO emailConfirmationDto
-            );
+        Task<SimpleResponse> ConfirmEmailAsync(EmailConfirmationDTO emailConfirmationDto);
         Task<SimpleResponse> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO);
         Task<SimpleResponse> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
     }
