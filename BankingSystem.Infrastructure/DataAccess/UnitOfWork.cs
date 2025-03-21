@@ -6,71 +6,71 @@ using System.Data;
 
 namespace BankingSystem.Infrastructure.DataAccess
 {
-    #region stackOverflowVersion
-    public class UnitOfWork : IUnitOfWork, IDisposable
-    {
-        private IDbConnection _connection;
-        private IDbTransaction _transaction;
-        private IServiceProvider _serviceProvider;
-        public IDbTransaction Transaction() => _transaction;
-        public UnitOfWork(SqlConnection connection, IServiceProvider _serviceProvider)
-        {
-            _connection = connection;
-            _connection.Open();
-            this._serviceProvider = _serviceProvider;
-        }
-        //private IPersonRepository _personRepository;
-        //private IAccountRepository _accountRepository;
-        //private ICardRepository _cardRepository;
-        //private ITransactionDetailsRepository _transactionDetailsRepository;
-        //private T InitService<T>(ref T member)
-        //{
-        //    return member ??= _serviceProvider.GetService<T>();
-        //}
-        public IPersonRepository PersonRepository => _serviceProvider.GetRequiredService<IPersonRepository>();// InitService(ref _personRepository);
-        public IAccountRepository AccountRepository => _serviceProvider.GetRequiredService<IAccountRepository>();// InitService(ref _accountRepository); 
-        public ICardRepository CardRepository => _serviceProvider.GetRequiredService<ICardRepository>();//  InitService(ref _cardRepository);
-        public ITransactionDetailsRepository TransactionDetailsRepository => _serviceProvider.GetRequiredService<ITransactionDetailsRepository>();//InitService(ref _transactionDetailsRepository); // 
+    //#region stackOverflowVersion
+    //public class UnitOfWork : IUnitOfWork, IDisposable
+    //{
+    //    private IDbConnection _connection;
+    //    private IDbTransaction _transaction;
+    //    private IServiceProvider _serviceProvider;
+    //    public IDbTransaction Transaction() => _transaction;
+    //    public UnitOfWork(SqlConnection connection, IServiceProvider _serviceProvider)
+    //    {
+    //        _connection = connection;
+    //        _connection.Open();
+    //        this._serviceProvider = _serviceProvider;
+    //    }
+    //    //private IPersonRepository _personRepository;
+    //    //private IAccountRepository _accountRepository;
+    //    //private ICardRepository _cardRepository;
+    //    //private ITransactionDetailsRepository _transactionDetailsRepository;
+    //    //private T InitService<T>(ref T member)
+    //    //{
+    //    //    return member ??= _serviceProvider.GetService<T>();
+    //    //}
+    //    public IPersonRepository PersonRepository => _serviceProvider.GetRequiredService<IPersonRepository>();// InitService(ref _personRepository);
+    //    public IAccountRepository AccountRepository => _serviceProvider.GetRequiredService<IAccountRepository>();// InitService(ref _accountRepository); 
+    //    public ICardRepository CardRepository => _serviceProvider.GetRequiredService<ICardRepository>();//  InitService(ref _cardRepository);
+    //    public ITransactionDetailsRepository TransactionDetailsRepository => _serviceProvider.GetRequiredService<ITransactionDetailsRepository>();//InitService(ref _transactionDetailsRepository); // 
 
 
 
-        public void BeginTransaction()
-        {
-            if (_connection.State != ConnectionState.Open)
-            {
-                _connection.Open();
-            }
+    //    public void BeginTransaction()
+    //    {
+    //        if (_connection.State != ConnectionState.Open)
+    //        {
+    //            _connection.Open();
+    //        }
 
-            _transaction = (SqlTransaction)_connection.BeginTransaction();
-        }
+    //        _transaction = (SqlTransaction)_connection.BeginTransaction();
+    //    }
 
 
-        public void SaveChanges()
-        {
-            if (_transaction == null)
-                throw new InvalidOperationException
-                 ("Transaction have already been committed. Check your transaction handling.");
+    //    public void SaveChanges()
+    //    {
+    //        if (_transaction == null)
+    //            throw new InvalidOperationException
+    //             ("Transaction have already been committed. Check your transaction handling.");
 
-            _transaction.Commit();
-            _transaction = null;
-        }
+    //        _transaction.Commit();
+    //        _transaction = null;
+    //    }
 
-        public void Dispose()
-        {
-            if (_transaction != null)
-            {
-                _transaction.Rollback();
-                _transaction = null;
-            }
+    //    public void Dispose()
+    //    {
+    //        if (_transaction != null)
+    //        {
+    //            _transaction.Rollback();
+    //            _transaction = null;
+    //        }
 
-            if (_connection != null && _connection.State != ConnectionState.Closed)
-            {
-                _connection.Close();
-                _connection = null;
-            }
-        }
-    }
-    #endregion
+    //        if (_connection != null && _connection.State != ConnectionState.Closed)
+    //        {
+    //            _connection.Close();
+    //            _connection = null;
+    //        }
+    //    }
+    //}
+    //#endregion
 
     #region LazyVersion
     public class UnitOfWork : IUnitOfWork, IDisposable
