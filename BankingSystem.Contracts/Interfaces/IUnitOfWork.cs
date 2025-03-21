@@ -5,10 +5,10 @@ namespace BankingSystem.Contracts.Interfaces
 {
     public interface IUnitOfWork
     {
-        IPersonRepository PersonRepository { get; set; }
-        IAccountRepository AccountRepository { get; set; }
-        ICardRepository CardRepository { get; set; }      
-        ITransactionDetailsRepository TransactionDetailsRepository { get; set; }
+        IPersonRepository PersonRepository { get;  }
+        IAccountRepository AccountRepository { get;  }
+        ICardRepository CardRepository { get;  }      
+        ITransactionDetailsRepository TransactionDetailsRepository { get; }
         IDbTransaction Transaction();
         void BeginTransaction();
         void SaveChanges();
