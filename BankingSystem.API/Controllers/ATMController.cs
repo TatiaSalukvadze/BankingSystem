@@ -36,8 +36,9 @@ namespace BankingSystem.API.Controllers
         public async Task<IActionResult> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
         {
             var response = await _cardService.ChangeCardPINAsync(changeCardDtp);
-            var (success, message) = (response.Success, response.Message);
-            return await HandleResult(success, message);
+            return new ObjectResult(response);
+            //var (success, message) = (response.Success, response.Message);
+            //return await HandleResult(success, message);
         }
     }
 }

@@ -6,7 +6,9 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(options => options.Filters.Add<CustomExceptionFilter>())
+builder.Services.AddControllers(options => { options.Filters.Add<CustomExceptionFilter>();
+    options.Filters.Add<ResponseFilter>();
+})
   .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); 
 
 builder.Services.AddSwaggerConfiguration();

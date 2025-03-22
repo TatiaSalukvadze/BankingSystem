@@ -45,8 +45,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> DeleteAccount(string iban)
         {
             var response = await _accountService.DeleteAccountAsync(iban);
-            var (success, message) = (response.Success, response.Message);
-            return await HandleResult(success, message);
+            return new ObjectResult(response);
+            //var (success, message) = (response.Success, response.Message);
+            //return await HandleResult(success, message);
         }
 
         [HttpPost("Card")]

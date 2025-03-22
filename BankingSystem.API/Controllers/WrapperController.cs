@@ -8,6 +8,10 @@ namespace BankingSystem.API.Controllers
     {
         protected async Task<IActionResult> HandleResult(bool success, string message, object data = null)
         {
+            return new ObjectResult(data)
+            {
+                StatusCode = 404//StatusCodes.Status422UnprocessableEntity
+            };
             if (!success)
             {
                 return BadRequest(message);

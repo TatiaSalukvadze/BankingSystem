@@ -18,8 +18,9 @@ namespace BankingSystem.API.Controllers.Reports
         public async Task<IActionResult> RegisteredPeopleStatistics()
         {
             var response = await _personService.RegisteredPeopleStatisticsAsync();
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
     }
 }
