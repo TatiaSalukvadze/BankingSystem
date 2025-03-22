@@ -10,17 +10,15 @@ namespace BankingSystem.API.Controllers.OnlineBank
     [Route("/OnlineBank/[controller]")]
     public class UserBankingController : WrapperController
     {
-        private readonly IPersonService _personService;
         private readonly IAccountService _accountService;
         private readonly ICardService _cardService;
         private readonly ITransactionDetailsService _transactionService;
         private readonly ITransactionOperationService _transactionOperationService;
 
-        public UserBankingController(IPersonService personService, IAccountService accountService,
+        public UserBankingController(IAccountService accountService,
             ICardService cardService, ITransactionDetailsService transactionService,
             ITransactionOperationService transactionOperationService)
         {
-            _personService = personService;
             _accountService = accountService;
             _cardService = cardService;
             _transactionService = transactionService;
@@ -32,8 +30,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _accountService.SeeAccountsAsync(userEmail);
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("Cards")]
@@ -41,8 +40,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _cardService.SeeCardsAsync(userEmail);
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
 
         [HttpPost("TransferToOwnAccount")]
@@ -50,8 +50,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: true);
-            var (success, message) = (response.Success, response.Message);
-            return await HandleResult(success, message);
+            return new ObjectResult(response);
+            //var (success, message) = (response.Success, response.Message);
+            //return await HandleResult(success, message);
         }
 
         [HttpPost("TransferToOtherAccount")]
@@ -59,8 +60,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
-            var (success, message) = (response.Success, response.Message);
-            return await HandleResult(success, message);
+            return new ObjectResult(response);
+            //var (success, message) = (response.Success, response.Message);
+            //return await HandleResult(success, message);
         }
 
         [HttpGet("TotalIncomeExpense")]
@@ -68,9 +70,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _transactionService.TotalIncomeExpenseAsync(dateRangeDto, userEmail);
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
-
     }
 }

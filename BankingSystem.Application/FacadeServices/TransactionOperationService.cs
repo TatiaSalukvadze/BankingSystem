@@ -24,14 +24,14 @@ namespace BankingSystem.Application.FacadeServices
             var response = new SimpleResponse();
             if (createTransactionDto.Amount <= 0)
             {
-                return response.Set(false, "You need to enter more than 0 value!");
+                return response.Set(false, "You need to enter more than 0 value!", 400);
             }
 
-            var  validateAccountsResponse = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
+            var validateAccountsResponse = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
                 createTransactionDto.ToIBAN, email, isSelfTransfer);
             if (!validateAccountsResponse.Success)
             {
-                return response.Set(false, validateAccountsResponse.Message);
+                return response.Set(false, validateAccountsResponse.Message, validateAccountsResponse.StatusCode);
             }
 
             var transferAccounts = validateAccountsResponse.Data;
@@ -40,13 +40,13 @@ namespace BankingSystem.Application.FacadeServices
                 toAccount.Currency, createTransactionDto.Amount, isSelfTransfer);
             if (!calculationResponse.Success)
             {
-                return response.Set(false, calculationResponse.Message);
+                return response.Set(false, calculationResponse.Message, calculationResponse.StatusCode);
             }
 
             var transferAmounts = calculationResponse.Data;
             if (fromAccount.Amount < transferAmounts.AmountFromAccount)
             {
-                return response.Set(false, "You don't have enough money to transfer on your account!");
+                return response.Set(false, "You don't have enough money to transfer on your account!", 400);
             }
 
             var updateAccountsResponse = await _accountService.UpdateAccountsAmountAsync(fromAccount.Id, toAccount.Id, transferAmounts.AmountFromAccount, transferAmounts.AmountToAccount);
@@ -66,19 +66,19 @@ namespace BankingSystem.Application.FacadeServices
             var validateCardResponse = await _cardService.AuthorizeCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN);
             if (!validateCardResponse.Success)
             {
-                return response.Set(false, validateCardResponse.Message);
+                return response.Set(false, validateCardResponse.Message, validateCardResponse.StatusCode);
             }
 
             if (withdrawalDto.Amount <= 0)
             {
-                return response.Set(false, "Withdrawal amount must be greater than zero.");
+                return response.Set(false, "Withdrawal amount must be greater than zero.", 400);
             }
     
             var calculationResponse = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(withdrawalDto.CardNumber, withdrawalDto.PIN,
                 withdrawalDto.Amount, withdrawalDto.Currency.ToString());
             if (!calculationResponse.Success)
             {
-                return response.Set(false, calculationResponse.Message);
+                return response.Set(false, calculationResponse.Message, calculationResponse.StatusCode);
             }
 
             var card = validateCardResponse.Data;

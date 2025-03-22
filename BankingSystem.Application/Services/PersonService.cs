@@ -32,10 +32,10 @@ namespace BankingSystem.Application.Services
             var personId = await _unitOfWork.PersonRepository.RegisterPersonAsync(person);
             if (personId <= 0)
             {
-                return response.Set(false, "Adding user in physical person system failed!");
+                return response.Set(false, "Adding user in physical person system failed!", null, 400);
             }
 
-            return response.Set(true, "User was registered successfully!",new { IdentityUserId, CustomUserId = personId });
+            return response.Set(true, "User was registered successfully!", new { IdentityUserId, CustomUserId = personId }, 200);
         }
 
         public async Task<Response<Dictionary<string, int>>> RegisteredPeopleStatisticsAsync()
@@ -48,7 +48,7 @@ namespace BankingSystem.Application.Services
             var result = await Task.WhenAll(PeopleRegisteredThisYear, PeopleRegisteredLast1Year, PeopleRegisteredLast30Days);
             if (result is null || result.Count() != 3)
             {
-                return response.Set(false, "Person Statistics couldn't be retrieved!");
+                return response.Set(false, "Person Statistics couldn't be retrieved!", null, 404);
             }
 
             var personStatistics = new Dictionary<string, int>()
@@ -58,7 +58,7 @@ namespace BankingSystem.Application.Services
                 { "People Registered Last 30 Days", result[2] }
             };
 
-            return response.Set(true, "Statistics are retrieved!", personStatistics);
+            return response.Set(true, "Statistics are retrieved!", personStatistics, 200);
         }
     }
 }

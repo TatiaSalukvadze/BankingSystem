@@ -23,13 +23,13 @@ namespace BankingSystem.Application.Services
             var account = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN);
             if (account == null)
             {
-                return response.Set(false, "Account does not exist in the system!");
+                return response.Set(false, "Account does not exist in the system!", null, 404);
             }
 
             bool cardNumberExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(createCardDto.CardNumber);
             if (cardNumberExists)
             {
-                return response.Set(false, "Card number already exists!");
+                return response.Set(false, "Card number already exists!", null, 409);
             }
 
             var card = new Card
@@ -44,11 +44,11 @@ namespace BankingSystem.Application.Services
             int insertedId = await _unitOfWork.CardRepository.CreateCardAsync(card);
             if (insertedId <= 0)
             {
-                return response.Set(false, "Card could not be created, something went wrong!");
+                return response.Set(false, "Card could not be created, something went wrong!", null, 400);
             }
             card.Id = insertedId;
  
-            return response.Set(true, "Card was created successfully!", card);
+            return response.Set(true, "Card was created successfully!", card, 201);
         }
 
         public async Task<Response<List<CardWithIBANDTO>>> SeeCardsAsync(string email)
@@ -57,16 +57,16 @@ namespace BankingSystem.Application.Services
             bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
             if (!accountsExist)
             {
-                return response.Set(false, "You don't have accounts!");
+                return response.Set(false, "You don't have accounts!", null, 400);
             }
 
             var cards = await _unitOfWork.CardRepository.GetCardsForPersonAsync(email);
             if (cards == null || cards.Count == 0)
             {
-                return response.Set(false, "You don't have cards!");
+                return response.Set(false, "You don't have cards!", null, 404);
             }
 
-            return response.Set(true, "Cards For Account (IBAN) were found!", cards);          
+            return response.Set(true, "Cards For Account (IBAN) were found!", cards, 200);          
         }
 
         public async Task<Response<SeeBalanceDTO>> SeeBalanceAsync(CardAuthorizationDTO cardAuthorizationDto)
@@ -75,16 +75,16 @@ namespace BankingSystem.Application.Services
             var cardValidateResponse = await AuthorizeCardAsync(cardAuthorizationDto.CardNumber, cardAuthorizationDto.PIN);
             if (!cardValidateResponse.Success)
             {
-                return response.Set(false, cardValidateResponse.Message);
+                return response.Set(false, cardValidateResponse.Message, null, cardValidateResponse.StatusCode);
             }
 
             var balanceInfo = await _unitOfWork.CardRepository.GetBalanceAsync(cardAuthorizationDto);
             if (balanceInfo is null || balanceInfo.Amount == 0 || balanceInfo.Currency == 0)
             {
-                return response.Set(false, "Unable to retrieve balance.");
+                return response.Set(false, "Unable to retrieve balance.", null, 400);
             }
 
-            return response.Set(true, "Balance retrieved successfully.", balanceInfo);
+            return response.Set(true, "Balance retrieved successfully.", balanceInfo, 200);
         }
 
         public async Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardDtp)
@@ -93,17 +93,17 @@ namespace BankingSystem.Application.Services
             var cardValidateResponse = await AuthorizeCardAsync(changeCardDtp.CardNumber, changeCardDtp.PIN);
             if (!cardValidateResponse.Success)
             {
-                return response.Set(false, cardValidateResponse.Message);
+                return response.Set(false, cardValidateResponse.Message, cardValidateResponse.StatusCode);
             }
 
             var card = cardValidateResponse.Data;
             bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardDtp.NewPIN);
             if (!updated)
             {
-                return response.Set(false, "Card PIN could not be updated!");
+                return response.Set(false, "Card PIN could not be updated!", 400);
             }
 
-            return response.Set(true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}");
+            return response.Set(true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}", 200);
         }
 
         public async Task<SimpleResponse> DeleteCardAsync(string cardNumber)
@@ -112,16 +112,16 @@ namespace BankingSystem.Application.Services
             var cardExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(cardNumber);
             if (!cardExists)
             {
-                return response.Set(false, "There is no Card for that Card Number!");
+                return response.Set(false, "There is no Card for that Card Number!", 404);
             }
 
             var cardDeleted = await _unitOfWork.CardRepository.DeleteCardAsync(cardNumber);
             if (!cardDeleted)
             {
-                return response.Set(false, "Card could not be canceled!");
+                return response.Set(false, "Card could not be canceled!", 400);
             }
 
-            return response.Set(true, "Card was successfully canceled!");
+            return response.Set(true, "Card was successfully canceled!", 200);
         }
 
         public async Task<Response<Card>> AuthorizeCardAsync(string CardNumber, string PIN)
@@ -131,18 +131,18 @@ namespace BankingSystem.Application.Services
 
             if (card is null)
             {
-                return response.Set(false, "Card was not found!");
+                return response.Set(false, "Card was not found!", null, 404);
             }
             if (card.PIN != PIN)
             {
-                return response.Set(false, "Incorrect PIN!");
+                return response.Set(false, "Incorrect PIN!", null, 400);
             }
             if (CheckCardExpired(card.ExpirationDate))
             {
-                return response.Set(false, "Card is expired!");
+                return response.Set(false, "Card is expired!", null, 400);
             }
 
-            return response.Set(true, "Card validated", card);
+            return response.Set(true, "Card validated", card, 200);
         }
 
         private bool CheckCardExpired(string expirationDate)

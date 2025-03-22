@@ -29,16 +29,18 @@ namespace BankingSystem.API.Controllers.OnlineBank
                 return BadRequest(response.Message);
             }
             var finalResponse = await _personService.RegisterCustomPersonAsync(registerDto, response.Data);
-            var (success, message, data) = (finalResponse.Success, finalResponse.Message, finalResponse.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(finalResponse);
+            //var (success, message, data) = (finalResponse.Success, finalResponse.Message, finalResponse.Data);
+            //return await HandleResult(success, message, data);
         }
 
         [HttpPost("Account")]
         public async Task<IActionResult> CreateAccount([FromForm] CreateAccountDTO createAccountDto)
         {
             var response = await _accountService.CreateAccountAsync(createAccountDto);
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
 
         [HttpDelete("Account")]
@@ -54,16 +56,18 @@ namespace BankingSystem.API.Controllers.OnlineBank
         public async Task<IActionResult> CreateCard([FromForm] CreateCardDTO createCardDto)
         {
             var response = await _cardService.CreateCardAsync(createCardDto);
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
 
         [HttpDelete("Card")]
         public async Task<IActionResult> DeleteCard([FromForm] string cardNumber)
         {
             var response = await _cardService.DeleteCardAsync(cardNumber);
-            var (success, message) = (response.Success, response.Message);
-            return await HandleResult(success, message);
+            return new ObjectResult(response);
+            //var (success, message) = (response.Success, response.Message);
+            //return await HandleResult(success, message);
         }
     }
 }

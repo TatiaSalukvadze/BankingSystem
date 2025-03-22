@@ -41,12 +41,12 @@ namespace BankingSystem.Application.Services
             int insertedId = await _unitOfWork.TransactionDetailsRepository.CreateTransactionAsync(transaction);
             if (insertedId <= 0)
             {
-                return response.Set(false, "Transaction could not be created, something happened!");
+                return response.Set(false, "Transaction could not be created, something happened!", 400);
             }
             transaction.Id = insertedId;
             _unitOfWork.SaveChanges();
 
-            return response.Set(true, "Transaction was successfull!");
+            return response.Set(true, "Transaction was successfull!", 200);
         }
         
         public async Task<Response<TransactionCountDTO>> NumberOfTransactionsAsync()
@@ -55,11 +55,11 @@ namespace BankingSystem.Application.Services
             TransactionCountDTO transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsAsync();
             if (transactionCountDTO is not null)
             {
-                return response.Set(true, "Transaction Count retreived!", transactionCountDTO);
+                return response.Set(true, "Transaction Count retreived!", transactionCountDTO, 200);
             }
             else
             {
-                return response.Set(false, "Transaction Count couldn't be retreived!");
+                return response.Set(false, "Transaction Count couldn't be retreived!", null, 404);
             }
         }
 
@@ -69,10 +69,10 @@ namespace BankingSystem.Application.Services
             List<BankProfitDTO> profitData = await _unitOfWork.TransactionDetailsRepository.GetBankProfitByTimePeriodAsync();
             if (profitData != null && profitData.Any())
             {
-                return response.Set(true, "Bank profit retrieved successfully.", profitData);
+                return response.Set(true, "Bank profit retrieved successfully.", profitData, 200);
             }
 
-            return response.Set(false, "No bank profit data found.");
+            return response.Set(false, "No bank profit data found.", null, 404);
         }
 
         public async Task<Response<Dictionary<string, decimal>>> AverageBankProfitAsync()
@@ -81,11 +81,11 @@ namespace BankingSystem.Application.Services
             var averageBankProfits = await _unitOfWork.TransactionDetailsRepository.AverageBankProfitAsyncAsync();
             if (averageBankProfits is not null && averageBankProfits.Count != 0)
             {
-                return response.Set(true, "Bank profit Count retreived!", averageBankProfits);
+                return response.Set(true, "Bank profit Count retreived!", averageBankProfits, 200);
             }
             else
             {
-                return response.Set(false, "Bank profit couldn't be retreived!");
+                return response.Set(false, "Bank profit couldn't be retreived!", null, 404);
             }
         }
 
@@ -95,11 +95,11 @@ namespace BankingSystem.Application.Services
             List<TransactionCountChartDTO> transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync();
             if (transactionCountDTO is not null)
             {
-                return response.Set(true, "Transaction Count retreived!", transactionCountDTO);
+                return response.Set(true, "Transaction Count retreived!", transactionCountDTO, 200);
             }
             else
             {
-                return response.Set(false, "Transaction Count couldn't be retreived!");
+                return response.Set(false, "Transaction Count couldn't be retreived!", null, 404);
             }
         }
 
@@ -109,10 +109,10 @@ namespace BankingSystem.Application.Services
             var rawData = await _unitOfWork.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync();
             if (rawData != null && rawData.Any())
             {
-                return response.Set(true, "ATM withdrawals data retrieved successfully.", rawData);
+                return response.Set(true, "ATM withdrawals data retrieved successfully.", rawData, 200);
             }
 
-            return response.Set(false, "No ATM withdrawal data found.");
+            return response.Set(false, "No ATM withdrawal data found.", null, 404);
         }
 
         public async Task<Response<IncomeExpenseDTO>> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto, string email)
@@ -123,11 +123,11 @@ namespace BankingSystem.Application.Services
 
             if (dateRangeDto.FromDate >= now || dateRangeDto.ToDate > now)
             {
-                return response.Set(false, "Provide correct time, not future time!");
+                return response.Set(false, "Provide correct time, not future time!", null, 400);
             }
             if(dateRangeDto.ToDate <= dateRangeDto.FromDate)
             {
-                return response.Set(false, "Provide correct time, toDate cannot be yearlier than fromDate!");
+                return response.Set(false, "Provide correct time, toDate cannot be yearlier than fromDate!", null, 400);
             }
 
             var income = await _unitOfWork.TransactionDetailsRepository.GetTotalIncomeAsync(dateRangeDto.FromDate, dateRangeDto.ToDate, email);
@@ -139,7 +139,7 @@ namespace BankingSystem.Application.Services
                 Expense = expense
             };
 
-            return response.Set(true, "Income and Expense retreived!", incomeExpense);
+            return response.Set(true, "Income and Expense retreived!", incomeExpense, 200);
         }
 
         #region transactionHelpers
@@ -150,7 +150,7 @@ namespace BankingSystem.Application.Services
             decimal currencyRate = await _exchangeRateService.GetCurrencyRateAsync(fromCurrency, toCurrency);
             if (currencyRate <= 0) 
             { 
-                return response.Set(false, "One of the account has incorrect currency!"); 
+                return response.Set(false, "One of the account has incorrect currency!", null, 400); 
             }
 
             decimal fee;
@@ -170,7 +170,7 @@ namespace BankingSystem.Application.Services
             transferAmounts.AmountFromAccount = amountToTransfer + transferAmounts.BankProfit;
             transferAmounts.AmountToAccount = amountToTransfer * currencyRate;
 
-            return response.Set(true, "", transferAmounts);
+            return response.Set(true, "", transferAmounts, 200);
         }
 
         public async Task<Response<AtmWithdrawalCalculationDTO>> CalculateATMWithdrawalTransactionAsync(string cardNumber, string pin, decimal withdrawalAmount, string withdrawalCurrency)
@@ -179,7 +179,7 @@ namespace BankingSystem.Application.Services
             var accountInfo = await _unitOfWork.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
             if (accountInfo == null)
             {
-                return response.Set(false, "Unable to retrieve account details.");
+                return response.Set(false, "Unable to retrieve account details.", null, 400);
             }
 
             decimal accountBalance = accountInfo.Amount;
@@ -193,7 +193,7 @@ namespace BankingSystem.Application.Services
 
                 if (exchangeRate <= 0)
                 {
-                    return response.Set(false, "Currency conversion failed.");
+                    return response.Set(false, "Currency conversion failed.", null, 400);
                 }
 
                 convertedAmount *= exchangeRate;
@@ -204,14 +204,14 @@ namespace BankingSystem.Application.Services
             decimal totalAmountToDeduct = convertedAmount + fee;
             if (accountBalance < totalAmountToDeduct)
             {
-                return response.Set(false, "You don't have enough money");
+                return response.Set(false, "You don't have enough money", null, 400);
             }
 
             decimal newTotalWithdrawnIn24Hours = totalWithdrawnIn24Hours + totalAmountToDeduct;
             decimal atmWithdrawalLimit = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalLimitForDay");
             if (newTotalWithdrawnIn24Hours > atmWithdrawalLimit)
             {
-                return response.Set(false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours.");
+                return response.Set(false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours.", null, 400);
             }
 
             var withdrawalData = new AtmWithdrawalCalculationDTO
@@ -222,7 +222,7 @@ namespace BankingSystem.Application.Services
                 TotalAmountToDeduct = totalAmountToDeduct
             };
 
-            return response.Set(true, "", withdrawalData);
+            return response.Set(true, "", withdrawalData, 200);
         }
         #endregion
     }

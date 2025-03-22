@@ -17,44 +17,46 @@ namespace BankingSystem.API.Controllers.Reports
         [HttpGet("Count")]
         public async Task<IActionResult> TransactionsCount()
         {
-
             var response = await _transactionService.NumberOfTransactionsAsync();
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("BankProfitByTimePeriod")] 
         public async Task<IActionResult> GetBankProfitByTimePeriodAsync()
         {
             var response = await _transactionService.BankProfitByTimePeriodAsync();
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("CountChart")]
         public async Task<IActionResult> TransactionsCountChart()
         {
-
             var response = await _transactionService.NumberOfTransactionsChartAsync();
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("AverageProfit")]
         public async Task<IActionResult> AverageProfit()
         {
-
             var response = await _transactionService.AverageBankProfitAsync();
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("TotalAtmWithdrawals")]
         public async Task<IActionResult> TotalAtmWithdrawals()
         {
             var response = await _transactionService.TotalAtmWithdrawalsAsync();
-            var (success, message, data) = (response.Success, response.Message, response.Data);
-            return await HandleResult(success, message, data);
+            return new ObjectResult(response);
+            //var (success, message, data) = (response.Success, response.Message, response.Data);
+            //return await HandleResult(success, message, data);
         }
     }
 }

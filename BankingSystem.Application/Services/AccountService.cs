@@ -22,13 +22,13 @@ namespace BankingSystem.Application.Services
             int personId = await _unitOfWork.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber);
             if (personId <= 0)
             {
-                return response.Set(false, "Such person doesn't exist in our system!");
+                return response.Set(false, "Such person doesn't exist in our system!", null, 404);
             }
 
             bool IBANExists = await _unitOfWork.AccountRepository.IBANExists(createAccountDto.IBAN);
             if (IBANExists)
             {
-                return response.Set(false, "Such IBAN already exist in our system!");
+                return response.Set(false, "Such IBAN already exist in our system!", null, 409);
             }
             
             var account = new Account
@@ -42,11 +42,11 @@ namespace BankingSystem.Application.Services
             int insertedId = await _unitOfWork.AccountRepository.CreateAccountAsync(account);
             if (insertedId <= 0)
             {
-                return response.Set(false, "Account could not be created, something happened!");
+                return response.Set(false, "Account could not be created, something happened!", null, 400);
             }
             account.Id = insertedId;
 
-            return response.Set(true, "Account was created successfully!", account);
+            return response.Set(true, "Account was created successfully!", account, 201);
         }
 
         public async Task<Response<List<SeeAccountsDTO>>> SeeAccountsAsync(string email)
@@ -55,16 +55,16 @@ namespace BankingSystem.Application.Services
             bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
             if (!accountsExist)
             {
-                return response.Set(false, "You don't have any accounts!");
+                return response.Set(false, "You don't have any accounts!", null, 400);
             }
 
             var accounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email);
             if (accounts == null || accounts.Count == 0)
             {
-                return response.Set(false, "No accounts found!");
+                return response.Set(false, "No accounts found!", null, 404);
             }
 
-            return response.Set(true, "Accounts retrieved successfully!", accounts);
+            return response.Set(true, "Accounts retrieved successfully!", accounts, 200);
         }
 
         public async Task<SimpleResponse> DeleteAccountAsync(string iban)
@@ -73,22 +73,22 @@ namespace BankingSystem.Application.Services
             bool exists = await _unitOfWork.AccountRepository.IBANExists(iban);
             if (!exists)
             {
-                return response.Set(false, "Account not found.");
+                return response.Set(false, "Account not found.", 404);
             }
 
             var balance = await _unitOfWork.AccountRepository.GetBalanceByIBANAsync(iban);
             if (balance > 0)
             {
-                return response.Set(false, "Account cannot be deleted while it has a balance.");
+                return response.Set(false, "Account cannot be deleted while it has a balance.", 400);
             }
 
             bool deleted = await _unitOfWork.AccountRepository.DeleteAccountByIBANAsync(iban);
             if (!deleted)
             {
-                return response.Set(false, "Failed to delete account.");
+                return response.Set(false, "Failed to delete account.", 400);
             }
 
-            return response.Set(true, "Account deleted successfully.");
+            return response.Set(true, "Account deleted successfully.", 200);
         }
 
         #region transactionHelpers
@@ -98,7 +98,7 @@ namespace BankingSystem.Application.Services
             var response = new Response<TransferAccountsDTO>();
             if (fromIBAN == toIBAN)
             {
-                return response.Set(false, "You can't transfer to same account!");
+                return response.Set(false, "You can't transfer to same account!", null, 400);
             }
 
             var fromToAccounts = new TransferAccountsDTO();
@@ -114,10 +114,10 @@ namespace BankingSystem.Application.Services
             }
             if (fromToAccounts.From is null || fromToAccounts.To is null)
             {
-                return response.Set(false, "There is no account for one or both provided IBANs, check well!");
+                return response.Set(false, "There is no account for one or both provided IBANs, check well!", null, 404);
             }
 
-            return response.Set(true, "Accounts validated!", fromToAccounts);
+            return response.Set(true, "Accounts validated!", fromToAccounts, 200);
         }
 
         public async Task<SimpleResponse> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,
@@ -131,9 +131,9 @@ namespace BankingSystem.Application.Services
             var toAccountUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(toAccountId, amountToAccount);
             if (!fromAccountUpdated || !toAccountUpdated)
             {
-                return response.Set(false, "Balance couldn't be updated!");
+                return response.Set(false, "Balance couldn't be updated!", 400);
             }
-            return response.Set(true,"Balance updated successfully!");
+            return response.Set(true,"Balance updated successfully!", 200);
         }
 
         public async Task<SimpleResponse> UpdateBalanceForATMAsync(int accountId, decimal amountToDeduct)
@@ -145,10 +145,10 @@ namespace BankingSystem.Application.Services
             bool isBalanceUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(accountId, -amountToDeduct);
             if (!isBalanceUpdated)
             {
-                return response.Set(false, "Failed to update account balance.");
+                return response.Set(false, "Failed to update account balance.", 400);
             }
 
-            return response.Set(true, "Balance updated successfully.");
+            return response.Set(true, "Balance updated successfully.", 200);
         }
         #endregion
     }

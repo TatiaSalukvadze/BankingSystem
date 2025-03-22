@@ -9,7 +9,7 @@ namespace BankingSystem.Contracts.Response
         public int StatusCode { get; set; }
         public T Data { get; set; }
 
-        public Response<T> Set(bool success, string message, T data = null, int statusCode = 200 ) {
+        public Response<T> Set(bool success, string message, T data = null, int statusCode = 400 ) {
             Success = success;
             Message = message;
             StatusCode = statusCode;
