@@ -202,7 +202,7 @@ namespace BankingSystem.UnitTests
             Assert.Equal("Balance updated successfully!", result.Message);
             Assert.Equal(200, result.StatusCode);
 
-            _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
+            _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(3));
         }
 
         [Fact]
@@ -220,8 +220,8 @@ namespace BankingSystem.UnitTests
             Assert.False(result.Success);
             Assert.Equal("Balance couldn't be updated!", result.Message);
             Assert.Equal(400, result.StatusCode);
-
-            _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
+         
+            _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(3));
         }
 
         [Fact]
@@ -230,14 +230,14 @@ namespace BankingSystem.UnitTests
             int accountId = 1;
             decimal amountToDeduct = 50;
 
-            _mockUnitOfWork.Setup(u => u.AccountRepository.UpdateAccountAmountAsync(accountId, amountToDeduct)).ReturnsAsync(true);
+            _mockUnitOfWork.Setup(u => u.AccountRepository.UpdateAccountAmountAsync(accountId, -amountToDeduct)).ReturnsAsync(true);
 
             var response = await _accountService.UpdateBalanceForATMAsync(accountId, amountToDeduct);
             Assert.True(response.Success);
             Assert.Equal("Balance updated successfully.", response.Message);
             Assert.Equal(200, response.StatusCode);
 
-            _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Once);
+            _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
         }
 
         [Fact]
@@ -246,14 +246,14 @@ namespace BankingSystem.UnitTests
             int accountId = 1;
             decimal amountToDeduct = 50;
 
-            _mockUnitOfWork.Setup(u => u.AccountRepository.UpdateAccountAmountAsync(accountId, amountToDeduct)).ReturnsAsync(false);
+            _mockUnitOfWork.Setup(u => u.AccountRepository.UpdateAccountAmountAsync(accountId, -amountToDeduct)).ReturnsAsync(false);
 
             var response = await _accountService.UpdateBalanceForATMAsync(accountId, amountToDeduct);
             Assert.False(response.Success);
             Assert.Equal("Failed to update account balance.", response.Message);
             Assert.Equal(400, response.StatusCode);
 
-            _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Once);
+            _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
         }
     }
 }
