@@ -12,18 +12,18 @@ namespace BankingSystem.Infrastructure.DataAccess
         private IDbTransaction _transaction;
         private IServiceProvider _serviceProvider;
         public IDbTransaction Transaction() => _transaction;
-        public UnitOfWork(SqlConnection connection, IServiceProvider _serviceProvider)
+
+        public UnitOfWork(SqlConnection connection, IServiceProvider serviceProvider)
         {
             _connection = connection;
             _connection.Open();
-            this._serviceProvider = _serviceProvider;
+            _serviceProvider = serviceProvider;
         }
+
         public IPersonRepository PersonRepository => _serviceProvider.GetRequiredService<IPersonRepository>();
         public IAccountRepository AccountRepository => _serviceProvider.GetRequiredService<IAccountRepository>();
         public ICardRepository CardRepository => _serviceProvider.GetRequiredService<ICardRepository>();
         public ITransactionDetailsRepository TransactionDetailsRepository => _serviceProvider.GetRequiredService<ITransactionDetailsRepository>();
-
-
 
         public void BeginTransaction()
         {
@@ -34,7 +34,6 @@ namespace BankingSystem.Infrastructure.DataAccess
 
             _transaction = (SqlTransaction)_connection.BeginTransaction();
         }
-
 
         public void SaveChanges()
         {
