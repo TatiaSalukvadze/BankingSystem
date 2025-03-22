@@ -21,7 +21,7 @@ namespace BankingSystem.API.Filters
                 objectResult.Value = simpleResponse.Message;
                 objectResult.StatusCode = simpleResponse.StatusCode;
             }
-            else if (objectResult.Value.GetType().GetGenericTypeDefinition() == typeof(Response<>))
+            else if (objectResult.Value.GetType().IsGenericType && objectResult.Value.GetType().GetGenericTypeDefinition() == typeof(Response<>))
             {
                 Type resultType = objectResult.Value.GetType();
                 var response = objectResult.Value;

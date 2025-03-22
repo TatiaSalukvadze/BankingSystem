@@ -37,6 +37,10 @@ namespace BankingSystem.API.Controllers
         [HttpPut("PIN")]
         public async Task<IActionResult> ChangeCardPINAsync([FromForm] ChangeCardPINDTO changeCardDtp)
         {
+            if (ModelState.IsValid)
+            {
+                return BadRequest("wjagrl");
+            }
             var response = await _cardService.ChangeCardPINAsync(changeCardDtp);
             return new ObjectResult(response);
             //var (success, message) = (response.Success, response.Message);
