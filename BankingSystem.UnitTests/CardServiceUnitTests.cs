@@ -220,34 +220,124 @@ namespace BankingSystem.UnitTests
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Once());
             //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never());
         }
-        //[Fact]
-        //public async Task SeeBalanceAsync_ShouldSeeBalance()
-        //{
-        //    string cardNumber = "4998892941729115";
-        //    string PIN = "1234";
+        [Fact]
+        public async Task SeeBalanceAsync_ShouldSeeBalance()
+        {
+            var cardAuthorizationDTO = new CardAuthorizationDTO { CardNumber = "4998892941729115", PIN = "1234" };
 
-        //    var seeBalanceDto = new SeeBalanceDTO { Amount = 100, Currency = CurrencyType.GEL};
-        //    var _cardServiceMock = new Mock<ICardService>();// (_cardService)
-        //    //{
-        //    //    CallBase = true // This allows partial mocking
-        //    //};
+            Card card = new Card
+            {
+                Id = 1,
+                AccountId = 1,
+                CardNumber = cardAuthorizationDTO.CardNumber,
+                ExpirationDate = "09/27",
+                CVV = "123",
+                PIN = cardAuthorizationDTO.PIN
+            };
 
-        //    _cardServiceMock.Setup(s => s.AuthorizeCardAsync(cardNumber, PIN)).ReturnsAsync((true,"",null));
-        //    _cardServiceMock.Setup(s => s.SeeBalanceAsync(cardNumber, PIN))
-        //        .ReturnsAsync( await _cardService.SeeBalanceAsync(cardNumber, PIN));
+            var seeBalanceDto = new SeeBalanceDTO { Amount = 100, Currency = CurrencyType.GEL };
 
-        //    //_mockUnitOfWork.Setup(u => u.CardRepository.GetCardAsync(cardNumber)).ReturnsAsync(new Card { });
-        //    _mockUnitOfWork.Setup(u => u.AccountRepository.GetBalanceAsync(cardNumber, PIN)).ReturnsAsync(seeBalanceDto);
+            _mockUnitOfWork.Setup(u => u.CardRepository.GetCardAsync(cardAuthorizationDTO.CardNumber)).ReturnsAsync(card);       
 
-        //    var (success, message, data) = await _cardServiceMock.Object.SeeBalanceAsync(cardNumber, PIN);
+            _mockUnitOfWork.Setup(u => u.CardRepository.GetBalanceAsync(cardAuthorizationDTO)).ReturnsAsync(seeBalanceDto);
 
-        //    Assert.True(success);
-        //    Assert.Equal("Balance retrieved successfully.", message);
-        //    Assert.Equal(seeBalanceDto,data);
+            var response = await _cardService.SeeBalanceAsync(cardAuthorizationDTO);
 
-        //    _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Once());
+            Assert.True(response.Success);
+            Assert.Equal("Balance retrieved successfully.", response.Message);
+            Assert.Equal(seeBalanceDto, response.Data);
+            Assert.Equal(200, response.StatusCode);
 
-        //}
+            _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
 
+        }
+
+        [Fact]
+        public async Task SeeBalanceAsync_ShouldNotSeeBalance()
+        {
+            var cardAuthorizationDTO = new CardAuthorizationDTO { CardNumber = "4998892941729115", PIN = "1234" };
+
+            Card card = new Card
+            {
+                Id = 1,
+                AccountId = 1,
+                CardNumber = cardAuthorizationDTO.CardNumber,
+                ExpirationDate = "09/27",
+                CVV = "123",
+                PIN = cardAuthorizationDTO.PIN
+            };
+
+            var seeBalanceDto = new SeeBalanceDTO { Amount = 0, Currency = 0};
+
+            _mockUnitOfWork.Setup(u => u.CardRepository.GetCardAsync(cardAuthorizationDTO.CardNumber)).ReturnsAsync(card);
+
+            _mockUnitOfWork.Setup(u => u.CardRepository.GetBalanceAsync(cardAuthorizationDTO)).ReturnsAsync(seeBalanceDto);
+
+            var response = await _cardService.SeeBalanceAsync(cardAuthorizationDTO);
+
+            Assert.False(response.Success);
+            Assert.Equal("Unable to retrieve balance.", response.Message);
+            Assert.Null(response.Data);
+            Assert.Equal(400, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
+
+        }
+
+        [Fact]
+        public async Task ChangeCardPINAsync_ShouldChangePIN()
+        {
+            var changePINDto = new ChangeCardPINDTO { CardNumber = "4998892941729115", PIN = "1234", NewPIN = "4321" };
+            Card card = new Card
+            {
+                Id = 1,
+                AccountId = 1,
+                CardNumber = changePINDto.CardNumber,
+                ExpirationDate = "09/27",
+                CVV = "123",
+                PIN = changePINDto.PIN
+            };
+
+            _mockUnitOfWork.Setup(u => u.CardRepository.GetCardAsync(changePINDto.CardNumber)).ReturnsAsync(card);
+
+            _mockUnitOfWork.Setup(u => u.CardRepository.UpdateCardAsync(card.Id, changePINDto.NewPIN)).ReturnsAsync(true);
+
+            var response = await _cardService.ChangeCardPINAsync(changePINDto);
+
+            Assert.True(response.Success);
+            Assert.Equal($"Card PIN was updated Successfully! New PIN: {changePINDto.NewPIN}", response.Message);
+            Assert.Equal(200, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
+
+        }
+
+        [Fact]
+        public async Task ChangeCardPINAsync_ShouldNotChangePIN()
+        {
+            var changePINDto = new ChangeCardPINDTO { CardNumber = "4998892941729115", PIN = "1234", NewPIN = "4321" };
+            Card card = new Card
+            {
+                Id = 1,
+                AccountId = 1,
+                CardNumber = changePINDto.CardNumber,
+                ExpirationDate = "09/27",
+                CVV = "123",
+                PIN = changePINDto.PIN
+            };
+
+            _mockUnitOfWork.Setup(u => u.CardRepository.GetCardAsync(changePINDto.CardNumber)).ReturnsAsync(card);
+
+            _mockUnitOfWork.Setup(u => u.CardRepository.UpdateCardAsync(card.Id, changePINDto.NewPIN)).ReturnsAsync(false);
+
+            var response = await _cardService.ChangeCardPINAsync(changePINDto);
+
+            Assert.False(response.Success);
+            Assert.Equal("Card PIN could not be updated!", response.Message);
+            Assert.Equal(400, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
+
+        }
     }
 }

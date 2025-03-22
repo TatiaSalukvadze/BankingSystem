@@ -79,7 +79,7 @@ namespace BankingSystem.Application.Services
             }
 
             var balanceInfo = await _unitOfWork.CardRepository.GetBalanceAsync(cardAuthorizationDto);
-            if (balanceInfo is null || balanceInfo.Amount == 0 || balanceInfo.Currency == 0)
+            if (balanceInfo is null || balanceInfo.Currency == 0)
             {
                 return response.Set(false, "Unable to retrieve balance.", null, 400);
             }
@@ -87,23 +87,23 @@ namespace BankingSystem.Application.Services
             return response.Set(true, "Balance retrieved successfully.", balanceInfo, 200);
         }
 
-        public async Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardDtp)
+        public async Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardPINDto)
         {
             var response = new SimpleResponse();
-            var cardValidateResponse = await AuthorizeCardAsync(changeCardDtp.CardNumber, changeCardDtp.PIN);
+            var cardValidateResponse = await AuthorizeCardAsync(changeCardPINDto.CardNumber, changeCardPINDto.PIN);
             if (!cardValidateResponse.Success)
             {
                 return response.Set(false, cardValidateResponse.Message, cardValidateResponse.StatusCode);
             }
 
             var card = cardValidateResponse.Data;
-            bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardDtp.NewPIN);
+            bool updated = await _unitOfWork.CardRepository.UpdateCardAsync(card.Id, changeCardPINDto.NewPIN);
             if (!updated)
             {
                 return response.Set(false, "Card PIN could not be updated!", 400);
             }
 
-            return response.Set(true, $"Card PIN was updated Successfully! New PIN: {changeCardDtp.NewPIN}", 200);
+            return response.Set(true, $"Card PIN was updated Successfully! New PIN: {changeCardPINDto.NewPIN}", 200);
         }
 
         public async Task<SimpleResponse> CancelCardAsync(string cardNumber)

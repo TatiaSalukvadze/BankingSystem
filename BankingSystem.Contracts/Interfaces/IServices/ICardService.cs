@@ -11,7 +11,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
         Task<Response<Card>> CreateCardAsync(CreateCardDTO createCardDto);
         Task<Response<List<CardWithIBANDTO>>> SeeCardsAsync(string email);
         Task<Response<SeeBalanceDTO>> SeeBalanceAsync(CardAuthorizationDTO cardAuthorizationDto);
-        Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardDtp);
+        Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardPINDto);
         Task<SimpleResponse> CancelCardAsync(string cardNumber);
         Task<Response<Card>> AuthorizeCardAsync(string CardNumber, string PIN);
     }

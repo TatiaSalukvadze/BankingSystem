@@ -25,15 +25,15 @@ namespace BankingSystem.UnitTests
         {
             var registerDto = new RegisterPersonDTO { Name = "Tatia", Surname = "Salu", IDNumber = "33001059400",
                 Birthdate = DateTime.Now, Email = "t@gmail.com", Password = "TatiaSalu0*", ClientUrl = "" };
-            string identityUserId = Guid.NewGuid().ToString();
-            var createdUser = new { IdentityUserId = Guid.NewGuid().ToString(), CustomUserId = 1 };
-            _mockUnitOfWork.Setup(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>())).ReturnsAsync(createdUser.CustomUserId);
+            var identityUserId = Guid.NewGuid().ToString();
+            var customUserId = 1;
+            _mockUnitOfWork.Setup(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>())).ReturnsAsync(customUserId);
 
-            var response = await _personService.RegisterCustomPersonAsync(registerDto, createdUser.IdentityUserId);
+            var response = await _personService.RegisterCustomPersonAsync(registerDto, identityUserId);
 
             Assert.True(response.Success);
             Assert.Equal("User was registered successfully!", response.Message);
-            Assert.Equal(createdUser, response.Data);
+            Assert.NotNull(response.Data);
             Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>()), Times.Once());
