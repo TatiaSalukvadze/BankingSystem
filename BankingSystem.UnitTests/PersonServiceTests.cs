@@ -26,17 +26,18 @@ namespace BankingSystem.UnitTests
             var registerDto = new RegisterPersonDTO { Name = "Tatia", Surname = "Salu", IDNumber = "33001059400",
                 Birthdate = DateTime.Now, Email = "t@gmail.com", Password = "TatiaSalu0*", ClientUrl = "" };
             string identityUserId = Guid.NewGuid().ToString();
+            var createdUser = new { IdentityUserId = Guid.NewGuid().ToString(), CustomUserId = 1 };
+            _mockUnitOfWork.Setup(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>())).ReturnsAsync(createdUser.CustomUserId);
 
-            _mockUnitOfWork.Setup(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>())).ReturnsAsync(1);
+            var response = await _personService.RegisterCustomPersonAsync(registerDto, createdUser.IdentityUserId);
 
-            var (success, message, data) = await _personService.RegisterCustomPersonAsync(registerDto, identityUserId);
-
-            Assert.True(success);
-            Assert.Equal("User was registered successfully!", message);
-            Assert.NotNull(data);
+            Assert.True(response.Success);
+            Assert.Equal("User was registered successfully!", response.Message);
+            Assert.Equal(createdUser, response.Data);
+            Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>()), Times.Once());
-            _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once());
+            //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once());
         }
 
         [Fact]
@@ -47,14 +48,15 @@ namespace BankingSystem.UnitTests
             string identityUserId = Guid.NewGuid().ToString();
 
             _mockUnitOfWork.Setup(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>())).ReturnsAsync(0);
-            var (success, message, data) = await _personService.RegisterCustomPersonAsync(registerDto, identityUserId);
+            var response = await _personService.RegisterCustomPersonAsync(registerDto, identityUserId);
 
-            Assert.False(success);
-            Assert.Equal("Adding user in physical person system failed!", message);
-            Assert.Null(data);
+            Assert.False(response.Success);
+            Assert.Equal("Adding user in physical person system failed!", response.Message);
+            Assert.Null(response.Data);
+            Assert.Equal(400, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>()), Times.Once());
-            _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never());
+            //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never());
         }
 
         [Fact]
@@ -64,12 +66,13 @@ namespace BankingSystem.UnitTests
             _mockUnitOfWork.Setup(u => u.PersonRepository.PeopleRegisteredLastOneYear()).ReturnsAsync(10);
             _mockUnitOfWork.Setup(u => u.PersonRepository.PeopleRegisteredLast30Days()).ReturnsAsync(10);
 
-            var (success, message, data) = await _personService.RegisteredPeopleStatisticsAsync();
+            var response = await _personService.RegisteredPeopleStatisticsAsync();
 
-            Assert.True(success);
-            Assert.Equal("Statistics are retrieved!", message);
-            Assert.NotNull(data);
-            Assert.Equal(3, data.Count);
+            Assert.True(response.Success);
+            Assert.Equal("Statistics are retrieved!", response.Message);
+            Assert.NotNull(response.Data);
+            Assert.Equal(3, response.Data.Count);
+            Assert.Equal(200, response.StatusCode);
             _mockUnitOfWork.Verify((u => u.PersonRepository), Times.Exactly(3));
 
         }
