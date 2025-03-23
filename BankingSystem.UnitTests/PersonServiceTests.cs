@@ -43,7 +43,7 @@ namespace BankingSystem.UnitTests
         [Fact]
         public async Task RegisterCustomPersonAsync_ShouldNotRegisterPerson()
         {
-            var registerDto = new RegisterPersonDTO { Name = "Tamar", Surname = "Salu", IDNumber = "33001059400",//same IDNUmber
+            var registerDto = new RegisterPersonDTO { Name = "Tamar", Surname = "Salu", IDNumber = "33001059400",
                 Birthdate = DateTime.Now, Email = "t@gmail.com", Password = "TamarSalu0*", ClientUrl = "" };
             string identityUserId = Guid.NewGuid().ToString();
 

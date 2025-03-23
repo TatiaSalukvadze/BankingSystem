@@ -199,6 +199,7 @@ namespace BankingSystem.UnitTests
             Assert.Equal(200, result.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(3));
+            _mockUnitOfWork.Verify(u => u.BeginTransaction(), Times.Once);
         }
 
         [Fact]
@@ -218,6 +219,7 @@ namespace BankingSystem.UnitTests
             Assert.Equal(400, result.StatusCode);
          
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(3));
+            _mockUnitOfWork.Verify(u => u.BeginTransaction(), Times.Once);
         }
 
         [Fact]
@@ -234,6 +236,7 @@ namespace BankingSystem.UnitTests
             Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
+            _mockUnitOfWork.Verify(u => u.BeginTransaction(), Times.Once);
         }
 
         [Fact]
@@ -250,6 +253,7 @@ namespace BankingSystem.UnitTests
             Assert.Equal(400, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
+            _mockUnitOfWork.Verify(u => u.BeginTransaction(), Times.Once);
         }
     }
 }
