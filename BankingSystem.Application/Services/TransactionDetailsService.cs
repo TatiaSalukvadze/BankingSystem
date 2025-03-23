@@ -76,7 +76,7 @@ namespace BankingSystem.Application.Services
         public async Task<Response<Dictionary<string, decimal>>> AverageBankProfitAsync()
         {
             var response = new Response<Dictionary<string, decimal>>();
-            var averageBankProfits = await _unitOfWork.TransactionDetailsRepository.AverageBankProfitAsyncAsync();
+            var averageBankProfits = await _unitOfWork.TransactionDetailsRepository.AverageBankProfitAsync();
             if (averageBankProfits == null || averageBankProfits.Count == 0)
             {
                 return response.Set(false, "Bank profit couldn't be retrieved!", null, 404);
@@ -180,7 +180,8 @@ namespace BankingSystem.Application.Services
             decimal accountBalance = accountInfo.Amount;
             decimal totalWithdrawnIn24Hours = accountInfo.WithdrawnAmountIn24Hours;
             string accountCurrency = accountInfo.Currency;
-
+            //account currency  gel da withdrawal currecny eur
+            //100 eur =300gel
             decimal convertedAmount = withdrawalAmount;
             if (withdrawalCurrency != accountCurrency)
             {

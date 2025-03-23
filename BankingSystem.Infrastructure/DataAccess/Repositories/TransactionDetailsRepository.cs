@@ -77,7 +77,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return new List<TotalAtmWithdrawalDTO>();
         }
 
-        public async Task<Dictionary<string, decimal>> AverageBankProfitAsyncAsync()
+        public async Task<Dictionary<string, decimal>> AverageBankProfitAsync()
         {
             var result = new Dictionary<string, decimal>();
             if (_connection != null)
