@@ -180,8 +180,7 @@ namespace BankingSystem.Application.Services
             decimal accountBalance = accountInfo.Amount;
             decimal totalWithdrawnIn24Hours = accountInfo.WithdrawnAmountIn24Hours;
             string accountCurrency = accountInfo.Currency;
-            //account currency  gel da withdrawal currecny eur
-            //100 eur =300gel
+      
             decimal convertedAmount = withdrawalAmount;
             if (withdrawalCurrency != accountCurrency)
             {

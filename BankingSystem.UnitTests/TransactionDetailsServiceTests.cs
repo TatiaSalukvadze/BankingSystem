@@ -2,23 +2,12 @@
 using BankingSystem.Contracts.DTOs.ATM;
 using BankingSystem.Contracts.DTOs.Report;
 using BankingSystem.Contracts.DTOs.UserBanking;
-using BankingSystem.Contracts.DTOs.ATM;
-using BankingSystem.Contracts.DTOs.Report;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Contracts.Interfaces.IRepositories;
-using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Domain.Entities;
-using BankingSystem.Domain.Enums;
-using Microsoft.AspNetCore.Server.Kestrel.Core.Features;
-using BankingSystem.Domain.Enums;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
 using Moq;
-using System.Collections.Generic;
-using System.Data;
-using System.Net.NetworkInformation;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BankingSystem.UnitTests
 {
@@ -42,6 +31,50 @@ namespace BankingSystem.UnitTests
             _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository).Returns(transactionDetailsRepositoryMock.Object);
 
             _transactionDetailsService = new TransactionDetailsService(_mockConfiguration.Object, _mockUnitOfWork.Object, _mockExchangeRateService.Object);
+        }
+
+        [Fact]
+        public async Task CreateTransactionAsync_ShouldCreate()
+        {
+            var bankProfit = 1;
+            var amount = 10;
+            var fromAccountId = 1;
+            var toAccountId = 2;
+            var currency = "GEL";
+            var isATM = false;
+
+            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.CreateTransactionAsync(It.IsAny<TransactionDetails>())).ReturnsAsync(1);
+
+            var response = await _transactionDetailsService.CreateTransactionAsync(bankProfit, amount, fromAccountId, toAccountId, currency);
+
+            Assert.True(response.Success);
+            Assert.Equal("Transaction was successfull!", response.Message);
+            Assert.Equal(200, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once());
+            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Exactly(2));
+        }
+
+        [Fact]
+        public async Task CreateTransactionAsync_ShouldNotCreate()
+        {
+            var bankProfit = 1;
+            var amount = 10;
+            var fromAccountId = 1;
+            var toAccountId = 1;
+            var currency = "GEL";
+            var isATM = true;
+
+            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.CreateTransactionAsync(It.IsAny<TransactionDetails>())).ReturnsAsync(0);
+
+            var response = await _transactionDetailsService.CreateTransactionAsync(bankProfit, amount, fromAccountId, toAccountId, currency);
+
+            Assert.False(response.Success);
+            Assert.Equal("Transaction could not be created, something happened!", response.Message);
+            Assert.Equal(400, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never());
+            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Exactly(2));
         }
 
         [Fact]
@@ -77,104 +110,6 @@ namespace BankingSystem.UnitTests
         }
 
         [Fact]
-        public async Task AverageBankProfitAsync_ShouldReturnAverageBankProfit()
-        {
-            var expectedData = new Dictionary<string, decimal>{ { "USD", 1500} };
-
-            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.AverageBankProfitAsync()).ReturnsAsync(expectedData);
-
-            var response = await _transactionDetailsService.AverageBankProfitAsync();
-
-            Assert.True(response.Success);
-            Assert.Equal("Bank profit count retrieved!", response.Message);
-            Assert.NotNull(response.Data);
-            Assert.Equal(expectedData, response.Data);
-            Assert.Equal(200, response.StatusCode);
-
-            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository.AverageBankProfitAsync(), Times.Once);
-        }
-
-
-        [Fact]
-        public async Task CreateTransactionAsync_ShouldCreate()
-        {
-            var bankProfit = 1;
-            var amount = 10;
-            var fromAccountId = 1;
-            var toAccountId = 2;
-            var currency = "GEL";
-            var isATM = false;
-         
-            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.CreateTransactionAsync(It.IsAny<TransactionDetails>())).ReturnsAsync(1);
-
-            var response = await _transactionDetailsService.CreateTransactionAsync(bankProfit, amount, fromAccountId, toAccountId, currency);
-
-            Assert.True(response.Success);
-            Assert.Equal("Transaction was successfull!", response.Message);
-            Assert.Equal(200, response.StatusCode);
-
-            _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once());
-            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Exactly(2));
-        }
-
-        [Fact]
-        public async Task CreateTransactionAsync_ShouldNotCreate()
-        {
-            var bankProfit = 1;
-            var amount = 10;
-            var fromAccountId = 1;
-            var toAccountId = 1;
-            var currency = "GEL";
-            var isATM = true;
-
-            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.CreateTransactionAsync(It.IsAny<TransactionDetails>())).ReturnsAsync(0);
-
-            var response = await _transactionDetailsService.CreateTransactionAsync(bankProfit, amount, fromAccountId, toAccountId, currency);
-
-            Assert.False(response.Success);
-            Assert.Equal("Transaction could not be created, something happened!", response.Message);
-            Assert.Equal(400, response.StatusCode);
-
-            _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never());
-            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Exactly(2));
-        }
-
-
-        [Fact]
-        public async Task NumberOfTransactionsChartAsync_ShouldReturnValue()
-        {
-            var transactionCountChartDtos = new List<TransactionCountChartDTO>();
-            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync()).ReturnsAsync(transactionCountChartDtos);
-
-            var response = await _transactionDetailsService.NumberOfTransactionsChartAsync();
-
-            Assert.True(response.Success);
-            Assert.Equal("Transaction Count retreived!", response.Message);
-            Assert.Equal(200, response.StatusCode);
-            Assert.Equal(transactionCountChartDtos, response.Data);
-
-            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Once());
-        }
-
-
-        [Fact]
-        public async Task NumberOfTransactionsChartAsync_ShouldNotReturnValue()
-        {
-            List<TransactionCountChartDTO> transactionCountChartDtos = null;
-            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync()).ReturnsAsync(transactionCountChartDtos);
-
-            var response = await _transactionDetailsService.NumberOfTransactionsChartAsync();
-
-            Assert.False(response.Success);
-            Assert.Equal("Transaction Count couldn't be retreived!", response.Message);
-            Assert.Equal(404, response.StatusCode);
-            Assert.Null(response.Data);
-
-            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Once());
-        }
-
-
-        [Fact]
         public async Task BankProfitByTimePeriodAsync_ShouldReturnValue()
         {
             var bankProfitDtos = new List<BankProfitDTO>();
@@ -205,6 +140,110 @@ namespace BankingSystem.UnitTests
             Assert.Null(response.Data);
 
             _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Once());
+        }
+
+
+        [Fact]
+        public async Task AverageBankProfitAsync_ShouldReturnAverageBankProfit()
+        {
+            var expectedData = new Dictionary<string, decimal>{ { "USD", 1500} };
+
+            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.AverageBankProfitAsync()).ReturnsAsync(expectedData);
+
+            var response = await _transactionDetailsService.AverageBankProfitAsync();
+
+            Assert.True(response.Success);
+            Assert.Equal("Bank profit count retrieved!", response.Message);
+            Assert.NotNull(response.Data);
+            Assert.Equal(expectedData, response.Data);
+            Assert.Equal(200, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository.AverageBankProfitAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task AverageBankProfitAsync_ShouldNotReturnAverageBankProfit()
+        {
+            var expectedData = new Dictionary<string, decimal> { };
+
+            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.AverageBankProfitAsync()).ReturnsAsync(expectedData);
+
+            var response = await _transactionDetailsService.AverageBankProfitAsync();
+
+            Assert.False(response.Success);
+            Assert.Equal("Bank profit couldn't be retrieved!", response.Message);
+            Assert.Null(response.Data);
+            Assert.NotEqual(expectedData, response.Data);
+            Assert.Equal(404, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository.AverageBankProfitAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task NumberOfTransactionsChartAsync_ShouldReturnValue()
+        {
+            var transactionCountChartDtos = new List<TransactionCountChartDTO>();
+            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync()).ReturnsAsync(transactionCountChartDtos);
+
+            var response = await _transactionDetailsService.NumberOfTransactionsChartAsync();
+
+            Assert.True(response.Success);
+            Assert.Equal("Transaction Count retreived!", response.Message);
+            Assert.Equal(200, response.StatusCode);
+            Assert.Equal(transactionCountChartDtos, response.Data);
+
+            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Once());
+        }
+
+        [Fact]
+        public async Task NumberOfTransactionsChartAsync_ShouldNotReturnValue()
+        {
+            List<TransactionCountChartDTO> transactionCountChartDtos = null;
+            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync()).ReturnsAsync(transactionCountChartDtos);
+
+            var response = await _transactionDetailsService.NumberOfTransactionsChartAsync();
+
+            Assert.False(response.Success);
+            Assert.Equal("Transaction Count couldn't be retreived!", response.Message);
+            Assert.Equal(404, response.StatusCode);
+            Assert.Null(response.Data);
+
+            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Once());
+        }
+
+        [Fact]
+        public async Task TotalAtmWithdrawalsAsync_ShouldReturnTotalAtmWithdrawals()
+        {
+            var expectedData = new List<TotalAtmWithdrawalDTO> { };
+
+            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync()).ReturnsAsync(expectedData);
+
+            var response = await _transactionDetailsService.TotalAtmWithdrawalsAsync();
+
+            Assert.True(response.Success);
+            Assert.Equal("ATM withdrawals data retrieved successfully.", response.Message);
+            Assert.NotNull(response.Data);
+            Assert.Equal(expectedData, response.Data);
+            Assert.Equal(200, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task TotalAtmWithdrawalsAsync_ShouldNotReturnTotalAtmWithdrawals()
+        {
+            List<TotalAtmWithdrawalDTO> expectedData = null;
+
+            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync()).ReturnsAsync(expectedData);
+
+            var response = await _transactionDetailsService.TotalAtmWithdrawalsAsync();
+
+            Assert.False(response.Success);
+            Assert.Equal("No ATM withdrawal data found.", response.Message);
+            Assert.Null(response.Data);
+            Assert.Equal(404, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync(), Times.Once);
         }
 
         [Fact]
@@ -246,93 +285,6 @@ namespace BankingSystem.UnitTests
             Assert.Null(response.Data);
 
             _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository, Times.Never());
-        }
-
-        [Fact]
-        public async Task CalculateATMWithdrawalTransactionAsync_ShouldReturnValue()
-        {
-            string cardNumber = "4998892941729115";
-            string pin = "1234";
-            decimal withdrawalAmount = 200;
-            string withdrawalCurrency = "GEL";
-            var accountInfo = new BalanceAndWithdrawalDTO() { Amount = 1200, Currency = "USD", WithdrawnAmountIn24Hours = 200 };
-
-            _mockUnitOfWork.Setup(u => u.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin)).ReturnsAsync(accountInfo);
-            _mockExchangeRateService.Setup(er => er.GetCurrencyRateAsync(withdrawalCurrency, accountInfo.Currency)).ReturnsAsync(0.333m);
-
-            Mock<IConfigurationSection> mockSectionATMPercent = new Mock<IConfigurationSection>();
-            mockSectionATMPercent.Setup(x => x.Value).Returns("2");
-
-           
-            _mockConfiguration.Setup(x => x.GetSection("TransactionFees:AtmWithdrawalPercent")).Returns(mockSectionATMPercent.Object);
-
-            Mock<IConfigurationSection> mockSectionATMLimit = new Mock<IConfigurationSection>();
-            mockSectionATMLimit.Setup(x => x.Value).Returns("10000");
-
-           
-            _mockConfiguration.Setup(x => x.GetSection("TransactionFees:AtmWithdrawalLimitForDay")).Returns(mockSectionATMLimit.Object);
-
-            var response = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(cardNumber, pin, withdrawalAmount, withdrawalCurrency);      
-
-
-            Assert.True(response.Success);
-            Assert.Equal(200, response.StatusCode);
-            Assert.NotNull(response.Data);
-
-            _mockUnitOfWork.Verify(u => u.CardRepository, Times.Once());
-        }
-        [Fact]
-        public async Task AverageBankProfitAsync_ShouldNotReturnAverageBankProfit()
-        {
-            var expectedData = new Dictionary<string, decimal> { };
-
-            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.AverageBankProfitAsync()).ReturnsAsync(expectedData);
-
-            var response = await _transactionDetailsService.AverageBankProfitAsync();
-
-            Assert.False(response.Success);
-            Assert.Equal("Bank profit couldn't be retrieved!", response.Message);
-            Assert.Null(response.Data);
-            Assert.NotEqual(expectedData, response.Data);
-            Assert.Equal(404, response.StatusCode);
-
-            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository.AverageBankProfitAsync(), Times.Once);
-        }
-
-
-        [Fact]
-        public async Task TotalAtmWithdrawalsAsync_ShouldReturnTotalAtmWithdrawals()
-        {
-            var expectedData = new List<TotalAtmWithdrawalDTO> { };
-            
-            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync()).ReturnsAsync(expectedData);
-
-            var response = await _transactionDetailsService.TotalAtmWithdrawalsAsync();
-
-            Assert.True(response.Success);
-            Assert.Equal("ATM withdrawals data retrieved successfully.", response.Message);
-            Assert.NotNull(response.Data);
-            Assert.Equal(expectedData, response.Data);
-            Assert.Equal(200, response.StatusCode);
-
-            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync(), Times.Once);
-        }
-
-        [Fact]
-        public async Task TotalAtmWithdrawalsAsync_ShouldNotReturnTotalAtmWithdrawals()
-        {
-            List<TotalAtmWithdrawalDTO> expectedData = null;
-
-            _mockUnitOfWork.Setup(u => u.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync()).ReturnsAsync(expectedData);
-
-            var response = await _transactionDetailsService.TotalAtmWithdrawalsAsync();
-
-            Assert.False(response.Success);
-            Assert.Equal("No ATM withdrawal data found.", response.Message);
-            Assert.Null(response.Data);
-            Assert.Equal(404, response.StatusCode);
-
-            _mockUnitOfWork.Verify(u => u.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync(), Times.Once);
         }
 
         [Fact]
@@ -381,6 +333,56 @@ namespace BankingSystem.UnitTests
             Assert.False(response.Success);
             Assert.Equal("One of the account has incorrect currency!", response.Message);
             Assert.Equal(400, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task CalculateATMWithdrawalTransactionAsync_ShouldReturnValue()
+        {
+            string cardNumber = "4998892941729115";
+            string pin = "1234";
+            decimal withdrawalAmount = 200;
+            string withdrawalCurrency = "GEL";
+            var accountInfo = new BalanceAndWithdrawalDTO() { Amount = 1200, Currency = "USD", WithdrawnAmountIn24Hours = 200 };
+
+            _mockUnitOfWork.Setup(u => u.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin)).ReturnsAsync(accountInfo);
+            _mockExchangeRateService.Setup(er => er.GetCurrencyRateAsync(withdrawalCurrency, accountInfo.Currency)).ReturnsAsync(0.333m);
+
+            Mock<IConfigurationSection> mockSectionATMPercent = new Mock<IConfigurationSection>();
+            mockSectionATMPercent.Setup(x => x.Value).Returns("2");
+            _mockConfiguration.Setup(x => x.GetSection("TransactionFees:AtmWithdrawalPercent")).Returns(mockSectionATMPercent.Object);
+
+            Mock<IConfigurationSection> mockSectionATMLimit = new Mock<IConfigurationSection>();
+            mockSectionATMLimit.Setup(x => x.Value).Returns("10000");
+            _mockConfiguration.Setup(x => x.GetSection("TransactionFees:AtmWithdrawalLimitForDay")).Returns(mockSectionATMLimit.Object);
+
+            var response = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(cardNumber, pin, withdrawalAmount, withdrawalCurrency);
+
+            Assert.True(response.Success);
+            Assert.Equal(200, response.StatusCode);
+            Assert.NotNull(response.Data);
+
+            _mockUnitOfWork.Verify(u => u.CardRepository, Times.Once());
+        }
+
+        [Fact]
+        public async Task CalculateATMWithdrawalTransactionAsync_ShouldNotReturnValue()
+        {
+            string cardNumber = "1233367899931777";
+            string pin = "1111";
+            decimal withdrawalAmount = 444;
+            string withdrawalCurrency = "EUR";
+            BalanceAndWithdrawalDTO accountInfo = null;
+
+            _mockUnitOfWork.Setup(u => u.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin)).ReturnsAsync(accountInfo);
+            
+            var response = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(cardNumber, pin, withdrawalAmount, withdrawalCurrency);
+
+            Assert.False(response.Success);
+            Assert.Equal("Unable to retrieve account details.", response.Message);
+            Assert.Null(response.Data);
+            Assert.Equal(400, response.StatusCode);
+
+            _mockUnitOfWork.Verify(u => u.CardRepository, Times.Once());
         }
     }
 }
