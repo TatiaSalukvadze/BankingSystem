@@ -49,7 +49,6 @@ namespace BankingSystem.UnitTests
             Assert.Equal(201, returnedResponse.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
-           // _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once);
         }
 
         [Fact]
@@ -74,7 +73,6 @@ namespace BankingSystem.UnitTests
             Assert.Equal(409, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Once);
-            //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never);
         }
 
         [Fact]
@@ -128,7 +126,6 @@ namespace BankingSystem.UnitTests
             Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(3));
-            //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once);
         }
 
         [Fact]
@@ -158,7 +155,6 @@ namespace BankingSystem.UnitTests
             var account = new Account();
 
             _mockUnitOfWork.Setup(u => u.AccountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email)).ReturnsAsync(account);
-            //_mockUnitOfWork.Setup(u => u.AccountRepository.FindAccountByIBANandEmailAsync(toIBAN, email)).ReturnsAsync(account);
             _mockUnitOfWork.Setup(u => u.AccountRepository.FindAccountByIBANAsync(toIBAN)).ReturnsAsync(account);
 
             var response = await _accountService.ValidateAccountsForOnlineTransferAsync(fromIBAN, toIBAN, email, isSelfTransfer);
