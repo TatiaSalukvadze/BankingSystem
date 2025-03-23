@@ -12,9 +12,9 @@ namespace BankingSystem.Application.Services
 {
     public class TransactionDetailsService : ITransactionDetailsService
     {
-        private readonly IExchangeRateService _exchangeRateService;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IExchangeRateService _exchangeRateService;
 
         public TransactionDetailsService(IConfiguration configuration, IUnitOfWork unitOfWork, IExchangeRateService exchangeRateService)
         {
