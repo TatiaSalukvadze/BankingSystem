@@ -53,66 +53,61 @@ namespace BankingSystem.Application.Services
         {
             var response = new Response<TransactionCountDTO>(); 
             TransactionCountDTO transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsAsync();
-            if (transactionCountDTO is not null)
+            if (transactionCountDTO is null)
             {
-                return response.Set(true, "Transaction Count retreived!", transactionCountDTO, 200);
+                return response.Set(false, "Transaction Count couldn't be retreived!", null, 404); 
             }
-            else
-            {
-                return response.Set(false, "Transaction Count couldn't be retreived!", null, 404);
-            }
+
+            return response.Set(true, "Transaction Count retreived!", transactionCountDTO, 200);
         }
 
         public async Task<Response<List<BankProfitDTO>>> BankProfitByTimePeriodAsync()
         {
             var response = new Response<List<BankProfitDTO>>();
             List<BankProfitDTO> profitData = await _unitOfWork.TransactionDetailsRepository.GetBankProfitByTimePeriodAsync();
-            if (profitData != null && profitData.Any())
+            if (profitData is null)
             {
-                return response.Set(true, "Bank profit retrieved successfully.", profitData, 200);
+                return response.Set(false, "No bank profit data found.", null, 404);
             }
 
-            return response.Set(false, "No bank profit data found.", null, 404);
+            return response.Set(true, "Bank profit retrieved successfully.", profitData, 200);
         }
 
         public async Task<Response<Dictionary<string, decimal>>> AverageBankProfitAsync()
         {
             var response = new Response<Dictionary<string, decimal>>();
             var averageBankProfits = await _unitOfWork.TransactionDetailsRepository.AverageBankProfitAsyncAsync();
-            if (averageBankProfits is not null && averageBankProfits.Count != 0)
+            if (averageBankProfits == null || averageBankProfits.Count == 0)
             {
-                return response.Set(true, "Bank profit Count retreived!", averageBankProfits, 200);
+                return response.Set(false, "Bank profit couldn't be retrieved!", null, 404);
             }
-            else
-            {
-                return response.Set(false, "Bank profit couldn't be retreived!", null, 404);
-            }
+
+            return response.Set(true, "Bank profit count retrieved!", averageBankProfits, 200);
         }
+
 
         public async Task<Response<List<TransactionCountChartDTO>>> NumberOfTransactionsChartAsync()
         {
             var response = new Response<List<TransactionCountChartDTO>>();
             List<TransactionCountChartDTO> transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync();
-            if (transactionCountDTO is not null)
-            {
-                return response.Set(true, "Transaction Count retreived!", transactionCountDTO, 200);
-            }
-            else
+            if (transactionCountDTO is null)
             {
                 return response.Set(false, "Transaction Count couldn't be retreived!", null, 404);
             }
+
+            return response.Set(true, "Transaction Count retreived!", transactionCountDTO, 200);
         }
 
         public async Task<Response<List<TotalAtmWithdrawalDTO>>> TotalAtmWithdrawalsAsync()
         {
             var response = new Response<List<TotalAtmWithdrawalDTO>>();
             var rawData = await _unitOfWork.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync();
-            if (rawData != null && rawData.Any())
+            if (rawData is null)
             {
-                return response.Set(true, "ATM withdrawals data retrieved successfully.", rawData, 200);
+                return response.Set(false, "No ATM withdrawal data found.", null, 404);
             }
 
-            return response.Set(false, "No ATM withdrawal data found.", null, 404);
+            return response.Set(true, "ATM withdrawals data retrieved successfully.", rawData, 200);
         }
 
         public async Task<Response<IncomeExpenseDTO>> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto, string email)
