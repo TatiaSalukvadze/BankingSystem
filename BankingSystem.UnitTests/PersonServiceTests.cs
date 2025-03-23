@@ -3,7 +3,6 @@ using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Moq;
 
 namespace BankingSystem.UnitTests
@@ -20,6 +19,7 @@ namespace BankingSystem.UnitTests
             _mockUnitOfWork.Setup(u => u.PersonRepository).Returns(personRepositoryMock.Object);
             _personService = new PersonService(_mockUnitOfWork.Object);
         }
+
         [Fact]
         public async Task RegisterCustomPersonAsync_ShouldRegisterPerson()
         {
@@ -73,9 +73,8 @@ namespace BankingSystem.UnitTests
             Assert.NotNull(response.Data);
             Assert.Equal(3, response.Data.Count);
             Assert.Equal(200, response.StatusCode);
+
             _mockUnitOfWork.Verify((u => u.PersonRepository), Times.Exactly(3));
-
         }
-
     }
 }

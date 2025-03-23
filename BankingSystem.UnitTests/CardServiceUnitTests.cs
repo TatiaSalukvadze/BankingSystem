@@ -2,21 +2,11 @@
 using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Contracts.Interfaces;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Domain.Entities;
 using BankingSystem.Contracts.DTOs.OnlineBank;
-using System.Net.NetworkInformation;
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.DTOs.ATM;
 using BankingSystem.Domain.Enums;
-using BankingSystem.Contracts.Interfaces.IServices;
-using NuGet.Frameworks;
 
 namespace BankingSystem.UnitTests
 {
@@ -61,8 +51,8 @@ namespace BankingSystem.UnitTests
             Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.CardRepository.GetCardAsync(cardNumber), Times.Once());
-
         }
+
         [Fact]
         public async Task AuthorizeCardAsync_ShouldNotAuthorizeExpiredCard()
         {
@@ -87,8 +77,8 @@ namespace BankingSystem.UnitTests
             Assert.Null(response.Data);
 
             _mockUnitOfWork.Verify(u => u.CardRepository.GetCardAsync(cardNumber), Times.Once());
-
         }
+
         [Fact]
         public async Task CreateCardAsync_SHouldCreateCard()
         {
@@ -115,8 +105,8 @@ namespace BankingSystem.UnitTests
             _mockUnitOfWork.Verify(u => u.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN), Times.Once());
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
             //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once());
-
         }
+
         [Fact]
         public async Task CreateCardAsync_SHouldNotCreateExistingCard()
         {
@@ -143,7 +133,6 @@ namespace BankingSystem.UnitTests
             _mockUnitOfWork.Verify(u => u.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN), Times.Once());
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Once());
             //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never());
-
         }
 
         [Fact]
@@ -163,7 +152,6 @@ namespace BankingSystem.UnitTests
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Once());
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Once());
-
         }
 
         [Fact]
@@ -183,8 +171,8 @@ namespace BankingSystem.UnitTests
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Once());
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Never());
-
         }
+
         [Fact]
         public async Task CancelCardAsync_ShouldCancelCard()
         {
@@ -220,6 +208,7 @@ namespace BankingSystem.UnitTests
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Once());
             //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never());
         }
+
         [Fact]
         public async Task SeeBalanceAsync_ShouldSeeBalance()
         {
@@ -238,7 +227,6 @@ namespace BankingSystem.UnitTests
             var seeBalanceDto = new SeeBalanceDTO { Amount = 100, Currency = CurrencyType.GEL };
 
             _mockUnitOfWork.Setup(u => u.CardRepository.GetCardAsync(cardAuthorizationDTO.CardNumber)).ReturnsAsync(card);       
-
             _mockUnitOfWork.Setup(u => u.CardRepository.GetBalanceAsync(cardAuthorizationDTO)).ReturnsAsync(seeBalanceDto);
 
             var response = await _cardService.SeeBalanceAsync(cardAuthorizationDTO);
@@ -249,7 +237,6 @@ namespace BankingSystem.UnitTests
             Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
-
         }
 
         [Fact]
@@ -270,7 +257,6 @@ namespace BankingSystem.UnitTests
             var seeBalanceDto = new SeeBalanceDTO { Amount = 0, Currency = 0};
 
             _mockUnitOfWork.Setup(u => u.CardRepository.GetCardAsync(cardAuthorizationDTO.CardNumber)).ReturnsAsync(card);
-
             _mockUnitOfWork.Setup(u => u.CardRepository.GetBalanceAsync(cardAuthorizationDTO)).ReturnsAsync(seeBalanceDto);
 
             var response = await _cardService.SeeBalanceAsync(cardAuthorizationDTO);
@@ -281,7 +267,6 @@ namespace BankingSystem.UnitTests
             Assert.Equal(400, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
-
         }
 
         [Fact]
@@ -299,7 +284,6 @@ namespace BankingSystem.UnitTests
             };
 
             _mockUnitOfWork.Setup(u => u.CardRepository.GetCardAsync(changePINDto.CardNumber)).ReturnsAsync(card);
-
             _mockUnitOfWork.Setup(u => u.CardRepository.UpdateCardAsync(card.Id, changePINDto.NewPIN)).ReturnsAsync(true);
 
             var response = await _cardService.ChangeCardPINAsync(changePINDto);
@@ -309,7 +293,6 @@ namespace BankingSystem.UnitTests
             Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
-
         }
 
         [Fact]
@@ -327,7 +310,6 @@ namespace BankingSystem.UnitTests
             };
 
             _mockUnitOfWork.Setup(u => u.CardRepository.GetCardAsync(changePINDto.CardNumber)).ReturnsAsync(card);
-
             _mockUnitOfWork.Setup(u => u.CardRepository.UpdateCardAsync(card.Id, changePINDto.NewPIN)).ReturnsAsync(false);
 
             var response = await _cardService.ChangeCardPINAsync(changePINDto);
@@ -337,7 +319,6 @@ namespace BankingSystem.UnitTests
             Assert.Equal(400, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.CardRepository, Times.Exactly(2));
-
         }
     }
 }
