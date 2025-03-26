@@ -9,6 +9,10 @@ using BankingSystem.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
+using System.Data;
+using System.Net.NetworkInformation;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace BankingSystem.UnitTests
 {
     public class TransactionDetailsServiceTests

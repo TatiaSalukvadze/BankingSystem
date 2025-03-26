@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
+﻿
 namespace BankingSystem.Contracts.Response
 {
     public class Response<T> where T : class
