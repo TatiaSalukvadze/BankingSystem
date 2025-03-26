@@ -17,7 +17,6 @@ namespace BankingSystem.API.Filters
             var objectResult = context.Result as ObjectResult;
             if (objectResult.Value is SimpleResponse simpleResponse)
             {
-
                 objectResult.Value = simpleResponse.Message;
                 objectResult.StatusCode = simpleResponse.StatusCode;
             }
@@ -29,8 +28,9 @@ namespace BankingSystem.API.Filters
                 var success = resultType.GetProperty("Success")?.GetValue(response);
                 var statusCode = resultType.GetProperty("StatusCode")?.GetValue(response);
 
-                var messageProperty = resultType.GetProperty("Message");//?.GetValue(response);
-                var dataProperty = resultType.GetProperty("Data");//?.GetValue(response);
+                var messageProperty = resultType.GetProperty("Message");
+                var dataProperty = resultType.GetProperty("Data");
+
                 if (success is null || statusCode is null ||
                     messageProperty is null || dataProperty is null)
                 {
@@ -41,12 +41,10 @@ namespace BankingSystem.API.Filters
                 {
                     var message = messageProperty.GetValue(response);
                     var data = dataProperty.GetValue(response);
-                    objectResult.Value = (bool)success ? new { message, data } :
-                        message;
+                    objectResult.Value = (bool)success ? new { message, data } : message;
                     objectResult.StatusCode = (int)statusCode;
                 }
             }
-
             await next();
         }
     }
