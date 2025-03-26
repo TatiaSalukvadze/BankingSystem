@@ -20,8 +20,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var response = await _identityService.LoginPersonAsync(loginDto);
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         //https://fusionauth.io/dev-tools/url-encoder-decoder used for decode
@@ -30,8 +28,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var response = await _identityService.ConfirmEmailAsync(emailConfirmationDto);
             return new ObjectResult(response);
-            //var (success, message) = (response.Success, response.Message);
-            //return await HandleResult(success, message);
         }
 
         [HttpPost("ForgotPassword")]
@@ -39,8 +35,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var response = await _identityService.ForgotPasswordAsync(forgotPasswordDTO);
             return new ObjectResult(response);
-            //var (success, message) = (response.Success, response.Message);
-            //return await HandleResult(success, message);
         }
 
         [HttpPost("ResetPassword")]
@@ -48,8 +42,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var response = await _identityService.ResetPasswordAsync(resetPasswordDTO);
             return new ObjectResult(response);
-            //var (success, message) = (response.Success, response.Message);
-            //return await HandleResult(success, message);
         }
     }
 }

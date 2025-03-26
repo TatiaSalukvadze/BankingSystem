@@ -21,8 +21,6 @@ namespace BankingSystem.API.Controllers
         {
             var response = await _cardService.SeeBalanceAsync(cardAuthorizationDto);
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpPost("Withdraw")]
@@ -30,8 +28,6 @@ namespace BankingSystem.API.Controllers
         {
             var response = await _transactionOperationService.WithdrawAsync(withdrawalDto);
             return new ObjectResult(response);
-            //var (success, message) = (response.Success, response.Message);
-            //return await HandleResult(success, message);
         }
 
         [HttpPut("PIN")]
@@ -39,8 +35,6 @@ namespace BankingSystem.API.Controllers
         {
             var response = await _cardService.ChangeCardPINAsync(changeCardDtp);
             return new ObjectResult(response);
-            //var (success, message) = (response.Success, response.Message);
-            //return await HandleResult(success, message);
         }
     }
 }

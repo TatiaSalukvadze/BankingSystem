@@ -30,8 +30,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             }
             var finalResponse = await _personService.RegisterCustomPersonAsync(registerDto, response.Data);
             return new ObjectResult(finalResponse);
-            //var (success, message, data) = (finalResponse.Success, finalResponse.Message, finalResponse.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpPost("Account")]
@@ -39,8 +37,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var response = await _accountService.CreateAccountAsync(createAccountDto);
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpDelete("Account")]
@@ -48,8 +44,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var response = await _accountService.DeleteAccountAsync(iban);
             return new ObjectResult(response);
-            //var (success, message) = (response.Success, response.Message);
-            //return await HandleResult(success, message);
         }
 
         [HttpPost("Card")]
@@ -57,8 +51,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var response = await _cardService.CreateCardAsync(createCardDto);
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpDelete("Card")]
@@ -66,8 +58,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var response = await _cardService.CancelCardAsync(cardNumber);
             return new ObjectResult(response);
-            //var (success, message) = (response.Success, response.Message);
-            //return await HandleResult(success, message);
         }
     }
 }

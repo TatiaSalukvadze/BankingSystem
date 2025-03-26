@@ -19,8 +19,6 @@ namespace BankingSystem.API.Controllers.Reports
         {
             var response = await _personService.RegisteredPeopleStatisticsAsync();
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
     }
 }

@@ -31,8 +31,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _accountService.SeeAccountsAsync(userEmail);
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("Cards")]
@@ -41,8 +39,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _cardService.SeeCardsAsync(userEmail);
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpPost("TransferToOwnAccount")]
@@ -51,8 +47,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: true);
             return new ObjectResult(response);
-            //var (success, message) = (response.Success, response.Message);
-            //return await HandleResult(success, message);
         }
 
         [HttpPost("TransferToOtherAccount")]
@@ -61,8 +55,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, userEmail, isSelfTransfer: false);
             return new ObjectResult(response);
-            //var (success, message) = (response.Success, response.Message);
-            //return await HandleResult(success, message);
         }
 
         [HttpGet("TotalIncomeExpense")]
@@ -71,8 +63,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var response = await _transactionService.TotalIncomeExpenseAsync(dateRangeDto, userEmail);
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
     }
 }

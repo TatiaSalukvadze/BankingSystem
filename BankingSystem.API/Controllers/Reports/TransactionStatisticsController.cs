@@ -19,8 +19,6 @@ namespace BankingSystem.API.Controllers.Reports
         {
             var response = await _transactionService.NumberOfTransactionsAsync();
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("BankProfitByTimePeriod")] 
@@ -28,8 +26,6 @@ namespace BankingSystem.API.Controllers.Reports
         {
             var response = await _transactionService.BankProfitByTimePeriodAsync();
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("CountChart")]
@@ -37,8 +33,6 @@ namespace BankingSystem.API.Controllers.Reports
         {
             var response = await _transactionService.NumberOfTransactionsChartAsync();
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("AverageProfit")]
@@ -46,8 +40,6 @@ namespace BankingSystem.API.Controllers.Reports
         {
             var response = await _transactionService.AverageBankProfitAsync();
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
 
         [HttpGet("TotalAtmWithdrawals")]
@@ -55,8 +47,6 @@ namespace BankingSystem.API.Controllers.Reports
         {
             var response = await _transactionService.TotalAtmWithdrawalsAsync();
             return new ObjectResult(response);
-            //var (success, message, data) = (response.Success, response.Message, response.Data);
-            //return await HandleResult(success, message, data);
         }
     }
 }
