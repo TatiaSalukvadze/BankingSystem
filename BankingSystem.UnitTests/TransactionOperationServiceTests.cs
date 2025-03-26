@@ -7,7 +7,6 @@ using BankingSystem.Contracts.Response;
 using BankingSystem.Domain.Entities;
 using BankingSystem.Domain.Enums;
 using Moq;
-using System.Net.NetworkInformation;
 
 namespace BankingSystem.UnitTests
 {
