@@ -10,21 +10,21 @@ namespace BankingSystem.API.Controllers.OnlineBank
         private readonly IPersonService _personService;
         private readonly IAccountService _accountService;
         private readonly ICardService _cardService;
-        private readonly IIdentityService _identityService;
+        private readonly IAuthService _authService;
 
         public OnlineBankController(IPersonService personService, IAccountService accountService, 
-            ICardService cardService, IIdentityService identityService)
+            ICardService cardService, IAuthService authService)
         {
             _personService = personService;
             _accountService = accountService;
             _cardService = cardService;
-            _identityService = identityService;
+            _authService = authService;
         }
 
         [HttpPost("RegisterPerson")]
         public async Task<IActionResult> RegisterPerson([FromForm] RegisterPersonDTO registerDto)
         {
-            var response = await _identityService.RegisterPersonAsync(registerDto);        
+            var response = await _authService.RegisterPersonAsync(registerDto);        
             if (!response.Success) {
                 return BadRequest(response.Message);
             }

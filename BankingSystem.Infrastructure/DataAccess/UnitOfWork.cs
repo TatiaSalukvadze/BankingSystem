@@ -24,6 +24,7 @@ namespace BankingSystem.Infrastructure.DataAccess
         public IAccountRepository AccountRepository => _serviceProvider.GetRequiredService<IAccountRepository>();
         public ICardRepository CardRepository => _serviceProvider.GetRequiredService<ICardRepository>();
         public ITransactionDetailsRepository TransactionDetailsRepository => _serviceProvider.GetRequiredService<ITransactionDetailsRepository>();
+        public IRefreshTokenRepository RefreshTokenRepository => _serviceProvider.GetRequiredService<IRefreshTokenRepository>();
 
         public void BeginTransaction()
         {

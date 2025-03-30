@@ -9,6 +9,7 @@ namespace BankingSystem.Contracts.Interfaces
         IAccountRepository AccountRepository { get;  }
         ICardRepository CardRepository { get;  }      
         ITransactionDetailsRepository TransactionDetailsRepository { get; }
+        IRefreshTokenRepository RefreshTokenRepository { get; }
         IDbTransaction Transaction();
         void BeginTransaction();
         void SaveChanges();

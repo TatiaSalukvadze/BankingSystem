@@ -4,26 +4,28 @@ using BankingSystem.Contracts.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BankingSystem.Contracts.DTOs.Auth;
-using BankingSystem.Contracts.DTOs.Identity;
 using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.Response;
 
+
 namespace BankingSystem.Application.Services
 {
-    public class IdentityService : IIdentityService
+    public class AuthService : IAuthService
     {
-        private readonly IAuthService _authService;
+        private readonly ITokenService _tokenService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IEmailService _emailService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public IdentityService(IAuthService authService, UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager, IEmailService emailService)
+        public AuthService(ITokenService tokenService, UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager, IEmailService emailService, IUnitOfWork unitOfWork)
         {
-            _authService = authService;
+            _tokenService = tokenService;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Response<object>> LoginPersonAsync(LoginDTO loginDto)
@@ -43,9 +45,16 @@ namespace BankingSystem.Application.Services
 
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? "";
-            var token = _authService.GenerateToken(user, role);
 
-            return response.Set(true, "Login successful!", new { token }, 200);
+            var acessToken = _tokenService.GenerateAccessToken(user.Email, role);
+            var refreshToken = _tokenService.GenerateRefreshToken(user.Id, loginDto.DeviceId);
+
+            var refreshTokenSaved = await _unitOfWork.RefreshTokenRepository.SaveRefreshTokenAsync(refreshToken);
+            if (!refreshTokenSaved)
+            {
+                return response.Set(false, "Refresh Token was not saved!", null, 400);
+            }
+            return response.Set(true, "Login successful!", new { acessToken, refreshToken = refreshToken.Token }, 200);
         }
 
         public async Task<Response<string>> RegisterPersonAsync(RegisterPersonDTO registerDto)
@@ -130,6 +139,73 @@ namespace BankingSystem.Application.Services
             }
 
             return response.Set(true, "Password reset successful!", 200);
+        }
+
+        public async Task<Response<object>> RefreshTokensAsync(RefreshTokensDTO refreshTokensDto)
+        {
+            var response = new Response<object>();
+
+            var refreshToken = await _unitOfWork.RefreshTokenRepository.GetRefreshTokenAsync(refreshTokensDto.RefreshToken);
+
+            if (refreshToken is null || refreshToken.ExpirationDate <= DateTime.UtcNow
+                || refreshTokensDto.DeviceId != refreshToken.DeviceId)
+            {
+                return response.Set(false, "Provided refresh token is invalid!",null, 400);
+            }
+
+            var newAccessToken = _tokenService.RenewAccessToken(refreshTokensDto.AccessToken);
+            if(newAccessToken is null)
+            {
+                return response.Set(false, "New access token could not be generated!", null, 400);
+            }
+
+            var newRefreshToken = _tokenService.GenerateRefreshToken(refreshToken.IdentityUserId, refreshTokensDto.DeviceId);
+
+            var refreshTokenSaved = await _unitOfWork.RefreshTokenRepository.SaveRefreshTokenAsync(newRefreshToken);
+            if (!refreshTokenSaved)
+            {
+                return response.Set(false, "Refresh Token was not saved!", null, 400);
+            }
+
+            var deletedOldRefreshToken = await _unitOfWork.RefreshTokenRepository.DeleteRefreshTokensync(refreshToken.Id);
+            if (!deletedOldRefreshToken)
+            {
+                return response.Set(false, "Failed to delete old refresh token!",null, 400);
+            }
+
+            return response.Set(true, "new accesss token and refresh token retreived!", new { newAccessToken, newRefreshToken = newRefreshToken.Token }, 200);
+
+        }
+
+        public async Task<SimpleResponse> LogoutAsync(LogoutDTO logoutDto, string userEmail)
+        {
+            var response = new SimpleResponse();
+            if (string.IsNullOrEmpty(logoutDto.RefreshToken))
+            {
+                return response.Set(false, "Incorrect refresh token provided!", 400);
+            }
+
+            var refreshToken = await _unitOfWork.RefreshTokenRepository.GetRefreshTokenAsync(logoutDto.RefreshToken);
+
+            if (refreshToken is null)
+            {
+                return response.Set(false, "Provided refresh token is invalid!", 400);
+            }
+
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (refreshToken.IdentityUserId != user.Id
+                || logoutDto.DeviceId != refreshToken.DeviceId)
+            {
+                return response.Set(false, "You are not allowed to logout!", 400);
+            }
+
+            var deleted = await _unitOfWork.RefreshTokenRepository.DeleteRefreshTokensync(refreshToken.Id);
+            if(!deleted)
+            {
+                return response.Set(false, "Failed to logout!", 400);
+            }
+
+            return response.Set(true, "Logged out Successfully!", 200);
         }
     }
 }

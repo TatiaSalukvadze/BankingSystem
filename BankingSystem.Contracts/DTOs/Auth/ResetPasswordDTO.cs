@@ -1,4 +1,4 @@
-﻿namespace BankingSystem.Contracts.DTOs.Identity
+﻿namespace BankingSystem.Contracts.DTOs.Auth
 {
     public class ResetPasswordDTO
     {

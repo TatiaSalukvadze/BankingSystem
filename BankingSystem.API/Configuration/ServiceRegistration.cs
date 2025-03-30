@@ -35,12 +35,12 @@ namespace BankingSystem.API.Extensions
 
         public static IServiceCollection InjectServices(this IServiceCollection services)
         {
-            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICardService, CardService>();
             services.AddScoped<ITransactionDetailsService, TransactionDetailsService>();
-            services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITransactionOperationService, TransactionOperationService>();
             services.AddMemoryCache();
             services.AddHostedService<DataSeedHostedService>();
@@ -55,6 +55,7 @@ namespace BankingSystem.API.Extensions
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICardRepository, CardRepository>();
             services.AddScoped<ITransactionDetailsRepository, TransactionDetailsRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             return services;
         }

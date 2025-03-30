@@ -35,7 +35,7 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "Adding user in physical person system failed!", null, 400);
             }
 
-            return response.Set(true, "User was registered successfully!", new { IdentityUserId, CustomUserId = personId }, 200);
+            return response.Set(true, "User was registered successfully!", new { IdentityUserId, CustomUserId = personId }, 201);
         }
 
         public async Task<Response<Dictionary<string, int>>> RegisteredPeopleStatisticsAsync()
