@@ -11,15 +11,19 @@ namespace BankingSystem.Application.Services
     public class CardService : ICardService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEncryptionService _encryptionService;
+        private readonly IHashingService _hashingService;
 
-        public CardService(IUnitOfWork unitOfWork)
+        public CardService(IUnitOfWork unitOfWork, IEncryptionService encryptionService, IHashingService hashingService)
         {
             _unitOfWork = unitOfWork;
+            _encryptionService = encryptionService;
+            _hashingService = hashingService;
         }
 
-        public async Task<Response<Card>> CreateCardAsync(CreateCardDTO createCardDto)
+        public async Task<Response<CreateCardDTO>> CreateCardAsync(CreateCardDTO createCardDto)
         {
-            var response = new Response<Card>();
+            var response = new Response<CreateCardDTO>();
             var account = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN);
             if (account == null)
             {
@@ -35,10 +39,10 @@ namespace BankingSystem.Application.Services
             var card = new Card
             {
                 AccountId = account.Id,
-                CardNumber = createCardDto.CardNumber,
+                CardNumber = _encryptionService.Encrypt(createCardDto.CardNumber),
                 ExpirationDate = createCardDto.ExpirationDate,
-                CVV = createCardDto.CVV,
-                PIN = createCardDto.PIN
+                CVV = _encryptionService.Encrypt(createCardDto.CVV),
+                PIN = _hashingService.HashValue(createCardDto.PIN)
             };
 
             int insertedId = await _unitOfWork.CardRepository.CreateCardAsync(card);
@@ -46,9 +50,9 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, "Card could not be created, something went wrong!", null, 400);
             }
-            card.Id = insertedId;
- 
-            return response.Set(true, "Card was created successfully!", card, 201);
+            // card.Id = insertedId;
+
+            return response.Set(true, "Card was created successfully!", createCardDto, 201);
         }
 
         public async Task<Response<List<CardWithIBANDTO>>> SeeCardsAsync(string email)
@@ -64,6 +68,12 @@ namespace BankingSystem.Application.Services
             if (cards == null || cards.Count == 0)
             {
                 return response.Set(false, "You don't have cards!", null, 404);
+            }
+
+            foreach (var card in cards) 
+            {
+                card.CardNumber = _encryptionService.Decrypt(card.CardNumber);
+                card.CVV = _encryptionService.Decrypt(card.CVV);
             }
 
             return response.Set(true, "Cards For Account (IBAN) were found!", cards, 200);          

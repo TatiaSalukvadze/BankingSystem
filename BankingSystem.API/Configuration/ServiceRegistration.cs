@@ -13,6 +13,7 @@ using Microsoft.Data.SqlClient;
 using BankingSystem.Infrastructure.ExternalServices.Configuration;
 using BankingSystem.Infrastructure.Auth;
 using BankingSystem.Application.BackgroundServices;
+using BankingSystem.Application.HelperServices;
 
 namespace BankingSystem.API.Extensions
 {
@@ -42,6 +43,8 @@ namespace BankingSystem.API.Extensions
             services.AddScoped<ITransactionDetailsService, TransactionDetailsService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITransactionOperationService, TransactionOperationService>();
+            services.AddScoped<IHashingService, HashingService>();
+            services.AddScoped<IEncryptionService, EncryptionService>();
             services.AddMemoryCache();
             services.AddHostedService<DataSeedHostedService>();
 

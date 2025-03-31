@@ -39,7 +39,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             var result = new List<CardWithIBANDTO> { };
             if (_connection != null)
             {
-                var sql = @"SELECT a.IBAN, p.[Name], p.Surname, c.CardNumber, c.ExpirationDate, c.CVV, c.PIN 
+                var sql = @"SELECT a.IBAN, p.[Name], p.Surname, c.CardNumber, c.ExpirationDate, c.CVV 
                     FROM Card AS c JOIN Account AS a ON c.AccountId = a.Id
                     JOIN Person AS p ON a.PersonId = p.Id 
                     WHERE @email = p.Email";
