@@ -67,11 +67,13 @@ namespace DbCreation.DbSetup
             var createAccountTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "AccountTable.sql"));
             var createCardTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "CardTable.sql"));
             var createTransactionDetailsTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "TransactionDetailsTable.sql"));
+            var createRefreshTokenTable = await File.ReadAllTextAsync(Path.Combine(_basePath, "RefreshTokenTable.sql"));
 
             await _dbConnection.ExecuteAsync(createPersonTable, transaction: transaction);
             await _dbConnection.ExecuteAsync(createAccountTable, transaction: transaction);
             await _dbConnection.ExecuteAsync(createCardTable, transaction: transaction);
             await _dbConnection.ExecuteAsync(createTransactionDetailsTable, transaction: transaction);
+            await _dbConnection.ExecuteAsync(createRefreshTokenTable, transaction: transaction);
             _logger.LogInformation("Custom Tables created!");
         }
 
