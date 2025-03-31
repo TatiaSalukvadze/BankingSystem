@@ -96,7 +96,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return deleted;
         }
 
-        public async Task<SeeBalanceDTO> GetBalanceAsync(CardAuthorizationDTO cardAuthorizationDto)
+        public async Task<SeeBalanceDTO> GetBalanceAsync(string cardNumber, string pin)
         {
             if (_connection != null)
             {
@@ -104,9 +104,9 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 SELECT a.Amount, a.Currency
                 FROM Card ca
                 JOIN Account a ON ca.AccountId = a.Id
-                WHERE ca.CardNumber = @CardNumber
-                AND ca.PIN = @PIN";
-                var result = await _connection.QueryFirstOrDefaultAsync<SeeBalanceDTO>(sql, cardAuthorizationDto);
+                WHERE ca.CardNumber = @cardNumber
+                AND ca.PIN = @pin";
+                var result = await _connection.QueryFirstOrDefaultAsync<SeeBalanceDTO>(sql, new {cardNumber, pin });
                 return result;
             }
             return null;

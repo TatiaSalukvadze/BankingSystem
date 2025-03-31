@@ -73,24 +73,24 @@ namespace BankingSystem.Application.FacadeServices
             {
                 return response.Set(false, "Withdrawal amount must be greater than zero.", 400);
             }
-    
-            var calculationResponse = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(withdrawalDto.CardNumber, withdrawalDto.PIN,
+            var card = validateCardResponse.Data;
+            var calculationResponse = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(card.CardNumber, card.PIN,
                 withdrawalDto.Amount, withdrawalDto.Currency.ToString());
             if (!calculationResponse.Success)
             {
                 return response.Set(false, calculationResponse.Message, calculationResponse.StatusCode);
             }
 
-            var card = validateCardResponse.Data;
+            var accountId = card.AccountId;
             var withdrawalData = calculationResponse.Data;
-            var updateAccountResponse = await _accountService.UpdateBalanceForATMAsync(card.AccountId, withdrawalData.TotalAmountToDeduct);
+            var updateAccountResponse = await _accountService.UpdateBalanceForATMAsync(accountId, withdrawalData.TotalAmountToDeduct);
             if (!updateAccountResponse.Success)
             {
                 return updateAccountResponse;
             }
 
-            return await _transactionDetailsService.CreateTransactionAsync(withdrawalData.Fee, withdrawalData.Balance, card.AccountId, 
-                card.AccountId, withdrawalData.Currency, IsATM:true);
+            return await _transactionDetailsService.CreateTransactionAsync(withdrawalData.Fee, withdrawalData.Balance, accountId,
+                accountId, withdrawalData.Currency, IsATM:true);
         }
     }
 }
