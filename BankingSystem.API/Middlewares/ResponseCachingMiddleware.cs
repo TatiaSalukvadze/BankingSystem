@@ -28,14 +28,13 @@ namespace BankingSystem.API.Middlewares
                 string queryString = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : "";
                 var cacheKey = $"{action}{queryString}";
 
-                if (_memoryCache.TryGetValue(cacheKey, out var response) && response != ""
+                if (_memoryCache.TryGetValue(cacheKey, out string response) && response != ""
                     && _memoryCache.TryGetValue(cacheKey + "StatusCode", out int retreivedStatusCode))
                 {
                     _logger.LogInformation("Getting request response from MemoryCache!");
-                    context.Response.StatusCode = retreivedStatusCode;//StatusCodes.Status200OK;
+                    context.Response.StatusCode = retreivedStatusCode;
                     context.Response.ContentType = "application/json";
-                    var jsonResponse = JsonSerializer.Deserialize<object>(response.ToString());
-                    await context.Response.WriteAsJsonAsync(jsonResponse);
+                    await context.Response.WriteAsync(response);
                 }
                 else
                 {
