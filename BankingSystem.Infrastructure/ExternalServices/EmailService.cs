@@ -10,14 +10,18 @@ namespace BankingSystem.Infrastructure.ExternalServices
     public class EmailService : IEmailService
     {
         private readonly EmailSettings _emailSettings;
+        private string _templateBasePath;
 
         public EmailService(IOptions<EmailSettings> emailSettings)
         {
             _emailSettings = emailSettings.Value;
+            _templateBasePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName, "EmailTemplates");
+
         }
 
-        public async Task SendEmail(string email, string subject, string message)
+        public async Task SendEmail(string email, string templatePath, string subject, string message)
         {
+            var body = await File.ReadAllTextAsync(templatePath);
             var mail = new MailMessage
             {
                 From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
@@ -37,13 +41,14 @@ namespace BankingSystem.Infrastructure.ExternalServices
 
         public async Task SendTokenEmailAsync(string token, string email, string ClientUrl, string subject)
         {
+            var templatePath = Path.Combine(_templateBasePath, "SendTokenTemplate.html");
             var tokenEmail = new Dictionary<string, string?>()
                 {
                     {"email", email},
                     {"token", token }
                 };
             var verificationUrl = QueryHelpers.AddQueryString(ClientUrl, tokenEmail);
-            await SendEmail(email, subject, verificationUrl);
+            await SendEmail(email, templatePath, subject, verificationUrl);
         }
     }
 }
