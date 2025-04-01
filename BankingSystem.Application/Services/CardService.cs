@@ -5,8 +5,6 @@ using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Contracts.Interfaces.IServices;
 using BankingSystem.Contracts.Response;
 using BankingSystem.Domain.Entities;
-using System.Net.NetworkInformation;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BankingSystem.Application.Services
 {
@@ -52,7 +50,6 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, "Card could not be created, something went wrong!", null, 400);
             }
-            // card.Id = insertedId;
 
             return response.Set(true, "Card was created successfully!", createCardDto, 201);
         }
@@ -89,9 +86,10 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, cardValidateResponse.Message, null, cardValidateResponse.StatusCode);
             }
-            var hashedCardNumber = cardValidateResponse.Data.CardNumber;
-            var encryptedPin = cardValidateResponse.Data.PIN;
-            var balanceInfo = await _unitOfWork.CardRepository.GetBalanceAsync(hashedCardNumber, encryptedPin);
+
+            var encryptedCardNumber = cardValidateResponse.Data.CardNumber;
+            var hashedPin = cardValidateResponse.Data.PIN;
+            var balanceInfo = await _unitOfWork.CardRepository.GetBalanceAsync(encryptedCardNumber, hashedPin);
             if (balanceInfo is null || balanceInfo.Currency == 0)
             {
                 return response.Set(false, "Unable to retrieve balance.", null, 400);
