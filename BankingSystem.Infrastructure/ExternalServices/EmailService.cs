@@ -21,7 +21,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
         public async Task SendEmail(string email, string templatePath, string subject, string message)
         {
             var body = await File.ReadAllTextAsync(templatePath);
-            body = body.Replace("{{VerificationLink}}", message);
+            body = body.Replace("{{LinkWithToken}}", message);
 
             var mail = new MailMessage
             {
