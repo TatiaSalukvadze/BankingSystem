@@ -20,7 +20,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
         {
             var mail = new MailMessage
             {
-                From = new MailAddress(_emailSettings.SenderEmail!, _emailSettings.SenderName),
+                From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
                 Subject = subject,
                 Body = $"<p>{message}</p>",
                 IsBodyHtml = true
@@ -42,7 +42,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
                     {"email", email},
                     {"token", token }
                 };
-            var verificationUrl = QueryHelpers.AddQueryString(ClientUrl!, tokenEmail);
+            var verificationUrl = QueryHelpers.AddQueryString(ClientUrl, tokenEmail);
             await SendEmail(email, subject, verificationUrl);
         }
     }
