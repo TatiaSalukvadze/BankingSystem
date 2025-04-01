@@ -73,7 +73,6 @@ namespace BankingSystem.Application.Services
                 DataCountPerPage = perPage,
                 HasNext = page < totalPages,
                 HasPrevious = page > 1
-
             };
             return response.Set(true, "Accounts retrieved successfully!", pagingResponse, 200);
         }

@@ -34,10 +34,10 @@ namespace BankingSystem.API.Controllers.OnlineBank
         }
 
         [HttpGet("Cards")]
-        public async Task<IActionResult> SeeCards()
+        public async Task<IActionResult> SeeCards([FromQuery] int page = 1, [FromQuery] int perPage = 2)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var response = await _cardService.SeeCardsAsync(userEmail);
+            var response = await _cardService.SeeCardsAsync(userEmail, page, perPage);
             return new ObjectResult(response);
         }
 

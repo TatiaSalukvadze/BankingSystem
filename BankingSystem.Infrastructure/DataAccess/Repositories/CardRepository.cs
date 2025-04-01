@@ -34,7 +34,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return card;
         }
 
-        public async Task<List<CardWithIBANDTO>> GetCardsForPersonAsync(string email)
+        public async Task<List<CardWithIBANDTO>> GetCardsForPersonAsync(string email, int offset, int perPage)
         {
             var result = new List<CardWithIBANDTO> { };
             if (_connection != null)
@@ -42,10 +42,27 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 var sql = @"SELECT a.IBAN, p.[Name], p.Surname, c.CardNumber, c.ExpirationDate, c.CVV 
                     FROM Card AS c JOIN Account AS a ON c.AccountId = a.Id
                     JOIN Person AS p ON a.PersonId = p.Id 
-                    WHERE @email = p.Email";
-                result = (await _connection.QueryAsync<CardWithIBANDTO>(sql, new { email })).ToList();
+                    WHERE @email = p.Email
+                    ORDER BY c.Id DESC
+                    OFFSET @offset ROW
+                    FETCH NEXT @perPage ROWS ONLY";
+                result = (await _connection.QueryAsync<CardWithIBANDTO>(sql, new { email, offset, perPage })).ToList();
             }
             return result;
+        }
+
+        public async Task<int> GetCardsCountForPersonAsync(string email)
+        {
+            int count = 0;
+            if (_connection != null)
+            {
+                var sql = @"SELECT COUNT(*) 
+                    FROM Card AS c JOIN Account AS a ON c.AccountId = a.Id
+                    JOIN Person AS p ON a.PersonId = p.Id 
+                    WHERE @email = p.Email";
+                count = await _connection.ExecuteScalarAsync<int>(sql, new { email });
+            }
+            return count;
         }
 
         public async Task<bool> CardNumberExistsAsync(string cardNumber)

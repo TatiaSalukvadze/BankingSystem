@@ -54,28 +54,45 @@ namespace BankingSystem.Application.Services
             return response.Set(true, "Card was created successfully!", createCardDto, 201);
         }
 
-        public async Task<Response<List<CardWithIBANDTO>>> SeeCardsAsync(string email)
+        public async Task<Response<PagingResponseDTO<CardWithIBANDTO>>> SeeCardsAsync(string email, int page, int perPage)
         {
-            var response = new Response<List<CardWithIBANDTO>>();
+            var response = new Response<PagingResponseDTO<CardWithIBANDTO>>();
             bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
             if (!accountsExist)
             {
                 return response.Set(false, "You don't have accounts!", null, 400);
             }
-
-            var cards = await _unitOfWork.CardRepository.GetCardsForPersonAsync(email);
-            if (cards == null || cards.Count == 0)
+            int cardsCount = await _unitOfWork.CardRepository.GetCardsCountForPersonAsync(email);
+            if (cardsCount <= 0)
             {
-                return response.Set(false, "You don't have cards!", null, 404);
+                return response.Set(false, "You don't have any cards!", null, 400);
             }
 
-            foreach (var card in cards) 
+            var offset = (page - 1) * perPage;
+            var paginatedCards = await _unitOfWork.CardRepository.GetCardsForPersonAsync(email, offset, perPage);
+            if (paginatedCards == null || paginatedCards.Count == 0)
+            {
+                return response.Set(false, "Cards weren't found!", null, 404);
+            }
+
+            foreach (var card in paginatedCards) 
             {
                 card.CardNumber = _encryptionService.Decrypt(card.CardNumber);
                 card.CVV = _encryptionService.Decrypt(card.CVV);
             }
 
-            return response.Set(true, "Cards For Account (IBAN) were found!", cards, 200);          
+            int totalPages = (int)Math.Ceiling((double)cardsCount / perPage);
+            var pagingResponse = new PagingResponseDTO<CardWithIBANDTO>()
+            {
+                Data = paginatedCards,
+                TotalPages = totalPages,
+                TotalDataCount = cardsCount,
+                CurrentPage = page,
+                DataCountPerPage = perPage,
+                HasNext = page < totalPages,
+                HasPrevious = page > 1
+            };
+            return response.Set(true, "Cards For Account (IBAN) were found!", pagingResponse, 200);          
         }
 
         public async Task<Response<SeeBalanceDTO>> SeeBalanceAsync(CardAuthorizationDTO cardAuthorizationDto)

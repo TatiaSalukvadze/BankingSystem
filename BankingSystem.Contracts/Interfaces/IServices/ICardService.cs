@@ -9,7 +9,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     public interface ICardService
     {
         Task<Response<CreateCardDTO>> CreateCardAsync(CreateCardDTO createCardDto);
-        Task<Response<List<CardWithIBANDTO>>> SeeCardsAsync(string email);
+        Task<Response<PagingResponseDTO<CardWithIBANDTO>>> SeeCardsAsync(string email, int page, int perPage);
         Task<Response<SeeBalanceDTO>> SeeBalanceAsync(CardAuthorizationDTO cardAuthorizationDto);
         Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardPINDto);
         Task<SimpleResponse> CancelCardAsync(string cardNumber);
