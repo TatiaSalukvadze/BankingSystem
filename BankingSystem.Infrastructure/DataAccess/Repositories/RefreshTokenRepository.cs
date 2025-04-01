@@ -2,12 +2,7 @@
 using BankingSystem.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Dapper.SqlMapper;
 
 namespace BankingSystem.Infrastructure.DataAccess.Repositories
@@ -49,7 +44,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return null;
         }
 
-        public async Task<bool> DeleteRefreshTokensync(int id)
+        public async Task<bool> DeleteRefreshTokenAsync(int id)
         {
             bool deleted = false;
             if (_connection != null)
@@ -61,5 +56,15 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return deleted;
         }
 
+        public async Task<int> DeleteExpiredRefreshTokensAsync()
+        {
+            int rowsAffected = 0;
+            if (_connection != null)
+            {
+                var sql = "DELETE FROM RefreshToken WHERE ExpirationDate < GETDATE()";
+                rowsAffected = await _connection.ExecuteAsync(sql);
+            }
+            return rowsAffected;
+        }
     }
 }

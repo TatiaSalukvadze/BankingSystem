@@ -47,6 +47,7 @@ namespace BankingSystem.API.Extensions
             services.AddScoped<IEncryptionService, EncryptionService>();
             services.AddMemoryCache();
             services.AddHostedService<DataSeedHostedService>();
+            services.AddHostedService<CleanupExpiredTokensService>();
 
             return services;
         }

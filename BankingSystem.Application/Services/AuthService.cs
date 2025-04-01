@@ -167,7 +167,7 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "Refresh Token was not saved!", null, 400);
             }
 
-            var deletedOldRefreshToken = await _unitOfWork.RefreshTokenRepository.DeleteRefreshTokensync(refreshToken.Id);
+            var deletedOldRefreshToken = await _unitOfWork.RefreshTokenRepository.DeleteRefreshTokenAsync(refreshToken.Id);
             if (!deletedOldRefreshToken)
             {
                 return response.Set(false, "Failed to delete old refresh token!",null, 400);
@@ -199,7 +199,7 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "You are not allowed to logout!", 400);
             }
 
-            var deleted = await _unitOfWork.RefreshTokenRepository.DeleteRefreshTokensync(refreshToken.Id);
+            var deleted = await _unitOfWork.RefreshTokenRepository.DeleteRefreshTokenAsync(refreshToken.Id);
             if(!deleted)
             {
                 return response.Set(false, "Failed to logout!", 400);

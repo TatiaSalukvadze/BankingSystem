@@ -19,7 +19,7 @@ namespace BankingSystem.Application.BackgroundServices
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Seeding initial data in db if not present!");
-             using var scope = _serviceScopeFactory.CreateAsyncScope();
+            using var scope = _serviceScopeFactory.CreateAsyncScope();
             var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
 
             try
