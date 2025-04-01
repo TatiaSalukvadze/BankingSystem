@@ -49,22 +49,33 @@ namespace BankingSystem.Application.Services
             return response.Set(true, "Account was created successfully!", account, 201);
         }
 
-        public async Task<Response<List<SeeAccountsDTO>>> SeeAccountsAsync(string email)
+        public async Task<Response<PagingResponseDTO<SeeAccountsDTO>>> SeeAccountsAsync(string email, int page, int perPage)
         {
-            var response = new Response<List<SeeAccountsDTO>>();
-            bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
-            if (!accountsExist)
+            var response = new Response<PagingResponseDTO<SeeAccountsDTO>>();
+            int accountsCount = await _unitOfWork.AccountRepository.AccountsCountForEmail(email);
+            if (accountsCount <= 0)
             {
                 return response.Set(false, "You don't have any accounts!", null, 400);
             }
-
-            var accounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email);
-            if (accounts == null || accounts.Count == 0)
+            var offset = (page - 1) * perPage;
+            var paginatedAccounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email, offset, perPage);
+            if (paginatedAccounts == null || paginatedAccounts.Count == 0)
             {
                 return response.Set(false, "No accounts found!", null, 404);
             }
+            int totalPages = (int)Math.Ceiling((double)accountsCount / perPage);
+            var pagingResponse = new PagingResponseDTO<SeeAccountsDTO>()
+            {
+                Data = paginatedAccounts,
+                TotalPages = totalPages,
+                TotalDataCount = accountsCount,
+                CurrentPage = page,
+                DataCountPerPage = perPage,
+                HasNext = page < totalPages,
+                HasPrevious = page > 1
 
-            return response.Set(true, "Accounts retrieved successfully!", accounts, 200);
+            };
+            return response.Set(true, "Accounts retrieved successfully!", pagingResponse, 200);
         }
 
         public async Task<SimpleResponse> DeleteAccountAsync(string iban)

@@ -9,8 +9,9 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<Account> FindAccountByIBANandEmailAsync(string IBAN, string email);
         Task<bool> IBANExists(string IBAN);
         Task<bool> AccountExistForEmail(string email);
+        Task<int> AccountsCountForEmail(string email);
         Task<int> CreateAccountAsync(Account account);
-        Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email);
+        Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email, int offset, int perPage);
         Task<bool> UpdateAccountAmountAsync(int id,decimal amount);
         Task<bool> DeleteAccountByIBANAsync(string iban);
         Task<decimal> GetBalanceByIBANAsync(string iban);

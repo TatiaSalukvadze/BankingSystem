@@ -57,8 +57,18 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return exists;
         }
-
-        public async Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email)
+        public async Task<int> AccountsCountForEmail(string email)
+        {
+            int count = 0;
+            if (_connection != null)
+            {
+                var sql = @"SELECT COUNT(*) FROM Account as a WHERE @email = 
+                    (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId)";
+                count = await _connection.ExecuteScalarAsync<int>(sql, new { email });
+            }
+            return count;
+        }
+        public async Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email, int offset, int perPage)
         {
             var result = new List<SeeAccountsDTO>();
             if (_connection != null)
@@ -66,8 +76,11 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 var sql = @"
                 SELECT IBAN, Currency, Amount 
                 FROM Account AS a
-                WHERE @email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId);";
-                result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email })).ToList();
+                WHERE @email = (SELECT TOP 1 Email FROM Person WHERE Id = a.PersonId)
+                ORDER BY a.Id DESC
+                OFFSET @offset ROW
+                FETCH NEXT @perPage ROWS ONLY";
+                result = (await _connection.QueryAsync<SeeAccountsDTO>(sql, new { email, offset, perPage })).ToList();
             }
             return result;
         }

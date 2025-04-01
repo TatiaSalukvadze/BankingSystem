@@ -2,13 +2,14 @@
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Response;
 using BankingSystem.Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.Contracts.Interfaces.IServices
 {
     public interface IAccountService
     {
         Task<Response<Account>> CreateAccountAsync(CreateAccountDTO createAccountDto);
-        Task<Response<List<SeeAccountsDTO>>> SeeAccountsAsync(string email);
+        Task<Response<PagingResponseDTO<SeeAccountsDTO>>> SeeAccountsAsync(string email, int page, int perPage);
         Task<SimpleResponse> DeleteAccountAsync(string iban);
         Task<Response<TransferAccountsDTO>> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
             string toIBAN, string email, bool isSelfTransfer);
