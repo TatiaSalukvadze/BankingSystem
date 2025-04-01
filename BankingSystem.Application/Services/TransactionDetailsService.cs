@@ -114,8 +114,7 @@ namespace BankingSystem.Application.Services
         {
             var response = new Response<IncomeExpenseDTO>();
             var now = DateTime.Now;
-            //var now = new DateTime(exactNow.Year, exactNow.Month, exactNow.Day, exactNow.Hour, exactNow.Minute, 0, exactNow.Kind);
-
+            
             if (dateRangeDto.FromDate >= now || dateRangeDto.ToDate > now)
             {
                 return response.Set(false, "Provide correct time, not future time!", null, 400);
