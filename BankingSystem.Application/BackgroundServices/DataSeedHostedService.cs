@@ -27,7 +27,7 @@ namespace BankingSystem.Application.BackgroundServices
                 await seeder.SeedDataAsync();
             }
             catch (Exception ex) {
-                _logger.LogError("Problem happended during seeding initial data!");
+                _logger.LogError("Problem happended during seeding initial data: {message} {type}", ex.Message, ex.GetType().Name);
             }
         }
 

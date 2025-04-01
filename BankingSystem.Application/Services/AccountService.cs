@@ -103,7 +103,6 @@ namespace BankingSystem.Application.Services
 
             var fromToAccounts = new TransferAccountsDTO();
             fromToAccounts.From = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
-            Account toAccount;
             if (isSelfTransfer)
             {
                 fromToAccounts.To = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(toIBAN, email);
