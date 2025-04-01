@@ -15,18 +15,19 @@ namespace BankingSystem.Infrastructure.ExternalServices
         public EmailService(IOptions<EmailSettings> emailSettings)
         {
             _emailSettings = emailSettings.Value;
-            _templateBasePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName, "EmailTemplates");
-
+            _templateBasePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "BankingSystem.Infrastructure", "ExternalServices", "EmailTemplates");
         }
 
         public async Task SendEmail(string email, string templatePath, string subject, string message)
         {
             var body = await File.ReadAllTextAsync(templatePath);
+            body = body.Replace("{{VerificationLink}}", message);
+
             var mail = new MailMessage
             {
                 From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
                 Subject = subject,
-                Body = $"<p>{message}</p>",
+                Body = body,
                 IsBodyHtml = true
             };
             mail.To.Add(email);
