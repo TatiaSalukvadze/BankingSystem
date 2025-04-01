@@ -16,7 +16,7 @@ namespace BankingSystem.API.Filters
             var objectResult = context.Result as ObjectResult;
             if (objectResult.Value is SimpleResponse simpleResponse)
             {
-                objectResult.Value = simpleResponse.Message;
+                objectResult.Value = new { message = simpleResponse.Message };
                 objectResult.StatusCode = simpleResponse.StatusCode;
             }
             else if (objectResult.Value.GetType().IsGenericType && objectResult.Value.GetType().GetGenericTypeDefinition() == typeof(Response<>))
@@ -40,7 +40,7 @@ namespace BankingSystem.API.Filters
                 {
                     var message = messageProperty.GetValue(response);
                     var data = dataProperty.GetValue(response);
-                    objectResult.Value = (bool)success ? new { message, data } : message;
+                    objectResult.Value = (bool)success ? new { message, data } : new { message };
                     objectResult.StatusCode = (int)statusCode;
                 }
             }

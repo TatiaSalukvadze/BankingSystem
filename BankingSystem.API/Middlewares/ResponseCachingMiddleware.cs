@@ -28,10 +28,11 @@ namespace BankingSystem.API.Middlewares
                 string queryString = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : "";
                 var cacheKey = $"{action}{queryString}";
 
-                if (_memoryCache.TryGetValue(cacheKey, out var response) && response != "")
+                if (_memoryCache.TryGetValue(cacheKey, out var response) && response != ""
+                    && _memoryCache.TryGetValue(cacheKey + "StatusCode", out int retreivedStatusCode))
                 {
                     _logger.LogInformation("Getting request response from MemoryCache!");
-                    context.Response.StatusCode = StatusCodes.Status200OK;
+                    context.Response.StatusCode = retreivedStatusCode;//StatusCodes.Status200OK;
                     context.Response.ContentType = "application/json";
                     var jsonResponse = JsonSerializer.Deserialize<object>(response.ToString());
                     await context.Response.WriteAsJsonAsync(jsonResponse);
@@ -49,9 +50,11 @@ namespace BankingSystem.API.Middlewares
                     memoryStream.Seek(0, SeekOrigin.Begin);
                     var serviceResponse = await new StreamReader(memoryStream).ReadToEndAsync();
                     memoryStream.Seek(0, SeekOrigin.Begin);
+                    var statusCode = context.Response.StatusCode;
 
                     var cacheOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(15));
                     _memoryCache.Set(cacheKey, serviceResponse, cacheOptions);
+                    _memoryCache.Set(cacheKey + "StatusCode", statusCode, cacheOptions);
 
                     context.Response.Body = originalBodyStream;
                     await context.Response.Body.WriteAsync(memoryStream.ToArray());

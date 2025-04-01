@@ -113,8 +113,8 @@ namespace BankingSystem.Application.Services
         public async Task<Response<IncomeExpenseDTO>> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto, string email)
         {
             var response = new Response<IncomeExpenseDTO>();
-            var exactNow = DateTime.Now;
-            var now = new DateTime(exactNow.Year, exactNow.Month, exactNow.Day, exactNow.Hour, exactNow.Minute, 0, exactNow.Kind);
+            var now = DateTime.Now;
+            //var now = new DateTime(exactNow.Year, exactNow.Month, exactNow.Day, exactNow.Hour, exactNow.Minute, 0, exactNow.Kind);
 
             if (dateRangeDto.FromDate >= now || dateRangeDto.ToDate > now)
             {
