@@ -7,8 +7,8 @@ namespace BankingSystem.Contracts.Interfaces.IRepositories
         Task<Person?> FindByIdentityIdAsync(string identityId);
         Task<int> FindIdByIDNumberAsync(string IDNumber);
         Task<int> RegisterPersonAsync(Person person);
-        Task<int> PeopleRegisteredThisYear();
-        Task<int> PeopleRegisteredLastOneYear();
-        Task<int> PeopleRegisteredLast30Days();
+        Task<int> PeopleRegisteredThisYearAsync();
+        Task<int> PeopleRegisteredLastOneYearAsync();
+        Task<int> PeopleRegisteredLast30DaysAsync();
     }
 }

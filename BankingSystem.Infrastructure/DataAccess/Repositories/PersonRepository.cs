@@ -56,7 +56,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return addedUserId;
         }
 
-        public async Task<int> PeopleRegisteredThisYear()
+        public async Task<int> PeopleRegisteredThisYearAsync()
         {
             int count = 0;
             if (_connection != null)
@@ -67,7 +67,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return count;
         }
 
-        public async Task<int> PeopleRegisteredLastOneYear()
+        public async Task<int> PeopleRegisteredLastOneYearAsync()
         {
             if (_connection != null)
             {
@@ -78,7 +78,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return 0;
         }
 
-        public async Task<int> PeopleRegisteredLast30Days()
+        public async Task<int> PeopleRegisteredLast30DaysAsync()
         {
             if (_connection != null)
             {

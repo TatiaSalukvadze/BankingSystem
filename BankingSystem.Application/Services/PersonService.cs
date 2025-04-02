@@ -41,9 +41,9 @@ namespace BankingSystem.Application.Services
         public async Task<Response<Dictionary<string, int>>> RegisteredPeopleStatisticsAsync()
         {
             var response = new Response<Dictionary<string, int>>();
-            Task<int> PeopleRegisteredThisYear = _unitOfWork.PersonRepository.PeopleRegisteredThisYear();
-            Task<int> PeopleRegisteredLast1Year = _unitOfWork.PersonRepository.PeopleRegisteredLastOneYear();
-            Task<int> PeopleRegisteredLast30Days = _unitOfWork.PersonRepository.PeopleRegisteredLast30Days();
+            Task<int> PeopleRegisteredThisYear = _unitOfWork.PersonRepository.PeopleRegisteredThisYearAsync();
+            Task<int> PeopleRegisteredLast1Year = _unitOfWork.PersonRepository.PeopleRegisteredLastOneYearAsync();
+            Task<int> PeopleRegisteredLast30Days = _unitOfWork.PersonRepository.PeopleRegisteredLast30DaysAsync();
 
             var result = await Task.WhenAll(PeopleRegisteredThisYear, PeopleRegisteredLast1Year, PeopleRegisteredLast30Days);
             if (result is null || result.Count() != 3)

@@ -1,5 +1,4 @@
-﻿
-namespace BankingSystem.Contracts.Response
+﻿namespace BankingSystem.Contracts.Response
 {
     public class Response<T> where T : class
     {

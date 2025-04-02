@@ -35,7 +35,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return insertedId;
         }
 
-        public async Task<bool> IBANExists(string IBAN)
+        public async Task<bool> IBANExistsAsync(string IBAN)
         {
             bool exists = false;
             if (_connection != null)
@@ -46,7 +46,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             return exists;
         }
 
-        public async Task<bool> AccountExistForEmail(string email)
+        public async Task<bool> AccountExistForEmailAsync(string email)
         {
             bool exists = false;
             if (_connection != null)
@@ -57,7 +57,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return exists;
         }
-        public async Task<int> AccountsCountForEmail(string email)
+        public async Task<int> AccountsCountForEmailAsync(string email)
         {
             int count = 0;
             if (_connection != null)
@@ -68,7 +68,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
             }
             return count;
         }
-        public async Task<List<SeeAccountsDTO>> SeeAccountsByEmail(string email, int offset, int perPage)
+        public async Task<List<SeeAccountsDTO>> SeeAccountsByEmailAsync(string email, int offset, int perPage)
         {
             var result = new List<SeeAccountsDTO>();
             if (_connection != null)

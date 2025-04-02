@@ -18,7 +18,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
             _templateBasePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "BankingSystem.Infrastructure", "ExternalServices", "EmailTemplates");
         }
 
-        public async Task SendEmail(string email, string templatePath, string subject, string message)
+        public async Task SendEmailAsync(string email, string templatePath, string subject, string message)
         {
             var body = await File.ReadAllTextAsync(templatePath);
             body = body.Replace("{{LinkWithToken}}", message);
@@ -49,7 +49,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
                     {"token", token }
                 };
             var verificationUrl = QueryHelpers.AddQueryString(ClientUrl, tokenEmail);
-            await SendEmail(email, templatePath, subject, verificationUrl);
+            await SendEmailAsync(email, templatePath, subject, verificationUrl);
         }
     }
 }

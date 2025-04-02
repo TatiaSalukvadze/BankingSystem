@@ -57,7 +57,7 @@ namespace BankingSystem.Application.Services
         public async Task<Response<PagingResponseDTO<CardWithIBANDTO>>> SeeCardsAsync(string email, int page, int perPage)
         {
             var response = new Response<PagingResponseDTO<CardWithIBANDTO>>();
-            bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmail(email);
+            bool accountsExist = await _unitOfWork.AccountRepository.AccountExistForEmailAsync(email);
             if (!accountsExist)
             {
                 return response.Set(false, "You don't have accounts!", null, 400);

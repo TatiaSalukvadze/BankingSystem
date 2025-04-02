@@ -25,7 +25,7 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "Such person doesn't exist in our system!", null, 404);
             }
 
-            bool IBANExists = await _unitOfWork.AccountRepository.IBANExists(createAccountDto.IBAN);
+            bool IBANExists = await _unitOfWork.AccountRepository.IBANExistsAsync(createAccountDto.IBAN);
             if (IBANExists)
             {
                 return response.Set(false, "Such IBAN already exist in our system!", null, 409);
@@ -52,14 +52,14 @@ namespace BankingSystem.Application.Services
         public async Task<Response<PagingResponseDTO<SeeAccountsDTO>>> SeeAccountsAsync(string email, int page, int perPage)
         {
             var response = new Response<PagingResponseDTO<SeeAccountsDTO>>();
-            int accountsCount = await _unitOfWork.AccountRepository.AccountsCountForEmail(email);
+            int accountsCount = await _unitOfWork.AccountRepository.AccountsCountForEmailAsync(email);
             if (accountsCount <= 0)
             {
                 return response.Set(false, "You don't have any accounts!", null, 400);
             }
 
             var offset = (page - 1) * perPage;
-            var paginatedAccounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email, offset, perPage);
+            var paginatedAccounts = await _unitOfWork.AccountRepository.SeeAccountsByEmailAsync(email, offset, perPage);
             if (paginatedAccounts is null || paginatedAccounts.Count == 0)
             {
                 return response.Set(false, "No accounts found!", null, 404);
@@ -82,7 +82,7 @@ namespace BankingSystem.Application.Services
         public async Task<SimpleResponse> DeleteAccountAsync(string IBAN)
         {
             var response = new SimpleResponse();
-            bool exists = await _unitOfWork.AccountRepository.IBANExists(IBAN);
+            bool exists = await _unitOfWork.AccountRepository.IBANExistsAsync(IBAN);
             if (!exists)
             {
                 return response.Set(false, "Account not found!", 404);

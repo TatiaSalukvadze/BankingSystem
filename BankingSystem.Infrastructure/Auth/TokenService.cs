@@ -1,6 +1,5 @@
 ﻿using BankingSystem.Contracts.Interfaces;
 using BankingSystem.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,6 +12,7 @@ namespace BankingSystem.Infrastructure.Auth
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _configuration;
+
         public TokenService(IConfiguration config)
         {
             _configuration = config;
@@ -21,10 +21,8 @@ namespace BankingSystem.Infrastructure.Auth
         public string GenerateAccessToken(string userEmail, string role)
         {
             var handler = new JwtSecurityTokenHandler();
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JwtSettings:PrivateKey"]!));
-            var credentials = new SigningCredentials(
-                key,
-                SecurityAlgorithms.HmacSha256Signature);
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JwtSettings:PrivateKey"]));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
             if (!int.TryParse(_configuration["JwtSettings:AccessTokenExpirationMinutes"], out int accessTokenValidity))
             {
                 throw new InvalidOperationException("Invalid AccessTokenValidityInMinutes value in configuration!");
@@ -42,6 +40,7 @@ namespace BankingSystem.Infrastructure.Auth
             var token = handler.CreateToken(tokenDescriptor);
             return handler.WriteToken(token);
         }
+
         public RefreshToken GenerateRefreshToken(string identityUserId, string deviceId)
         {
             string refreshToken;
@@ -51,10 +50,12 @@ namespace BankingSystem.Infrastructure.Auth
                 rng.GetBytes(randomNumber);
                 refreshToken =  Convert.ToBase64String(randomNumber);
             }
+
             if (!int.TryParse(_configuration["JwtSettings:RefreshTokenExpirationDays"], out int refreshTokenValidity))
             {
                 throw new InvalidOperationException("Invalid RefreshTokenExpirationDays value in configuration!");
             }
+
             var refreshTokenModel = new RefreshToken()
             {
                 IdentityUserId = identityUserId,
@@ -63,17 +64,23 @@ namespace BankingSystem.Infrastructure.Auth
                 DeviceId = deviceId,
                 CreatedAt = DateTime.UtcNow
             };
+
             return refreshTokenModel;
         }
+
         public string RenewAccessToken(string oldAccessToken)
         {
             var claimsPrincipal = GetPrincipalFromOldAccessToken(oldAccessToken);
-            if (claimsPrincipal == null) return null;
+            if (claimsPrincipal is null)
+            {
+                return null;
+            }
 
             var emailClaim = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
             var roleClaim = claimsPrincipal.FindFirstValue(ClaimTypes.Role);
             return GenerateAccessToken(emailClaim, roleClaim);
         }
+
         #region helperMethods
         private static ClaimsIdentity GenerateClaims(string userEmail, string role)
         {
@@ -83,10 +90,11 @@ namespace BankingSystem.Infrastructure.Auth
 
             return claims;
         }
+
         private ClaimsPrincipal GetPrincipalFromOldAccessToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JwtSettings:PrivateKey"]!));
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JwtSettings:PrivateKey"]));
             
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -100,7 +108,7 @@ namespace BankingSystem.Infrastructure.Auth
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
 
             var jwtSecurityToken = securityToken as JwtSecurityToken;
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            if (jwtSecurityToken is null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new SecurityTokenException("Invalid token");
             }
