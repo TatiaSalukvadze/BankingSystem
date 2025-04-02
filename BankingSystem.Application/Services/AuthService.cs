@@ -7,7 +7,6 @@ using BankingSystem.Contracts.DTOs.Auth;
 using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.Response;
 
-
 namespace BankingSystem.Application.Services
 {
     public class AuthService : IAuthService
@@ -135,7 +134,7 @@ namespace BankingSystem.Application.Services
             var result = await _userManager.ResetPasswordAsync(user, resetPasswordDTO.Token, resetPasswordDTO.Password);
             if (!result.Succeeded)
             {
-                return response.Set(false, "Password reset failed! Please try again.", 400);
+                return response.Set(false, "Password reset failed, please try again!", 400);
             }
 
             return response.Set(true, "Password reset successful!", 200);
@@ -144,13 +143,10 @@ namespace BankingSystem.Application.Services
         public async Task<Response<object>> RefreshTokensAsync(RefreshTokensDTO refreshTokensDto)
         {
             var response = new Response<object>();
-
             var refreshToken = await _unitOfWork.RefreshTokenRepository.GetRefreshTokenAsync(refreshTokensDto.RefreshToken);
-
-            if (refreshToken is null || refreshToken.ExpirationDate <= DateTime.UtcNow
-                || refreshTokensDto.DeviceId != refreshToken.DeviceId)
+            if (refreshToken is null || refreshToken.ExpirationDate <= DateTime.UtcNow || refreshTokensDto.DeviceId != refreshToken.DeviceId)
             {
-                return response.Set(false, "Provided refresh token is invalid!",null, 400);
+                return response.Set(false, "Provided refresh token is invalid!", null, 400);
             }
 
             var newAccessToken = _tokenService.RenewAccessToken(refreshTokensDto.AccessToken);
@@ -160,7 +156,6 @@ namespace BankingSystem.Application.Services
             }
 
             var newRefreshToken = _tokenService.GenerateRefreshToken(refreshToken.IdentityUserId, refreshTokensDto.DeviceId);
-
             var refreshTokenSaved = await _unitOfWork.RefreshTokenRepository.SaveRefreshTokenAsync(newRefreshToken);
             if (!refreshTokenSaved)
             {
@@ -173,28 +168,20 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "Failed to delete old refresh token!",null, 400);
             }
 
-            return response.Set(true, "new access token and refresh token retrieved!", new { newAccessToken, newRefreshToken = newRefreshToken.Token }, 200);
-
+            return response.Set(true, "New access token and refresh token retrieved!", new { newAccessToken, newRefreshToken = newRefreshToken.Token }, 200);
         }
 
         public async Task<SimpleResponse> LogoutAsync(LogoutDTO logoutDto, string userEmail)
         {
             var response = new SimpleResponse();
-            if (string.IsNullOrEmpty(logoutDto.RefreshToken))
-            {
-                return response.Set(false, "Incorrect refresh token provided!", 400);
-            }
-
             var refreshToken = await _unitOfWork.RefreshTokenRepository.GetRefreshTokenAsync(logoutDto.RefreshToken);
-
             if (refreshToken is null)
             {
                 return response.Set(false, "Provided refresh token is invalid!", 400);
             }
 
             var user = await _userManager.FindByEmailAsync(userEmail);
-            if (user is null || refreshToken.IdentityUserId != user.Id
-                || logoutDto.DeviceId != refreshToken.DeviceId)
+            if (user is null || refreshToken.IdentityUserId != user.Id || logoutDto.DeviceId != refreshToken.DeviceId)
             {
                 return response.Set(false, "You are not allowed to logout!", 400);
             }

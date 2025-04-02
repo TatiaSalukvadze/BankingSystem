@@ -57,12 +57,14 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, "You don't have any accounts!", null, 400);
             }
+
             var offset = (page - 1) * perPage;
             var paginatedAccounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email, offset, perPage);
             if (paginatedAccounts is null || paginatedAccounts.Count == 0)
             {
                 return response.Set(false, "No accounts found!", null, 404);
             }
+
             int totalPages = (int)Math.Ceiling((double)accountsCount / perPage);
             var pagingResponse = new PagingResponseDTO<SeeAccountsDTO>()
             {
@@ -83,22 +85,22 @@ namespace BankingSystem.Application.Services
             bool exists = await _unitOfWork.AccountRepository.IBANExists(IBAN);
             if (!exists)
             {
-                return response.Set(false, "Account not found.", 404);
+                return response.Set(false, "Account not found!", 404);
             }
 
             var balance = await _unitOfWork.AccountRepository.GetBalanceByIBANAsync(IBAN);
             if (balance > 0)
             {
-                return response.Set(false, "Account cannot be deleted while it has a balance.", 400);
+                return response.Set(false, "Account cannot be deleted while it has a balance!", 400);
             }
 
             bool deleted = await _unitOfWork.AccountRepository.DeleteAccountByIBANAsync(IBAN);
             if (!deleted)
             {
-                return response.Set(false, "Failed to delete account.", 400);
+                return response.Set(false, "Failed to delete account!", 400);
             }
 
-            return response.Set(true, "Account deleted successfully.", 200);
+            return response.Set(true, "Account deleted successfully!", 200);
         }
 
         #region transactionHelpers
@@ -118,8 +120,8 @@ namespace BankingSystem.Application.Services
             if (fromToAccounts.From is null)
             {
                 return response.Set(false, $"You don't have account with IBAN: {fromIBAN} check well!", null, 404);
-
             }
+
             if (isSelfTransfer)
             {
                 fromToAccounts.To = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(toIBAN, email);
@@ -161,10 +163,10 @@ namespace BankingSystem.Application.Services
             bool isBalanceUpdated = await _unitOfWork.AccountRepository.UpdateAccountAmountAsync(accountId, -amountToDeduct);
             if (!isBalanceUpdated)
             {
-                return response.Set(false, "Failed to update account balance.", 400);
+                return response.Set(false, "Failed to update account balance!", 400);
             }
 
-            return response.Set(true, "Balance updated successfully.", 200);
+            return response.Set(true, "Balance updated successfully!", 200);
         }
         #endregion
     }

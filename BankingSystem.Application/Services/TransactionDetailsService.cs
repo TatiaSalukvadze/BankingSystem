@@ -67,10 +67,10 @@ namespace BankingSystem.Application.Services
             List<BankProfitDTO> profitData = await _unitOfWork.TransactionDetailsRepository.GetBankProfitByTimePeriodAsync();
             if (profitData is null)
             {
-                return response.Set(false, "No bank profit data found.", null, 404);
+                return response.Set(false, "No bank profit data found!", null, 404);
             }
 
-            return response.Set(true, "Bank profit retrieved successfully.", profitData, 200);
+            return response.Set(true, "Bank profit retrieved successfully!", profitData, 200);
         }
 
         public async Task<Response<Dictionary<string, decimal>>> AverageBankProfitAsync()
@@ -104,10 +104,10 @@ namespace BankingSystem.Application.Services
             var rawData = await _unitOfWork.TransactionDetailsRepository.GetTotalAtmWithdrawalsAsync();
             if (rawData is null)
             {
-                return response.Set(false, "No ATM withdrawal data found.", null, 404);
+                return response.Set(false, "No ATM withdrawal data found!", null, 404);
             }
 
-            return response.Set(true, "ATM withdrawals data retrieved successfully.", rawData, 200);
+            return response.Set(true, "ATM withdrawals data retrieved successfully!", rawData, 200);
         }
 
         public async Task<Response<IncomeExpenseDTO>> TotalIncomeExpenseAsync(DateRangeDTO dateRangeDto, string email)
@@ -173,45 +173,43 @@ namespace BankingSystem.Application.Services
             var accountInfo = await _unitOfWork.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
             if (accountInfo == null)
             {
-                return response.Set(false, "Unable to retrieve account details.", null, 400);
+                return response.Set(false, "Unable to retrieve account details!", null, 400);
             }
 
             decimal accountBalance = accountInfo.Amount;
             decimal totalWithdrawnIn24Hours = accountInfo.WithdrawnAmountIn24Hours;
             string accountCurrency = accountInfo.Currency;
       
-            decimal convertedAmount = withdrawalAmount;
+            decimal amountToDeduct = withdrawalAmount;
             if (withdrawalCurrency != accountCurrency)
             {
                 decimal exchangeRate = await _exchangeRateService.GetCurrencyRateAsync(withdrawalCurrency, accountCurrency);
-
                 if (exchangeRate <= 0)
                 {
-                    return response.Set(false, "Currency conversion failed.", null, 400);
+                    return response.Set(false, "Currency conversion failed!", null, 400);
                 }
-
-                convertedAmount *= exchangeRate;
+                amountToDeduct *= exchangeRate;
             }
 
             decimal feePercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
-            decimal bankProfit = convertedAmount * (feePercent / 100);
-            decimal totalAmountToDeduct = convertedAmount + bankProfit;
+            decimal bankProfit = amountToDeduct * (feePercent / 100);
+            decimal totalAmountToDeduct = amountToDeduct + bankProfit;
             if (accountBalance < totalAmountToDeduct)
             {
-                return response.Set(false, "You don't have enough money", null, 400);
+                return response.Set(false, "You don't have enough money!", null, 400);
             }
 
             decimal newTotalWithdrawnIn24Hours = totalWithdrawnIn24Hours + totalAmountToDeduct;
             decimal atmWithdrawalLimit = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalLimitForDay");
             if (newTotalWithdrawnIn24Hours > atmWithdrawalLimit)
             {
-                return response.Set(false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours.", null, 400);
+                return response.Set(false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours!", null, 400);
             }
 
             var withdrawalData = new AtmWithdrawalCalculationDTO
             {
-                Fee = bankProfit,
-                Balance = convertedAmount,
+                BankProfit = bankProfit,
+                Amount = amountToDeduct,
                 Currency = accountCurrency,
                 TotalAmountToDeduct = totalAmountToDeduct
             };

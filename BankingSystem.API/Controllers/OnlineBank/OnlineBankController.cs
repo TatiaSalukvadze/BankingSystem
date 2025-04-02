@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.OnlineBank
 {
-    [Authorize(policy: "OperatorOnly")]
+    //[Authorize(policy: "OperatorOnly")]
     public class OnlineBankController : WrapperController
     {
         private readonly IPersonService _personService;

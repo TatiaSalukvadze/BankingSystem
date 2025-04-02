@@ -173,7 +173,7 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "Card is expired!", null, 400);
             }
 
-            return response.Set(true, "Card validated", card, 200);
+            return response.Set(true, "Card validated!", card, 200);
         }
 
         private bool CheckCardExpired(string expirationDate)

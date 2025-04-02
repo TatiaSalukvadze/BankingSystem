@@ -89,7 +89,7 @@ namespace BankingSystem.Application.FacadeServices
                 return updateAccountResponse;
             }
 
-            return await _transactionDetailsService.CreateTransactionAsync(withdrawalData.Fee, withdrawalData.Balance, accountId,
+            return await _transactionDetailsService.CreateTransactionAsync(withdrawalData.BankProfit, withdrawalData.Amount, accountId,
                 accountId, withdrawalData.Currency, IsATM:true);
         }
     }
