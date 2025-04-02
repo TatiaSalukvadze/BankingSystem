@@ -46,7 +46,7 @@ namespace BankingSystem.Application.Services
             transaction.Id = insertedId;
             _unitOfWork.SaveChanges();
 
-            return response.Set(true, "Transaction was successfull!", 200);
+            return response.Set(true, "Transaction was successful!", 200);
         }
         
         public async Task<Response<TransactionCountDTO>> NumberOfTransactionsAsync()
@@ -55,10 +55,10 @@ namespace BankingSystem.Application.Services
             TransactionCountDTO transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsAsync();
             if (transactionCountDTO is null)
             {
-                return response.Set(false, "Transaction Count couldn't be retreived!", null, 404); 
+                return response.Set(false, "Transaction Count couldn't be retrieved!", null, 404); 
             }
 
-            return response.Set(true, "Transaction Count retreived!", transactionCountDTO, 200);
+            return response.Set(true, "Transaction Count retrieved!", transactionCountDTO, 200);
         }
 
         public async Task<Response<List<BankProfitDTO>>> BankProfitByTimePeriodAsync()
@@ -92,10 +92,10 @@ namespace BankingSystem.Application.Services
             List<TransactionCountChartDTO> transactionCountDTO = await _unitOfWork.TransactionDetailsRepository.NumberOfTransactionsLastMonthAsync();
             if (transactionCountDTO is null)
             {
-                return response.Set(false, "Transaction Count couldn't be retreived!", null, 404);
+                return response.Set(false, "Transaction Count couldn't be retrieved!", null, 404);
             }
 
-            return response.Set(true, "Transaction Count retreived!", transactionCountDTO, 200);
+            return response.Set(true, "Transaction Count retrieved!", transactionCountDTO, 200);
         }
 
         public async Task<Response<List<TotalAtmWithdrawalDTO>>> TotalAtmWithdrawalsAsync()
@@ -121,7 +121,7 @@ namespace BankingSystem.Application.Services
             }
             if(dateRangeDto.ToDate <= dateRangeDto.FromDate)
             {
-                return response.Set(false, "Provide correct time, toDate cannot be yearlier than fromDate!", null, 400);
+                return response.Set(false, "Provide correct time, toDate cannot be earlier than fromDate!", null, 400);
             }
 
             var income = await _unitOfWork.TransactionDetailsRepository.GetTotalIncomeAsync(dateRangeDto.FromDate, dateRangeDto.ToDate, email);
@@ -133,7 +133,7 @@ namespace BankingSystem.Application.Services
                 Expense = expense
             };
 
-            return response.Set(true, "Income and Expense retreived!", incomeExpense, 200);
+            return response.Set(true, "Income and Expense retrieved!", incomeExpense, 200);
         }
 
         #region transactionHelpers
@@ -155,8 +155,8 @@ namespace BankingSystem.Application.Services
             }
             else
             {
-                fee = _configuration.GetValue<decimal>("TransactionFees:StandartTransferPercent");
-                extraFeeValue = _configuration.GetValue<decimal>("TransactionFees:StandartTransferValue");
+                fee = _configuration.GetValue<decimal>("TransactionFees:StandardTransferPercent");
+                extraFeeValue = _configuration.GetValue<decimal>("TransactionFees:StandardTransferValue");
             }
 
             var transferAmounts = new TransferAmountCalculationDTO();

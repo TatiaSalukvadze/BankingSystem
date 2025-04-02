@@ -9,7 +9,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
     public class RefreshTokenRepository : IRefreshTokenRepository
     {
-        private SqlConnection _connection;
+        private readonly SqlConnection _connection;
         private IDbTransaction _transaction;
 
         public RefreshTokenRepository(SqlConnection connection)
@@ -31,7 +31,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                      VALUES (@IdentityUserId, @Token, @ExpirationDate, @DeviceId, @CreatedAt)";
                 addedTokenId = await _connection.ExecuteScalarAsync<int>(sql, refreshToken);
             }
-            return addedTokenId > 0? true : false;
+            return addedTokenId > 0;
         }
 
         public async Task<RefreshToken> GetRefreshTokenAsync(string token)

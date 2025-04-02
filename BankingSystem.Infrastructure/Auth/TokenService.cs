@@ -65,9 +65,9 @@ namespace BankingSystem.Infrastructure.Auth
             };
             return refreshTokenModel;
         }
-        public string RenewAccessToken(string oldAcessToken)
+        public string RenewAccessToken(string oldAccessToken)
         {
-            var claimsPrincipal = GetPrincipalFromOldAcessToken(oldAcessToken);
+            var claimsPrincipal = GetPrincipalFromOldAccessToken(oldAccessToken);
             if (claimsPrincipal == null) return null;
 
             var emailClaim = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
@@ -83,7 +83,7 @@ namespace BankingSystem.Infrastructure.Auth
 
             return claims;
         }
-        private ClaimsPrincipal GetPrincipalFromOldAcessToken(string token)
+        private ClaimsPrincipal GetPrincipalFromOldAccessToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JwtSettings:PrivateKey"]!));

@@ -173,7 +173,7 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "Failed to delete old refresh token!",null, 400);
             }
 
-            return response.Set(true, "new accesss token and refresh token retreived!", new { newAccessToken, newRefreshToken = newRefreshToken.Token }, 200);
+            return response.Set(true, "new access token and refresh token retrieved!", new { newAccessToken, newRefreshToken = newRefreshToken.Token }, 200);
 
         }
 
@@ -193,7 +193,7 @@ namespace BankingSystem.Application.Services
             }
 
             var user = await _userManager.FindByEmailAsync(userEmail);
-            if (refreshToken.IdentityUserId != user.Id
+            if (user is null || refreshToken.IdentityUserId != user.Id
                 || logoutDto.DeviceId != refreshToken.DeviceId)
             {
                 return response.Set(false, "You are not allowed to logout!", 400);

@@ -13,7 +13,7 @@ namespace DbCreation.DbSetup
         private readonly IDbConnection _serverConnection;
         private readonly IDbConnection _dbConnection;
         private readonly ILogger _logger;
-        private string _basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName, "Queries");
+        private readonly string _basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName, "Queries");
         
         public DbSetup(ApplicationDbContext dbContext, IDbConnectionFactory dbConnectionFactory, ILogger<DbSetup> logger)
         {
@@ -56,7 +56,7 @@ namespace DbCreation.DbSetup
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    _logger.LogError("exception happened during db setupt: {ExceptionMessage},{StackTrace}", ex.Message, ex.StackTrace);
+                    _logger.LogError("exception happened during db setup: {ExceptionMessage},{StackTrace}", ex.Message, ex.StackTrace);
                 }
             }
         }

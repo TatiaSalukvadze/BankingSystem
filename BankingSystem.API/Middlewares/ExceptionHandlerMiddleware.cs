@@ -19,12 +19,12 @@
             }
             catch (Exception ex)
             {
-                _logger.LogError("An unhandled exception occured before reaching controller or while inner exception handling: {message}, {type}", ex.Message, ex.GetType().Name);
+                _logger.LogError("An unhandled exception occurred before reaching controller or while inner exception handling: {message}, {type}", ex.Message, ex.GetType().Name);
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/json";
 
-                var errorResponse = new { Message = $"An unhandled exception occured before reaching controller or while inner exception handling: {ex.Message}" };
+                var errorResponse = new { Message = $"An unhandled exception occurred before reaching controller or while inner exception handling: {ex.Message}" };
 
                 await context.Response.WriteAsJsonAsync(errorResponse);
             }

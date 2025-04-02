@@ -10,7 +10,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
     public class TransactionDetailsRepository : ITransactionDetailsRepository
     {
-        private SqlConnection _connection;
+        private readonly SqlConnection _connection;
         private IDbTransaction _transaction;
 
         public TransactionDetailsRepository(SqlConnection connection)
@@ -57,7 +57,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 var result = await _connection.QueryAsync<BankProfitDTO>(sql);
                 return result.ToList();
             }
-            return new List<BankProfitDTO>();
+            return [];
         }
 
         public async Task<List<TotalAtmWithdrawalDTO>> GetTotalAtmWithdrawalsAsync()
@@ -74,7 +74,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 var result = await _connection.QueryAsync<TotalAtmWithdrawalDTO>(sql);
                 return result.ToList();
             }
-            return new List<TotalAtmWithdrawalDTO>();
+            return [];
         }
 
         public async Task<Dictionary<string, decimal>> AverageBankProfitAsync()

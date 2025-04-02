@@ -1,5 +1,4 @@
 ﻿using BankingSystem.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 
 namespace BankingSystem.Contracts.Interfaces
 {
@@ -7,6 +6,6 @@ namespace BankingSystem.Contracts.Interfaces
     {
         string GenerateAccessToken(string userEmail, string role);
         RefreshToken GenerateRefreshToken(string identityUserId, string deviceId);
-        string RenewAccessToken(string oldAcessToken);
+        string RenewAccessToken(string oldAccessToken);
     }
 }

@@ -22,8 +22,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
             var response = await _authService.LoginPersonAsync(loginDto);
             return new ObjectResult(response);
         }
-
-        //https://fusionauth.io/dev-tools/url-encoder-decoder used for decode
+        
         [HttpGet("EmailConfirmation")]
         public async Task<IActionResult> EmailConfirmation([FromQuery] EmailConfirmationDTO emailConfirmationDto)
         {

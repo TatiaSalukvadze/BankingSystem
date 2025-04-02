@@ -20,7 +20,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
 
         public async Task<decimal> GetCurrencyRateAsync(string fromCurrency, string toCurrency)
         {
-            string url = _currencyApiSettings.BaseUrl + _currencyApiSettings.ApiKey + "/latest/" + fromCurrency;
+            string url = $"{_currencyApiSettings.BaseUrl}{_currencyApiSettings.ApiKey}/latest/{fromCurrency}";
             var result = await _httpClient.GetFromJsonAsync<JsonElement>(url);
 
             if(result.TryGetProperty("conversion_rates", out JsonElement conversionRates) 
@@ -36,4 +36,3 @@ namespace BankingSystem.Infrastructure.ExternalServices
         }
     }
 }
-//Example Request: https://v6.exchangerate-api.com/v6/2cd5220a1105f2545898dec2/latest/USD

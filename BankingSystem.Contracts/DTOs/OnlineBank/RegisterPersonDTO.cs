@@ -4,7 +4,6 @@ namespace BankingSystem.Contracts.DTOs.OnlineBank
 {
     public class RegisterPersonDTO
     {
-
         [Required]
         public string Name { get; set; }
 

@@ -26,7 +26,7 @@ namespace BankingSystem.Application.BackgroundServices
                     using var scope = _serviceScopeFactory.CreateScope();
                     var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     int rowsAffected = await unitOfWork.RefreshTokenRepository.DeleteExpiredRefreshTokensAsync();
-                    _logger.LogInformation($"CleanupExpiredTokensService deleted {rowsAffected} expired tokens.");
+                    _logger.LogInformation("CleanupExpiredTokensService deleted {rowsAffected} expired tokens.", rowsAffected);
                 }
                 catch(Exception ex)
                 {

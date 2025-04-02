@@ -8,7 +8,7 @@ namespace BankingSystem.Application.BackgroundServices
     public class DataSeedHostedService : IHostedService
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private ILogger<DataSeedHostedService> _logger;
+        private readonly ILogger<DataSeedHostedService> _logger;
 
         public DataSeedHostedService(IServiceScopeFactory serviceScopeFactory, ILogger<DataSeedHostedService> logger)
         {
@@ -27,7 +27,7 @@ namespace BankingSystem.Application.BackgroundServices
                 await seeder.SeedDataAsync();
             }
             catch (Exception ex) {
-                _logger.LogError("Problem happended during seeding initial data: {message} {type}", ex.Message, ex.GetType().Name);
+                _logger.LogError("Problem happened during seeding initial data: {message} {type}", ex.Message, ex.GetType().Name);
             }
         }
 

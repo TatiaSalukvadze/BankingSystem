@@ -2,7 +2,6 @@
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Response;
 using BankingSystem.Domain.Entities;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.Contracts.Interfaces.IServices
 {
@@ -10,7 +9,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     {
         Task<Response<Account>> CreateAccountAsync(CreateAccountDTO createAccountDto);
         Task<Response<PagingResponseDTO<SeeAccountsDTO>>> SeeAccountsAsync(string email, int page, int perPage);
-        Task<SimpleResponse> DeleteAccountAsync(string iban);
+        Task<SimpleResponse> DeleteAccountAsync(string IBAN);
         Task<Response<TransferAccountsDTO>> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
             string toIBAN, string email, bool isSelfTransfer);
         Task<SimpleResponse> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,

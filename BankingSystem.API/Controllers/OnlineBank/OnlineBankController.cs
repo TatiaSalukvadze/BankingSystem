@@ -1,10 +1,11 @@
 ﻿using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Contracts.Interfaces.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystem.API.Controllers.OnlineBank
 {
-    //[Authorize(policy: "OperatorOnly")]
+    [Authorize(policy: "OperatorOnly")]
     public class OnlineBankController : WrapperController
     {
         private readonly IPersonService _personService;
@@ -40,9 +41,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         }
 
         [HttpDelete("Account")]
-        public async Task<IActionResult> DeleteAccount(string iban)
+        public async Task<IActionResult> DeleteAccount([FromForm] string IBAN)
         {
-            var response = await _accountService.DeleteAccountAsync(iban);
+            var response = await _accountService.DeleteAccountAsync(IBAN);
             return new ObjectResult(response);
         }
 

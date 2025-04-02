@@ -77,22 +77,22 @@ namespace BankingSystem.Application.Services
             return response.Set(true, "Accounts retrieved successfully!", pagingResponse, 200);
         }
 
-        public async Task<SimpleResponse> DeleteAccountAsync(string iban)
+        public async Task<SimpleResponse> DeleteAccountAsync(string IBAN)
         {
             var response = new SimpleResponse();
-            bool exists = await _unitOfWork.AccountRepository.IBANExists(iban);
+            bool exists = await _unitOfWork.AccountRepository.IBANExists(IBAN);
             if (!exists)
             {
                 return response.Set(false, "Account not found.", 404);
             }
 
-            var balance = await _unitOfWork.AccountRepository.GetBalanceByIBANAsync(iban);
+            var balance = await _unitOfWork.AccountRepository.GetBalanceByIBANAsync(IBAN);
             if (balance > 0)
             {
                 return response.Set(false, "Account cannot be deleted while it has a balance.", 400);
             }
 
-            bool deleted = await _unitOfWork.AccountRepository.DeleteAccountByIBANAsync(iban);
+            bool deleted = await _unitOfWork.AccountRepository.DeleteAccountByIBANAsync(IBAN);
             if (!deleted)
             {
                 return response.Set(false, "Failed to delete account.", 400);
@@ -111,8 +111,10 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "You can't transfer to same account!", null, 400);
             }
 
-            var fromToAccounts = new TransferAccountsDTO();
-            fromToAccounts.From = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email);
+            var fromToAccounts = new TransferAccountsDTO
+            {
+                From = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email)
+            };
             if (isSelfTransfer)
             {
                 fromToAccounts.To = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(toIBAN, email);

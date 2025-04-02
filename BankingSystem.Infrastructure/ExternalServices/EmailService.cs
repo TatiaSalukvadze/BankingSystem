@@ -10,7 +10,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
     public class EmailService : IEmailService
     {
         private readonly EmailSettings _emailSettings;
-        private string _templateBasePath;
+        private readonly string _templateBasePath;
 
         public EmailService(IOptions<EmailSettings> emailSettings)
         {
