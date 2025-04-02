@@ -25,7 +25,7 @@ namespace BankingSystem.Application.Services
         {
             var response = new Response<CreateCardDTO>();
             var account = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(createCardDto.IBAN);
-            if (account == null)
+            if (account is null)
             {
                 return response.Set(false, "Account does not exist in the system!", null, 404);
             }
@@ -70,7 +70,7 @@ namespace BankingSystem.Application.Services
 
             var offset = (page - 1) * perPage;
             var paginatedCards = await _unitOfWork.CardRepository.GetCardsForPersonAsync(email, offset, perPage);
-            if (paginatedCards == null || paginatedCards.Count == 0)
+            if (paginatedCards is null || paginatedCards.Count == 0)
             {
                 return response.Set(false, "Cards weren't found!", null, 404);
             }
@@ -109,10 +109,10 @@ namespace BankingSystem.Application.Services
             var balanceInfo = await _unitOfWork.CardRepository.GetBalanceAsync(encryptedCardNumber, hashedPin);
             if (balanceInfo is null || balanceInfo.Currency == 0)
             {
-                return response.Set(false, "Unable to retrieve balance.", null, 400);
+                return response.Set(false, "Unable to retrieve balance!", null, 400);
             }
 
-            return response.Set(true, "Balance retrieved successfully.", balanceInfo, 200);
+            return response.Set(true, "Balance retrieved successfully!", balanceInfo, 200);
         }
 
         public async Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardPINDto)
@@ -184,15 +184,14 @@ namespace BankingSystem.Application.Services
             var monthNow = DateTime.Now.Month;
             var yearNow = DateTime.Now.Year % 100;
 
-            if (yearNow < cardYear)
+            bool expired = true;
+            if (yearNow < cardYear ||
+                (yearNow == cardYear && monthNow < cardMonth))
             {
-                return false;
+                expired = false;
             }
-            else if (yearNow == cardYear && monthNow > cardMonth)
-            {
-                return false;
-            }
-            return true;
+            
+            return expired;
         }
     }
 }

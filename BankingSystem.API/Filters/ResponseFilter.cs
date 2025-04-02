@@ -33,7 +33,7 @@ namespace BankingSystem.API.Filters
                 if (success is null || statusCode is null ||
                     messageProperty is null || dataProperty is null)
                 {
-                    context.Result = new ObjectResult(new { Message = "Result values were not retreived!" })
+                    context.Result = new ObjectResult(new { Message = "Result values were not retrieved!" })
                     { StatusCode = 500 };
                 }
                 else

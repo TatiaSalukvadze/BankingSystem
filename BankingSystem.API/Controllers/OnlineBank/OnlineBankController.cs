@@ -27,7 +27,7 @@ namespace BankingSystem.API.Controllers.OnlineBank
         {
             var response = await _authService.RegisterPersonAsync(registerDto);        
             if (!response.Success) {
-                return BadRequest(response.Message);
+                return new ObjectResult(response);
             }
             var finalResponse = await _personService.RegisterCustomPersonAsync(registerDto, response.Data);
             return new ObjectResult(finalResponse);

@@ -31,13 +31,13 @@ namespace BankingSystem.Application.Services
         public async Task<Response<object>> LoginPersonAsync(LoginDTO loginDto)
         {
             var response = new Response<object>();
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username!.ToLower());
-            if (user == null)
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+            if (user is null)
             {
                 return response.Set(false, "Invalid username!", null, 400);
             }
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password!, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
             if (!result.Succeeded)
             {
                 return response.Set(false, "Invalid username or password!", null, 400);
@@ -46,7 +46,7 @@ namespace BankingSystem.Application.Services
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? "";
 
-            var acessToken = _tokenService.GenerateAccessToken(user.Email, role);
+            var accessToken = _tokenService.GenerateAccessToken(user.Email, role);
             var refreshToken = _tokenService.GenerateRefreshToken(user.Id, loginDto.DeviceId);
 
             var refreshTokenSaved = await _unitOfWork.RefreshTokenRepository.SaveRefreshTokenAsync(refreshToken);
@@ -54,14 +54,14 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, "Refresh Token was not saved!", null, 400);
             }
-            return response.Set(true, "Login successful!", new { acessToken, refreshToken = refreshToken.Token }, 200);
+            return response.Set(true, "Login successful!", new { accessToken, refreshToken = refreshToken.Token }, 200);
         }
 
         public async Task<Response<string>> RegisterPersonAsync(RegisterPersonDTO registerDto)
         {
             var response = new Response<string>();
             var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
-            if (existingUser != null)
+            if (existingUser is not null)
             {
                 return response.Set(false, "A user with this email already exists!", null, 409);
             }
@@ -94,7 +94,7 @@ namespace BankingSystem.Application.Services
         {
             var response = new SimpleResponse();
             var user = await _userManager.FindByEmailAsync(emailConfirmationDto.Email);
-            if (user == null)
+            if (user is null)
             {
                 return response.Set(false, "Email confirmation request is invalid, user was not found!", 404);
             }
@@ -112,7 +112,7 @@ namespace BankingSystem.Application.Services
         {
             var response = new SimpleResponse();
             var user = await _userManager.FindByEmailAsync(forgotPasswordDTO.Email);
-            if (user == null)
+            if (user is null)
             {
                 return response.Set(false, "User not found!", 404);
             }
@@ -127,7 +127,7 @@ namespace BankingSystem.Application.Services
         {
             var response = new SimpleResponse();
             var user = await _userManager.FindByEmailAsync(resetPasswordDTO.Email);
-            if (user == null)
+            if (user is null)
             {
                 return response.Set(false, "User not found!", 404);
             }
@@ -167,8 +167,8 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "Refresh Token was not saved!", null, 400);
             }
 
-            var deletedOldRefreshToken = await _unitOfWork.RefreshTokenRepository.DeleteRefreshTokenAsync(refreshToken.Id);
-            if (!deletedOldRefreshToken)
+            var oldRefreshTokenDeleted = await _unitOfWork.RefreshTokenRepository.DeleteRefreshTokenAsync(refreshToken.Id);
+            if (!oldRefreshTokenDeleted)
             {
                 return response.Set(false, "Failed to delete old refresh token!",null, 400);
             }

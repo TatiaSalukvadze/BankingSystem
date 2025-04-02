@@ -77,7 +77,7 @@ namespace BankingSystem.Application.Services
         {
             var response = new Response<Dictionary<string, decimal>>();
             var averageBankProfits = await _unitOfWork.TransactionDetailsRepository.AverageBankProfitAsync();
-            if (averageBankProfits == null || averageBankProfits.Count == 0)
+            if (averageBankProfits is null || averageBankProfits.Count == 0)
             {
                 return response.Set(false, "Bank profit couldn't be retrieved!", null, 404);
             }
@@ -147,20 +147,20 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "One of the account has incorrect currency!", null, 400); 
             }
 
-            decimal fee;
-            decimal extraFeeValue = 0;
+            decimal feePercent;
+            decimal extraFeeAmount = 0;
             if (isSelfTransfer)
             {
-                fee = _configuration.GetValue<decimal>("TransactionFees:SelfTransferPercent");
+                feePercent = _configuration.GetValue<decimal>("TransactionFees:SelfTransferPercent");
             }
             else
             {
-                fee = _configuration.GetValue<decimal>("TransactionFees:StandardTransferPercent");
-                extraFeeValue = _configuration.GetValue<decimal>("TransactionFees:StandardTransferValue");
+                feePercent = _configuration.GetValue<decimal>("TransactionFees:StandardTransferPercent");
+                extraFeeAmount = _configuration.GetValue<decimal>("TransactionFees:StandardTransferValue");
             }
 
             var transferAmounts = new TransferAmountCalculationDTO();
-            transferAmounts.BankProfit = amountToTransfer * fee / 100 + extraFeeValue;
+            transferAmounts.BankProfit = amountToTransfer * feePercent / 100 + extraFeeAmount;
             transferAmounts.AmountFromAccount = amountToTransfer + transferAmounts.BankProfit;
             transferAmounts.AmountToAccount = amountToTransfer * currencyRate;
 
@@ -193,9 +193,9 @@ namespace BankingSystem.Application.Services
                 convertedAmount *= exchangeRate;
             }
 
-            decimal atmWithdrawalPercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
-            decimal fee = convertedAmount * (atmWithdrawalPercent / 100);
-            decimal totalAmountToDeduct = convertedAmount + fee;
+            decimal feePercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
+            decimal bankProfit = convertedAmount * (feePercent / 100);
+            decimal totalAmountToDeduct = convertedAmount + bankProfit;
             if (accountBalance < totalAmountToDeduct)
             {
                 return response.Set(false, "You don't have enough money", null, 400);
@@ -210,7 +210,7 @@ namespace BankingSystem.Application.Services
 
             var withdrawalData = new AtmWithdrawalCalculationDTO
             {
-                Fee = fee,
+                Fee = bankProfit,
                 Balance = convertedAmount,
                 Currency = accountCurrency,
                 TotalAmountToDeduct = totalAmountToDeduct

@@ -59,7 +59,7 @@ namespace BankingSystem.Application.Services
             }
             var offset = (page - 1) * perPage;
             var paginatedAccounts = await _unitOfWork.AccountRepository.SeeAccountsByEmail(email, offset, perPage);
-            if (paginatedAccounts == null || paginatedAccounts.Count == 0)
+            if (paginatedAccounts is null || paginatedAccounts.Count == 0)
             {
                 return response.Set(false, "No accounts found!", null, 404);
             }
@@ -115,6 +115,11 @@ namespace BankingSystem.Application.Services
             {
                 From = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(fromIBAN, email)
             };
+            if (fromToAccounts.From is null)
+            {
+                return response.Set(false, $"You don't have account with IBAN: {fromIBAN} check well!", null, 404);
+
+            }
             if (isSelfTransfer)
             {
                 fromToAccounts.To = await _unitOfWork.AccountRepository.FindAccountByIBANandEmailAsync(toIBAN, email);
@@ -123,9 +128,9 @@ namespace BankingSystem.Application.Services
             {
                 fromToAccounts.To = await _unitOfWork.AccountRepository.FindAccountByIBANAsync(toIBAN);
             }
-            if (fromToAccounts.From is null || fromToAccounts.To is null)
+            if (fromToAccounts.To is null)
             {
-                return response.Set(false, "There is no account for one or both provided IBANs, check well!", null, 404);
+                return response.Set(false, $"There is no account with IBAN: {toIBAN}, check well!", null, 404);
             }
 
             return response.Set(true, "Accounts validated!", fromToAccounts, 200);
