@@ -14,7 +14,7 @@ namespace BankingSystem.Contracts.DTOs.UserBanking
         public string ToIBAN { get; set; }
 
         [Required]
-        [GreaterThanOrEqualToZero(ErrorMessage = "თანხა უნდა იყოს 0 ან 0-ზე მეტი.")]
+        [GreaterThanZero(ErrorMessage = "თანხა უნდა იყოს 0-ზე მეტი.")]
         public decimal Amount { get; set; }
     }
 }

@@ -6,10 +6,13 @@ namespace BankingSystem.Contracts.DTOs.Auth
     {
         [Required]
         public string AccessToken { get; set; }
+
         [Required]
+        [MaxLength(450)]
         public string RefreshToken { get; set; }
 
         [Required]
+        [MaxLength(450)]
         public string DeviceId { get; set; }
     }
 }

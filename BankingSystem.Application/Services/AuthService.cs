@@ -174,6 +174,11 @@ namespace BankingSystem.Application.Services
         public async Task<SimpleResponse> LogoutAsync(LogoutDTO logoutDto, string userEmail)
         {
             var response = new SimpleResponse();
+            //if (string.IsNullOrEmpty(logoutDto.RefreshToken))
+            //{
+            //    return response.Set(false, "Incorrect refresh token provided!", 400);
+            //}
+
             var refreshToken = await _unitOfWork.RefreshTokenRepository.GetRefreshTokenAsync(logoutDto.RefreshToken);
             if (refreshToken is null)
             {

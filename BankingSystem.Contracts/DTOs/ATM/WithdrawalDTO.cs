@@ -1,4 +1,5 @@
 ﻿using BankingSystem.Domain.Enums;
+using BankingSystem.Domain.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Contracts.DTOs.ATM
@@ -14,6 +15,7 @@ namespace BankingSystem.Contracts.DTOs.ATM
         public string PIN { get; set; }
 
         [Required]
+        [GreaterThanZero(ErrorMessage = "თანხა უნდა იყოს 0-ზე მეტი.")]
         public decimal Amount { get; set; }
 
         [Required]

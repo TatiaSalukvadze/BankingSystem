@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BankingSystem.Domain.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Contracts.DTOs.OnlineBank
 {
@@ -14,6 +15,7 @@ namespace BankingSystem.Contracts.DTOs.OnlineBank
 
         [Required]
         [RegularExpression("^(0[1-9]|1[0-2])/[0-9]{2}$", ErrorMessage = "ვადის ამოწურვის თარიღი უნდა იყოს ფორმატში MM/YY")]
+        [ExpirationDate(ErrorMessage = "ვადის ამოწურვის თარიღი უნდა იყოს მომავალში.")]
         public string ExpirationDate { get; set; }
 
         [Required, StringLength(3)]
