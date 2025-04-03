@@ -6,6 +6,7 @@ using BankingSystem.Domain.Enums;
 using BankingSystem.Contracts.DTOs.OnlineBank;
 using BankingSystem.Domain.Entities;
 using BankingSystem.Contracts.DTOs.UserBanking;
+using System.Data;
 
 namespace BankingSystem.UnitTests
 {
@@ -39,7 +40,7 @@ namespace BankingSystem.UnitTests
             };
 
             _mockUnitOfWork.Setup(u => u.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber)).ReturnsAsync(1);
-            _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExists(createAccountDto.IBAN)).ReturnsAsync(false);
+            _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExistsAsync(createAccountDto.IBAN)).ReturnsAsync(false);
             _mockUnitOfWork.Setup(u => u.AccountRepository.CreateAccountAsync(It.IsAny<Account>())).ReturnsAsync(1);
 
             var returnedResponse = await _accountService.CreateAccountAsync(createAccountDto);
@@ -63,7 +64,7 @@ namespace BankingSystem.UnitTests
             };
 
             _mockUnitOfWork.Setup(u => u.PersonRepository.FindIdByIDNumberAsync(createAccountDto.IDNumber)).ReturnsAsync(1);
-            _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExists(createAccountDto.IBAN)).ReturnsAsync(true);
+            _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExistsAsync(createAccountDto.IBAN)).ReturnsAsync(true);
             _mockUnitOfWork.Setup(u => u.AccountRepository.CreateAccountAsync(It.IsAny<Account>())).ReturnsAsync(0);
 
             var response = await _accountService.CreateAccountAsync(createAccountDto);
@@ -79,12 +80,16 @@ namespace BankingSystem.UnitTests
         public async Task SeeAccountsAsync_ShouldSeeAccounts()
         {
             var email = "shamugiatamar22@gmail.com";
+            int page = 1;
+            int offset = 0;
+            int perPage = 2;
+            int accountsCount = 1;
             var accountsList = new List<SeeAccountsDTO> { new SeeAccountsDTO { } };
 
-            _mockUnitOfWork.Setup(u => u.AccountRepository.AccountExistForEmail(email)).ReturnsAsync(true);
-            _mockUnitOfWork.Setup(u => u.AccountRepository.SeeAccountsByEmail(email)).ReturnsAsync(accountsList);
-
-            var response = await _accountService.SeeAccountsAsync(email);
+            _mockUnitOfWork.Setup(u => u.AccountRepository.AccountsCountForEmailAsync(email)).ReturnsAsync(accountsCount);
+            _mockUnitOfWork.Setup(u => u.AccountRepository.SeeAccountsByEmailAsync(email, offset, perPage)).ReturnsAsync(accountsList);
+            
+            var response = await _accountService.SeeAccountsAsync(email, page, perPage);
             Assert.True(response.Success);
             Assert.Equal("Accounts retrieved successfully!", response.Message);
             Assert.NotNull(response.Data);
@@ -97,12 +102,14 @@ namespace BankingSystem.UnitTests
         public async Task SeeAccountsAsync_ShouldNotSeeAccounts()
         {
             var email = "shamugiatamar22@gmail.com";
+            int page = 1;
+            int perPage = 10;
+            int accountsCount = 0;
             var accountsList = new List<SeeAccountsDTO> { new SeeAccountsDTO { } };
 
-            _mockUnitOfWork.Setup(u => u.AccountRepository.AccountExistForEmail(email)).ReturnsAsync(false);
-            _mockUnitOfWork.Setup(u => u.AccountRepository.SeeAccountsByEmail(email)).ReturnsAsync(accountsList);
+            _mockUnitOfWork.Setup(u => u.AccountRepository.AccountsCountForEmailAsync(email)).ReturnsAsync(accountsCount);
 
-            var response = await _accountService.SeeAccountsAsync(email);
+            var response = await _accountService.SeeAccountsAsync(email, page, perPage);
             Assert.False(response.Success);
             Assert.Equal("You don't have any accounts!", response.Message);
             Assert.Null(response.Data);
@@ -116,13 +123,13 @@ namespace BankingSystem.UnitTests
         {
             var iban = "GE38CD9670132279404900";
 
-            _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExists(iban)).ReturnsAsync(true); ;
+            _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExistsAsync(iban)).ReturnsAsync(true); ;
             _mockUnitOfWork.Setup(u => u.AccountRepository.GetBalanceByIBANAsync(iban)).ReturnsAsync(0);
             _mockUnitOfWork.Setup(u => u.AccountRepository.DeleteAccountByIBANAsync(iban)).ReturnsAsync(true);
 
             var response = await _accountService.DeleteAccountAsync(iban);
             Assert.True(response.Success);
-            Assert.Equal("Account deleted successfully.", response.Message);
+            Assert.Equal("Account deleted successfully!", response.Message);
             Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(3));
@@ -133,13 +140,13 @@ namespace BankingSystem.UnitTests
         {
             var iban = "GE38CD9670132279404900";
 
-            _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExists(iban)).ReturnsAsync(true); ;
+            _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExistsAsync(iban)).ReturnsAsync(true); ;
             _mockUnitOfWork.Setup(u => u.AccountRepository.GetBalanceByIBANAsync(iban)).ReturnsAsync(1);
-            _mockUnitOfWork.Setup(u => u.AccountRepository.DeleteAccountByIBANAsync(iban)).ReturnsAsync(true);
+            //_mockUnitOfWork.Setup(u => u.AccountRepository.DeleteAccountByIBANAsync(iban)).ReturnsAsync(true);
 
             var response = await _accountService.DeleteAccountAsync(iban);
             Assert.False(response.Success);
-            Assert.Equal("Account cannot be deleted while it has a balance.", response.Message);
+            Assert.Equal("Account cannot be deleted while it has a balance!", response.Message);
             Assert.Equal(400, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
@@ -200,6 +207,7 @@ namespace BankingSystem.UnitTests
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(3));
             _mockUnitOfWork.Verify(u => u.BeginTransaction(), Times.Once);
+            _mockUnitOfWork.Verify(u => u.AccountRepository.SetTransaction(It.IsAny<IDbTransaction>()), Times.Once);
         }
 
         [Fact]
@@ -220,6 +228,7 @@ namespace BankingSystem.UnitTests
          
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(3));
             _mockUnitOfWork.Verify(u => u.BeginTransaction(), Times.Once);
+            _mockUnitOfWork.Verify(u => u.AccountRepository.SetTransaction(It.IsAny<IDbTransaction>()), Times.Once);
         }
 
         [Fact]
@@ -232,11 +241,12 @@ namespace BankingSystem.UnitTests
 
             var response = await _accountService.UpdateBalanceForATMAsync(accountId, amountToDeduct);
             Assert.True(response.Success);
-            Assert.Equal("Balance updated successfully.", response.Message);
+            Assert.Equal("Balance updated successfully!", response.Message);
             Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
             _mockUnitOfWork.Verify(u => u.BeginTransaction(), Times.Once);
+            _mockUnitOfWork.Verify(u => u.AccountRepository.SetTransaction(It.IsAny<IDbTransaction>()), Times.Once);
         }
 
         [Fact]
@@ -249,11 +259,12 @@ namespace BankingSystem.UnitTests
 
             var response = await _accountService.UpdateBalanceForATMAsync(accountId, amountToDeduct);
             Assert.False(response.Success);
-            Assert.Equal("Failed to update account balance.", response.Message);
+            Assert.Equal("Failed to update account balance!", response.Message);
             Assert.Equal(400, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.AccountRepository, Times.Exactly(2));
             _mockUnitOfWork.Verify(u => u.BeginTransaction(), Times.Once);
+            _mockUnitOfWork.Verify(u => u.AccountRepository.SetTransaction(It.IsAny<IDbTransaction>()), Times.Once);
         }
     }
 }

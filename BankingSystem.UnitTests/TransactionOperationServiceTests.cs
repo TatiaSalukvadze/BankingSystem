@@ -1,5 +1,4 @@
 ﻿using BankingSystem.Application.FacadeServices;
-using BankingSystem.Application.Services;
 using BankingSystem.Contracts.DTOs.ATM;
 using BankingSystem.Contracts.DTOs.UserBanking;
 using BankingSystem.Contracts.Interfaces.IServices;
@@ -38,7 +37,7 @@ namespace BankingSystem.UnitTests
             string email = "t@gmail.com";
             bool isSelfTransfer = false;
 
-            var transferAccounts = new TransferAccountsDTO() { From = new Account() { Amount = 500}, To = new Account() };
+            var transferAccounts = new TransferAccountsDTO() { From = new Account() { Amount = 500 }, To = new Account() };
             var validateAccountsResponse = new Response<TransferAccountsDTO>().Set(true, "Accounts validated!", transferAccounts, 200);
             _mockAccountService.Setup(a => a.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
                 createTransactionDto.ToIBAN, email, isSelfTransfer)).ReturnsAsync(validateAccountsResponse);
@@ -53,7 +52,7 @@ namespace BankingSystem.UnitTests
             .ReturnsAsync(updateAccountsResponse);
 
             var createTransactionResponse = new SimpleResponse().Set(true, "Transaction was successfull!", 200);
-            _mockTransactionDetailsService.Setup(td => td.CreateTransactionAsync(It.IsAny<decimal>(), It.IsAny<decimal>(), It.IsAny<int>(), 
+            _mockTransactionDetailsService.Setup(td => td.CreateTransactionAsync(It.IsAny<decimal>(), It.IsAny<decimal>(), It.IsAny<int>(),
                 It.IsAny<int>(), It.IsAny<string>(), false)).ReturnsAsync(createTransactionResponse);
 
             var response = await _transactionOperationService.OnlineTransactionAsync(createTransactionDto, email, isSelfTransfer);
@@ -100,43 +99,43 @@ namespace BankingSystem.UnitTests
         public async Task WithdrawAsync_ShouldWithdrawMoneyFromAtm()
         {
             var withdrawalDto = new WithdrawalDTO { CardNumber = "1234567890123456", PIN = "7777", Amount = 444, Currency = CurrencyType.GEL };
-            var card = new Card { AccountId = 1 };
-            var withdrawalData = new AtmWithdrawalCalculationDTO { Fee = 1, Balance = 999, Currency = "USD", TotalAmountToDeduct = 100 };
+            var card = new Card { AccountId = 1, CardNumber = "1234567890123456", PIN = "7777" };
+            var withdrawalData = new AtmWithdrawalCalculationDTO { BankProfit = 1, Amount = 999, Currency = "USD", TotalAmountToDeduct = 100 };
 
             _mockCardService.Setup(x => x.AuthorizeCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN))
-                .ReturnsAsync(new Response<Card> { Success = true, Message = "Card validated", Data = card, StatusCode = 200 });
-            _mockTransactionDetailsService.Setup(x => x.CalculateATMWithdrawalTransactionAsync(withdrawalDto.CardNumber, withdrawalDto.PIN, withdrawalDto.Amount, withdrawalDto.Currency.ToString()))
+                .ReturnsAsync(new Response<Card> { Success = true, Message = "Card validated!", Data = card, StatusCode = 200 });
+            _mockTransactionDetailsService.Setup(x => x.CalculateATMWithdrawalTransactionAsync(card.CardNumber, card.PIN, withdrawalDto.Amount, withdrawalDto.Currency.ToString()))
                 .ReturnsAsync(new Response<AtmWithdrawalCalculationDTO> { Success = true, Message = "", Data = withdrawalData, StatusCode = 200 });
             _mockAccountService.Setup(x => x.UpdateBalanceForATMAsync(card.AccountId, withdrawalData.TotalAmountToDeduct))
-                .ReturnsAsync(new SimpleResponse { Success = true, Message = "Balance updated successfully.", StatusCode = 200 });
-            _mockTransactionDetailsService.Setup(x => x.CreateTransactionAsync(withdrawalData.Fee, withdrawalData.Balance, card.AccountId, card.AccountId, withdrawalData.Currency, true))
-                .ReturnsAsync(new SimpleResponse { Success = true, Message = "Transaction successful", StatusCode = 200 });
+                .ReturnsAsync(new SimpleResponse { Success = true, Message = "Balance updated successfully!", StatusCode = 200 });
+            _mockTransactionDetailsService.Setup(x => x.CreateTransactionAsync(withdrawalData.BankProfit, withdrawalData.Amount, card.AccountId, card.AccountId, withdrawalData.Currency, true))
+                .ReturnsAsync(new SimpleResponse { Success = true, Message = "Transaction was successful!", StatusCode = 200 });
 
             var result = await _transactionOperationService.WithdrawAsync(withdrawalDto);
 
             Assert.True(result.Success);
-            Assert.Equal("Transaction successful", result.Message);
+            Assert.Equal("Transaction was successful!", result.Message);
             Assert.Equal(200, result.StatusCode);
         }
 
         [Fact]
-        public async Task WithdrawAsync_ShouldNotWithdrawMOneyFromAtm()
+        public async Task WithdrawAsync_ShouldNotWithdrawMoneyFromAtm()
         {
             var withdrawalDto = new WithdrawalDTO { CardNumber = "1234567890123456", PIN = "7777", Amount = 444, Currency = CurrencyType.GEL };
-            var card = new Card { AccountId = 1 };
-            var withdrawalData = new AtmWithdrawalCalculationDTO { Fee = 1, Balance = 999, Currency = "USD", TotalAmountToDeduct = 100 };
+            var card = new Card { AccountId = 1, CardNumber = "1234567890123456", PIN = "7777" };
+            var withdrawalData = new AtmWithdrawalCalculationDTO { BankProfit = 1, Amount = 999, Currency = "USD", TotalAmountToDeduct = 100 };
 
             _mockCardService.Setup(x => x.AuthorizeCardAsync(withdrawalDto.CardNumber, withdrawalDto.PIN))
-                .ReturnsAsync(new Response<Card> { Success = true, Message = "Card validated", Data = card, StatusCode = 200 });
-            _mockTransactionDetailsService.Setup(x => x.CalculateATMWithdrawalTransactionAsync(withdrawalDto.CardNumber, withdrawalDto.PIN, withdrawalDto.Amount, withdrawalDto.Currency.ToString()))
+                .ReturnsAsync(new Response<Card> { Success = true, Message = "Card validated!", Data = card, StatusCode = 200 });
+            _mockTransactionDetailsService.Setup(x => x.CalculateATMWithdrawalTransactionAsync(card.CardNumber, card.PIN, withdrawalDto.Amount, withdrawalDto.Currency.ToString()))
                 .ReturnsAsync(new Response<AtmWithdrawalCalculationDTO> { Success = true, Message = "", Data = withdrawalData, StatusCode = 200 });
             _mockAccountService.Setup(x => x.UpdateBalanceForATMAsync(card.AccountId, withdrawalData.TotalAmountToDeduct))
-                .ReturnsAsync(new SimpleResponse { Success = false, Message = "Failed to update account balance.", StatusCode = 400 });
+                .ReturnsAsync(new SimpleResponse { Success = false, Message = "Failed to update account balance!", StatusCode = 400 });
 
             var result = await _transactionOperationService.WithdrawAsync(withdrawalDto);
 
             Assert.False(result.Success);
-            Assert.Equal("Failed to update account balance.", result.Message);
+            Assert.Equal("Failed to update account balance!", result.Message);
             Assert.Equal(400, result.StatusCode);
         }
     }
