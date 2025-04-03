@@ -56,10 +56,10 @@ namespace BankingSystem.Application.Services
             return response.Set(true, "Login successful!", new { accessToken, refreshToken = refreshToken.Token }, 200);
         }
 
-        public async Task<Response<string>> RegisterPersonAsync(RegisterPersonDTO registerDto)
+        public async Task<Response<string>> RegisterPersonAsync(RegisterPersonDTO registerPersonDto)
         {
             var response = new Response<string>();
-            var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
+            var existingUser = await _userManager.FindByEmailAsync(registerPersonDto.Email);
             if (existingUser is not null)
             {
                 return response.Set(false, "A user with this email already exists!", null, 409);
@@ -67,11 +67,11 @@ namespace BankingSystem.Application.Services
 
             var user = new IdentityUser
             {
-                UserName = registerDto.Email,
-                Email = registerDto.Email,
+                UserName = registerPersonDto.Email,
+                Email = registerPersonDto.Email,
             };
 
-            var createdUser = await _userManager.CreateAsync(user, registerDto.Password);
+            var createdUser = await _userManager.CreateAsync(user, registerPersonDto.Password);
             if (!createdUser.Succeeded)
             {
                 return response.Set(false, "Adding user in identity system failed!", null, 400);
@@ -84,7 +84,7 @@ namespace BankingSystem.Application.Services
             }
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            await _emailService.SendTokenEmailAsync(token, registerDto.Email, registerDto.ClientUrl, "Email Confirmation Token");
+            await _emailService.SendTokenEmailAsync(token, registerPersonDto.Email, registerPersonDto.ClientUrl, "Email Confirmation Token");
 
             return response.Set(true, "User was registered successfully!", user.Id, 200);
         }
@@ -107,31 +107,31 @@ namespace BankingSystem.Application.Services
             return response.Set(true, "Email was successfully confirmed!", 200);
         }
 
-        public async Task<SimpleResponse> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDTO)
+        public async Task<SimpleResponse> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDto)
         {
             var response = new SimpleResponse();
-            var user = await _userManager.FindByEmailAsync(forgotPasswordDTO.Email);
+            var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
             if (user is null)
             {
                 return response.Set(false, "User not found!", 404);
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            await _emailService.SendTokenEmailAsync(token, forgotPasswordDTO.Email, forgotPasswordDTO.ClientUrl, "Reset password token");
+            await _emailService.SendTokenEmailAsync(token, forgotPasswordDto.Email, forgotPasswordDto.ClientUrl, "Reset password token");
 
             return response.Set(true, "Check email to reset password!", 200);
         }
 
-        public async Task<SimpleResponse> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
+        public async Task<SimpleResponse> ResetPasswordAsync(ResetPasswordDTO resetPasswordDto)
         {
             var response = new SimpleResponse();
-            var user = await _userManager.FindByEmailAsync(resetPasswordDTO.Email);
+            var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
             if (user is null)
             {
                 return response.Set(false, "User not found!", 404);
             }
 
-            var result = await _userManager.ResetPasswordAsync(user, resetPasswordDTO.Token, resetPasswordDTO.Password);
+            var result = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.Password);
             if (!result.Succeeded)
             {
                 return response.Set(false, "Password reset failed, please try again!", 400);
@@ -174,10 +174,6 @@ namespace BankingSystem.Application.Services
         public async Task<SimpleResponse> LogoutAsync(LogoutDTO logoutDto, string userEmail)
         {
             var response = new SimpleResponse();
-            //if (string.IsNullOrEmpty(logoutDto.RefreshToken))
-            //{
-            //    return response.Set(false, "Incorrect refresh token provided!", 400);
-            //}
 
             var refreshToken = await _unitOfWork.RefreshTokenRepository.GetRefreshTokenAsync(logoutDto.RefreshToken);
             if (refreshToken is null)
