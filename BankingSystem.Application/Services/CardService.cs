@@ -29,8 +29,8 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, "Account does not exist in the system!", null, 404);
             }
-
-            bool cardNumberExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(createCardDto.CardNumber);
+            var encryptedCardNumber = _encryptionService.Encrypt(createCardDto.CardNumber);
+            bool cardNumberExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(encryptedCardNumber);
             if (cardNumberExists)
             {
                 return response.Set(false, "Card number already exists!", null, 409);
@@ -39,7 +39,7 @@ namespace BankingSystem.Application.Services
             var card = new Card
             {
                 AccountId = account.Id,
-                CardNumber = _encryptionService.Encrypt(createCardDto.CardNumber),
+                CardNumber = encryptedCardNumber,
                 ExpirationDate = createCardDto.ExpirationDate,
                 CVV = _encryptionService.Encrypt(createCardDto.CVV),
                 PIN = _hashingService.HashValue(createCardDto.PIN)
@@ -186,7 +186,7 @@ namespace BankingSystem.Application.Services
 
             bool expired = true;
             if (yearNow < cardYear ||
-                (yearNow == cardYear && monthNow < cardMonth))
+                (yearNow == cardYear && monthNow <= cardMonth))
             {
                 expired = false;
             }

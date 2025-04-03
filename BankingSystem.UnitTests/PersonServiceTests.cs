@@ -34,10 +34,9 @@ namespace BankingSystem.UnitTests
             Assert.True(response.Success);
             Assert.Equal("User was registered successfully!", response.Message);
             Assert.NotNull(response.Data);
-            Assert.Equal(200, response.StatusCode);
+            Assert.Equal(201, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>()), Times.Once());
-            //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once());
         }
 
         [Fact]
@@ -56,15 +55,14 @@ namespace BankingSystem.UnitTests
             Assert.Equal(400, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.PersonRepository.RegisterPersonAsync(It.IsAny<Person>()), Times.Once());
-            //_mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Never());
         }
 
         [Fact]
         public async Task RegisteredPeopleStatisticsAsync_ShouldReturnValues()
         {
-            _mockUnitOfWork.Setup(u => u.PersonRepository.PeopleRegisteredThisYear()).ReturnsAsync(10);
-            _mockUnitOfWork.Setup(u => u.PersonRepository.PeopleRegisteredLastOneYear()).ReturnsAsync(10);
-            _mockUnitOfWork.Setup(u => u.PersonRepository.PeopleRegisteredLast30Days()).ReturnsAsync(10);
+            _mockUnitOfWork.Setup(u => u.PersonRepository.PeopleRegisteredThisYearAsync()).ReturnsAsync(10);
+            _mockUnitOfWork.Setup(u => u.PersonRepository.PeopleRegisteredLastOneYearAsync()).ReturnsAsync(10);
+            _mockUnitOfWork.Setup(u => u.PersonRepository.PeopleRegisteredLast30DaysAsync()).ReturnsAsync(10);
 
             var response = await _personService.RegisteredPeopleStatisticsAsync();
 

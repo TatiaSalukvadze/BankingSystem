@@ -49,7 +49,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.CreateTransactionAsync(bankProfit, amount, fromAccountId, toAccountId, currency);
 
             Assert.True(response.Success);
-            Assert.Equal("Transaction was successfull!", response.Message);
+            Assert.Equal("Transaction was successful!", response.Message);
             Assert.Equal(200, response.StatusCode);
 
             _mockUnitOfWork.Verify(u => u.SaveChanges(), Times.Once());
@@ -87,7 +87,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.NumberOfTransactionsAsync();
 
             Assert.True(response.Success);
-            Assert.Equal("Transaction Count retreived!", response.Message);
+            Assert.Equal("Transaction Count retrieved!", response.Message);
             Assert.NotNull(response.Data);
             Assert.Equal(200, response.StatusCode);
 
@@ -103,7 +103,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.NumberOfTransactionsAsync();
 
             Assert.False(response.Success);
-            Assert.Equal("Transaction Count couldn't be retreived!", response.Message);
+            Assert.Equal("Transaction Count couldn't be retrieved!", response.Message);
             Assert.Null(response.Data);
             Assert.Equal(404, response.StatusCode);
 
@@ -119,7 +119,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.BankProfitByTimePeriodAsync();
 
             Assert.True(response.Success);
-            Assert.Equal("Bank profit retrieved successfully.", response.Message);
+            Assert.Equal("Bank profit retrieved successfully!", response.Message);
             Assert.Equal(200, response.StatusCode);
             Assert.Equal(bankProfitDtos, response.Data);
 
@@ -136,7 +136,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.BankProfitByTimePeriodAsync();
 
             Assert.False(response.Success);
-            Assert.Equal("No bank profit data found.", response.Message);
+            Assert.Equal("No bank profit data found!", response.Message);
             Assert.Equal(404, response.StatusCode);
             Assert.Null(response.Data);
 
@@ -189,7 +189,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.NumberOfTransactionsChartAsync();
 
             Assert.True(response.Success);
-            Assert.Equal("Transaction Count retreived!", response.Message);
+            Assert.Equal("Transaction Count retrieved!", response.Message);
             Assert.Equal(200, response.StatusCode);
             Assert.Equal(transactionCountChartDtos, response.Data);
 
@@ -205,7 +205,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.NumberOfTransactionsChartAsync();
 
             Assert.False(response.Success);
-            Assert.Equal("Transaction Count couldn't be retreived!", response.Message);
+            Assert.Equal("Transaction Count couldn't be retrieved!", response.Message);
             Assert.Equal(404, response.StatusCode);
             Assert.Null(response.Data);
 
@@ -222,7 +222,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.TotalAtmWithdrawalsAsync();
 
             Assert.True(response.Success);
-            Assert.Equal("ATM withdrawals data retrieved successfully.", response.Message);
+            Assert.Equal("ATM withdrawals data retrieved successfully!", response.Message);
             Assert.NotNull(response.Data);
             Assert.Equal(expectedData, response.Data);
             Assert.Equal(200, response.StatusCode);
@@ -240,7 +240,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.TotalAtmWithdrawalsAsync();
 
             Assert.False(response.Success);
-            Assert.Equal("No ATM withdrawal data found.", response.Message);
+            Assert.Equal("No ATM withdrawal data found!", response.Message);
             Assert.Null(response.Data);
             Assert.Equal(404, response.StatusCode);
 
@@ -264,7 +264,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.TotalIncomeExpenseAsync(dateRangeDto,email);
 
             Assert.True(response.Success);
-            Assert.Equal("Income and Expense retreived!", response.Message);
+            Assert.Equal("Income and Expense retrieved!", response.Message);
             Assert.Equal(200, response.StatusCode);
             Assert.Equal(incomeExpense.Income, response.Data.Income);
             Assert.Equal(incomeExpense.Expense, response.Data.Expense);
@@ -281,7 +281,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.TotalIncomeExpenseAsync(dateRangeDto, email);
 
             Assert.False(response.Success);
-            Assert.Equal("Provide correct time, toDate cannot be yearlier than fromDate!", response.Message);
+            Assert.Equal("Provide correct time, toDate cannot be earlier than fromDate!", response.Message);
             Assert.Equal(400, response.StatusCode);
             Assert.Null(response.Data);
 
@@ -379,7 +379,7 @@ namespace BankingSystem.UnitTests
             var response = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(cardNumber, pin, withdrawalAmount, withdrawalCurrency);
 
             Assert.False(response.Success);
-            Assert.Equal("Unable to retrieve account details.", response.Message);
+            Assert.Equal("Unable to retrieve account details!", response.Message);
             Assert.Null(response.Data);
             Assert.Equal(400, response.StatusCode);
 
