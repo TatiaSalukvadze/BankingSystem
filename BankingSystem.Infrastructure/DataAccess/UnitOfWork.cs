@@ -40,7 +40,7 @@ namespace BankingSystem.Infrastructure.DataAccess
         {
             if (_transaction == null)
                 throw new InvalidOperationException
-                 ("Transaction have already been committed. Check your transaction handling.");
+                 ("Transaction have already been committed. Check your transaction handling!");
 
             _transaction.Commit();
             _transaction = null;
