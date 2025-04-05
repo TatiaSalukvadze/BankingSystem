@@ -18,13 +18,14 @@ namespace BankingSystem.Application.BackgroundServices
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Seeding initial data in db if not present!");
-            using var scope = _serviceScopeFactory.CreateAsyncScope();
-            var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
+            _logger.LogInformation("Seeding initial data in db if not present!");          
 
             try
             {
+                using var scope = _serviceScopeFactory.CreateAsyncScope();
+                var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
                 await seeder.SeedDataAsync();
+                _logger.LogInformation("Seeding initial data ended!");
             }
             catch (Exception ex) {
                 _logger.LogError("Problem happened during seeding initial data: {message} {type}", ex.Message, ex.GetType().Name);
@@ -33,7 +34,6 @@ namespace BankingSystem.Application.BackgroundServices
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Seeding initial data ended!");
             return Task.CompletedTask;
         }
     }
