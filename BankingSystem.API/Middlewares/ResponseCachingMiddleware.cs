@@ -20,19 +20,19 @@ namespace BankingSystem.API.Middlewares
         {
             var controller = context.GetRouteData().Values["Controller"].ToString();
             var action = context.GetRouteData().Values["Action"].ToString();
-            bool fromMemory = false;
 
             if (context.Request.Method == HttpMethods.Get && controller != "Auth")
             {
                 _logger.LogInformation("Response of the sent request might be in MemoryCache!");
                 string queryString = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : "";
-                var cacheKey = $"{action}{queryString}";
+                string cacheKey = $"{action}{queryString}";
+                string cacheKeyStatusCode = $"{cacheKey}StatusCode";
 
                 if (_memoryCache.TryGetValue(cacheKey, out string response) && response != ""
-                    && _memoryCache.TryGetValue(cacheKey + "StatusCode", out int retreivedStatusCode))
+                    && _memoryCache.TryGetValue(cacheKeyStatusCode, out int retrievedStatusCode))
                 {
                     _logger.LogInformation("Getting request response from MemoryCache!");
-                    context.Response.StatusCode = retreivedStatusCode;
+                    context.Response.StatusCode = retrievedStatusCode;
                     context.Response.ContentType = "application/json";
                     await context.Response.WriteAsync(response);
                 }
@@ -53,7 +53,7 @@ namespace BankingSystem.API.Middlewares
 
                     var cacheOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(15));
                     _memoryCache.Set(cacheKey, serviceResponse, cacheOptions);
-                    _memoryCache.Set(cacheKey + "StatusCode", statusCode, cacheOptions);
+                    _memoryCache.Set(cacheKeyStatusCode, statusCode, cacheOptions);
 
                     context.Response.Body = originalBodyStream;
                     await context.Response.Body.WriteAsync(memoryStream.ToArray());
