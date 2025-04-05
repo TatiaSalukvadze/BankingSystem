@@ -32,13 +32,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionHandlerMiddleware>();
-app.UseMiddleware<ResponseCachingMiddleware>();
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ResponseCachingMiddleware>();
 
 app.MapControllers();
 
