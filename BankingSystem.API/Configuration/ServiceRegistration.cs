@@ -29,7 +29,7 @@ namespace BankingSystem.API.Extensions
 
         public static IServiceCollection InjectDbConnection(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped((s) => new SqlConnection(configuration.GetConnectionString("Default")));
+            services.AddScoped((s) => new SqlConnection(configuration.GetConnectionString("default")));
     
             return services;
         }

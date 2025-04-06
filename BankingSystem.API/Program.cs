@@ -20,8 +20,7 @@ builder.Services.InjectApplicationDbContext(builder.Configuration).ConfigureIden
 
 builder.Services.InjectServices().InjectRepositories().InjectExternalServices(builder.Configuration);
 
-builder.Host.UseSerilog((context, configuration) =>
-configuration.ReadFrom.Configuration(context.Configuration));
+builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
 var app = builder.Build();
 
