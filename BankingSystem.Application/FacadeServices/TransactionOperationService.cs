@@ -22,10 +22,7 @@ namespace BankingSystem.Application.FacadeServices
             string email, bool isSelfTransfer)
         {
             var response = new SimpleResponse();
-            //if (createTransactionDto.Amount <= 0)
-            //{
-            //    return response.Set(false, "You need to enter more than 0 value!", 400);
-            //}
+
             var validateAccountsResponse = await _accountService.ValidateAccountsForOnlineTransferAsync(createTransactionDto.FromIBAN,
                 createTransactionDto.ToIBAN, email, isSelfTransfer);
             if (!validateAccountsResponse.Success)
@@ -67,11 +64,6 @@ namespace BankingSystem.Application.FacadeServices
             {
                 return response.Set(false, validateCardResponse.Message, validateCardResponse.StatusCode);
             }
-
-            //if (withdrawalDto.Amount <= 0)
-            //{
-            //    return response.Set(false, "Withdrawal amount must be greater than zero.", 400);
-            //}
 
             var card = validateCardResponse.Data;
             var calculationResponse = await _transactionDetailsService.CalculateATMWithdrawalTransactionAsync(card.CardNumber, card.PIN,
