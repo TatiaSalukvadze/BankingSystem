@@ -51,7 +51,7 @@ namespace BankingSystem.UnitTests
             var user = new IdentityUser { UserName = "shamtam11@gmail.com", Email = "shamtam11@gmail.com" };
 
             _mockUserManager.Setup(x => x.Users).Returns(new List<IdentityUser> { user }.AsQueryable().BuildMock());
-            _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, loginDto.Password, false)).ReturnsAsync(SignInResult.Success);
+            _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, loginDto.Password, true)).ReturnsAsync(SignInResult.Success);
             _mockUserManager.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(new List<string> { "User" });
             _mockTokenService.Setup(x => x.GenerateAccessToken(user.Email, "User")).Returns("accessToken");
             _mockTokenService.Setup(x => x.GenerateRefreshToken(user.Id, loginDto.DeviceId)).Returns(new RefreshToken { Token = "refreshToken" });

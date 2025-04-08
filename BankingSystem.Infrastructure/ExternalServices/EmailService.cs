@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
-using System.Net.Mail;
-using System.Net;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using Microsoft.AspNetCore.WebUtilities;
 using BankingSystem.Infrastructure.ExternalServices.Configuration;
+using MimeKit;
+using MimeKit.Text;
+using MailKit.Security;
+using MailKit.Net.Smtp;
 
 namespace BankingSystem.Infrastructure.ExternalServices
 {
@@ -23,21 +25,19 @@ namespace BankingSystem.Infrastructure.ExternalServices
             var body = await File.ReadAllTextAsync(templatePath);
             body = body.Replace("{{LinkWithToken}}", message);
 
-            var mail = new MailMessage
+            var mail = new MimeMessage()
             {
-                From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
+                From = { MailboxAddress.Parse(_emailSettings.SenderEmail) },
+                To = { MailboxAddress.Parse(email) },
                 Subject = subject,
-                Body = body,
-                IsBodyHtml = true
-            };
-            mail.To.Add(email);
-            using var smpt = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.Port)
-            {
-                Credentials = new NetworkCredential(_emailSettings.SmtpUser, _emailSettings.SmtpPassword),
-                EnableSsl = true
+                Body = new TextPart(TextFormat.Html) { Text = body }
             };
 
-            await smpt.SendMailAsync(mail);
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.Port, SecureSocketOptions.StartTls); 
+            await smtp.AuthenticateAsync(_emailSettings.SmtpUser, _emailSettings.SmtpPassword); 
+            await smtp.SendAsync(mail); 
+            await smtp.DisconnectAsync(true); 
         }
 
         public async Task SendTokenEmailAsync(string token, string email, string ClientUrl, string subject)

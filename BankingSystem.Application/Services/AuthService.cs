@@ -36,7 +36,12 @@ namespace BankingSystem.Application.Services
                 return response.Set(false, "Invalid username!", null, 400);
             }
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, true);
+            if (result.IsLockedOut)
+            {
+                var lockoutEnd = user.LockoutEnd?.ToLocalTime().ToString("g");
+                return response.Set(false, $"Your account is locked after 3 failed attempts. Please try again after {lockoutEnd}.", null, 400);
+            }
             if (!result.Succeeded)
             {
                 return response.Set(false, "Invalid username or password!", null, 400);
