@@ -23,13 +23,12 @@ namespace DbCreation.DbSetup
             _logger = logger;
         }
 
-        public async Task CreateDbAndTablesAsync()
+        public async Task CreateDbAndTablesAsync(string dbName)
         {
             bool dbExists = false;
             using (_serverConnection)
             {
                 _serverConnection.Open();
-                string dbName = "Test";
                 var checkDbSql = "SELECT CASE WHEN EXISTS (SELECT name FROM master.sys.databases WHERE name = @dbName) THEN 1 ELSE 0 END AS DbExists";
                 dbExists = await _serverConnection.ExecuteScalarAsync<bool>(checkDbSql, new { dbName });
             }
