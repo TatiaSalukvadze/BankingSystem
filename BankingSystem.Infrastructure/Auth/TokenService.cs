@@ -78,6 +78,12 @@ namespace BankingSystem.Infrastructure.Auth
 
             var emailClaim = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
             var roleClaim = claimsPrincipal.FindFirstValue(ClaimTypes.Role);
+
+            if (string.IsNullOrEmpty(emailClaim) || string.IsNullOrEmpty(roleClaim))
+            {
+                return null; 
+            }
+
             return GenerateAccessToken(emailClaim, roleClaim);
         }
 

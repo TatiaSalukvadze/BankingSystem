@@ -3,5 +3,5 @@
 namespace BankingSystem.Domain.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum CurrencyType { GEL = 1, USD, EUR };
+    public enum CurrencyType { GEL, USD, EUR };
 }

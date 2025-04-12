@@ -4,7 +4,7 @@ namespace BankingSystem.Contracts.Validation
 {
     public class GreaterThanOrEqualToZeroAttribute : ValidationAttribute
     {
-        public override bool IsValid(object? value)
+        public override bool IsValid(object value)
         {
             if (value is decimal decimalValue)
             {
