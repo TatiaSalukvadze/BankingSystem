@@ -2,6 +2,6 @@
 {
     public interface IDbSetup
     {
-        Task CreateDbAndTablesAsync();
+        Task CreateDbAndTablesAsync(string dbName);
     }
 }
