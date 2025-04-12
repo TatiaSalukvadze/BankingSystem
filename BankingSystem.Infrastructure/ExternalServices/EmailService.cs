@@ -27,7 +27,7 @@ namespace BankingSystem.Infrastructure.ExternalServices
 
             var mail = new MimeMessage()
             {
-                From = { MailboxAddress.Parse(_emailSettings.SenderEmail) },
+                From = { new MailboxAddress(_emailSettings.SenderName, _emailSettings.SenderEmail) },
                 To = { MailboxAddress.Parse(email) },
                 Subject = subject,
                 Body = new TextPart(TextFormat.Html) { Text = body }
