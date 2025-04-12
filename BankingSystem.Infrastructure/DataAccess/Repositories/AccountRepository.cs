@@ -9,10 +9,10 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
     public class AccountRepository : IAccountRepository
     {
-        private readonly SqlConnection _connection;
+        private readonly IDbConnection _connection;
         private IDbTransaction _transaction;
 
-        public AccountRepository(SqlConnection connection)
+        public AccountRepository(IDbConnection connection)
         {
             _connection = connection;
         }

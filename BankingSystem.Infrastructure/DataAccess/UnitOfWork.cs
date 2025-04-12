@@ -13,7 +13,7 @@ namespace BankingSystem.Infrastructure.DataAccess
         private IServiceProvider _serviceProvider;
         public IDbTransaction Transaction() => _transaction;
 
-        public UnitOfWork(SqlConnection connection, IServiceProvider serviceProvider)
+        public UnitOfWork(IDbConnection connection, IServiceProvider serviceProvider)
         {
             _connection = connection;
             _connection.Open();

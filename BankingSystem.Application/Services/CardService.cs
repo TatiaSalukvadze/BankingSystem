@@ -135,10 +135,10 @@ namespace BankingSystem.Application.Services
             return response.Set(true, $"Card PIN was updated Successfully! New PIN: {changeCardPINDto.NewPIN}", 200);
         }
 
-        public async Task<SimpleResponse> CancelCardAsync(string cardNumber)
+        public async Task<SimpleResponse> CancelCardAsync(DeleteCardDTO deleteCardDto)
         {
             var response = new SimpleResponse();
-            var encryptedCardNumber = _encryptionService.Encrypt(cardNumber);
+            var encryptedCardNumber = _encryptionService.Encrypt(deleteCardDto.CardNumber);
             var cardExists = await _unitOfWork.CardRepository.CardNumberExistsAsync(encryptedCardNumber);
             if (!cardExists)
             {

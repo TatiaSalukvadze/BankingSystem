@@ -207,14 +207,14 @@ namespace BankingSystem.UnitTests
         [Fact]
         public async Task CancelCardAsync_ShouldCancelCard()
         {
-            string cardNumber = "4998892941729115";
-            string encryptedCardNumber = $"encrypted{cardNumber}";
+            var deleteCardDto = new DeleteCardDTO { CardNumber = "4998892941729115" };
+            string encryptedCardNumber = $"encrypted{deleteCardDto.CardNumber}";
 
-            _mockEncryptionService.Setup(e => e.Encrypt(cardNumber)).Returns(encryptedCardNumber);
+            _mockEncryptionService.Setup(e => e.Encrypt(deleteCardDto.CardNumber)).Returns(encryptedCardNumber);
             _mockUnitOfWork.Setup(u => u.CardRepository.CardNumberExistsAsync(encryptedCardNumber)).ReturnsAsync(true);
             _mockUnitOfWork.Setup(u => u.CardRepository.DeleteCardAsync(encryptedCardNumber)).ReturnsAsync(true);
 
-            var response = await _cardService.CancelCardAsync(cardNumber);
+            var response = await _cardService.CancelCardAsync(deleteCardDto);
 
             Assert.True(response.Success);
             Assert.Equal("Card was successfully canceled!", response.Message);
@@ -226,13 +226,13 @@ namespace BankingSystem.UnitTests
         [Fact]
         public async Task CancelCardAsync_ShouldNotCancelNonexistentCard()
         {
-            string cardNumber = "4998892941729115";
-            string encryptedCardNumber = $"encrypted{cardNumber}";
+            var deleteCardDto = new DeleteCardDTO { CardNumber = "4998892941729115" };
+            string encryptedCardNumber = $"encrypted{deleteCardDto.CardNumber}";
 
-            _mockEncryptionService.Setup(e => e.Encrypt(cardNumber)).Returns(encryptedCardNumber);
+            _mockEncryptionService.Setup(e => e.Encrypt(deleteCardDto.CardNumber)).Returns(encryptedCardNumber);
             _mockUnitOfWork.Setup(u => u.CardRepository.CardNumberExistsAsync(encryptedCardNumber)).ReturnsAsync(false);
 
-            var response = await _cardService.CancelCardAsync(cardNumber);
+            var response = await _cardService.CancelCardAsync(deleteCardDto);
 
             Assert.False(response.Success);
             Assert.Equal("There is no Card for that Card Number!", response.Message);

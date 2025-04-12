@@ -122,12 +122,13 @@ namespace BankingSystem.UnitTests
         public async Task DeleteAccountAsync_ShouldDeleteAccount()
         {
             var iban = "GE38CD9670132279404900";
+            var deleteAccountDto = new DeleteAccountDTO { IBAN = iban };
 
             _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExistsAsync(iban)).ReturnsAsync(true); ;
             _mockUnitOfWork.Setup(u => u.AccountRepository.GetBalanceByIBANAsync(iban)).ReturnsAsync(0);
             _mockUnitOfWork.Setup(u => u.AccountRepository.DeleteAccountByIBANAsync(iban)).ReturnsAsync(true);
 
-            var response = await _accountService.DeleteAccountAsync(iban);
+            var response = await _accountService.DeleteAccountAsync(deleteAccountDto);
             Assert.True(response.Success);
             Assert.Equal("Account deleted successfully!", response.Message);
             Assert.Equal(200, response.StatusCode);
@@ -139,12 +140,12 @@ namespace BankingSystem.UnitTests
         public async Task DeleteAccountAsync_ShouldNotDeleteAccount()
         {
             var iban = "GE38CD9670132279404900";
+            var deleteAccountDto = new DeleteAccountDTO { IBAN = iban };
 
             _mockUnitOfWork.Setup(u => u.AccountRepository.IBANExistsAsync(iban)).ReturnsAsync(true); ;
             _mockUnitOfWork.Setup(u => u.AccountRepository.GetBalanceByIBANAsync(iban)).ReturnsAsync(1);
-            //_mockUnitOfWork.Setup(u => u.AccountRepository.DeleteAccountByIBANAsync(iban)).ReturnsAsync(true);
 
-            var response = await _accountService.DeleteAccountAsync(iban);
+            var response = await _accountService.DeleteAccountAsync(deleteAccountDto);
             Assert.False(response.Success);
             Assert.Equal("Account cannot be deleted while it has a balance!", response.Message);
             Assert.Equal(400, response.StatusCode);

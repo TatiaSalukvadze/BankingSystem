@@ -9,10 +9,10 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
     public class RefreshTokenRepository : IRefreshTokenRepository
     {
-        private readonly SqlConnection _connection;
+        private readonly IDbConnection _connection;
         private IDbTransaction _transaction;
 
-        public RefreshTokenRepository(SqlConnection connection)
+        public RefreshTokenRepository(IDbConnection connection)
         {
             _connection = connection;
         }

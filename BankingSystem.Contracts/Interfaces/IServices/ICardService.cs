@@ -12,7 +12,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
         Task<Response<PagingResponseDTO<CardWithIBANDTO>>> SeeCardsAsync(string email, int page, int perPage);
         Task<Response<SeeBalanceDTO>> SeeBalanceAsync(CardAuthorizationDTO cardAuthorizationDto);
         Task<SimpleResponse> ChangeCardPINAsync(ChangeCardPINDTO changeCardPINDto);
-        Task<SimpleResponse> CancelCardAsync(string cardNumber);
+        Task<SimpleResponse> CancelCardAsync(DeleteCardDTO deleteCardDto);
         Task<Response<Card>> AuthorizeCardAsync(string CardNumber, string PIN);
     }
 }

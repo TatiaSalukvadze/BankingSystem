@@ -79,22 +79,22 @@ namespace BankingSystem.Application.Services
             return response.Set(true, "Accounts retrieved successfully!", pagingResponse, 200);
         }
 
-        public async Task<SimpleResponse> DeleteAccountAsync(string IBAN)
+        public async Task<SimpleResponse> DeleteAccountAsync(DeleteAccountDTO deleteAccountDto)
         {
             var response = new SimpleResponse();
-            bool exists = await _unitOfWork.AccountRepository.IBANExistsAsync(IBAN);
+            bool exists = await _unitOfWork.AccountRepository.IBANExistsAsync(deleteAccountDto.IBAN);
             if (!exists)
             {
                 return response.Set(false, "Account not found!", 404);
             }
 
-            var balance = await _unitOfWork.AccountRepository.GetBalanceByIBANAsync(IBAN);
+            var balance = await _unitOfWork.AccountRepository.GetBalanceByIBANAsync(deleteAccountDto.IBAN);
             if (balance > 0)
             {
                 return response.Set(false, "Account cannot be deleted while it has a balance!", 400);
             }
 
-            bool deleted = await _unitOfWork.AccountRepository.DeleteAccountByIBANAsync(IBAN);
+            bool deleted = await _unitOfWork.AccountRepository.DeleteAccountByIBANAsync(deleteAccountDto.IBAN);
             if (!deleted)
             {
                 return response.Set(false, "Failed to delete account!", 400);

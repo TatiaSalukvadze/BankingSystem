@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BankingSystem.Domain.Validation
+namespace BankingSystem.Contracts.Validation
 {
     public class GreaterThanZeroAttribute : ValidationAttribute
     {

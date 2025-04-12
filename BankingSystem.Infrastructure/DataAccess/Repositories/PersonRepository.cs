@@ -9,10 +9,10 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
     public class PersonRepository : IPersonRepository
     {
-        private readonly SqlConnection _connection;
+        private readonly IDbConnection _connection;
         private IDbTransaction _transaction;
 
-        public PersonRepository(SqlConnection connection)
+        public PersonRepository(IDbConnection connection)
         {
             _connection = connection;
         }

@@ -14,6 +14,7 @@ using BankingSystem.Infrastructure.ExternalServices.Configuration;
 using BankingSystem.Infrastructure.Auth;
 using BankingSystem.Application.BackgroundServices;
 using BankingSystem.Application.HelperServices;
+using System.Data;
 
 namespace BankingSystem.API.Extensions
 {
@@ -29,7 +30,7 @@ namespace BankingSystem.API.Extensions
 
         public static IServiceCollection InjectDbConnection(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped((s) => new SqlConnection(configuration.GetConnectionString("default")));
+            services.AddScoped<IDbConnection>((s) => new SqlConnection(configuration.GetConnectionString("default")));
     
             return services;
         }

@@ -1,4 +1,4 @@
-﻿using BankingSystem.Domain.Validation;
+﻿using BankingSystem.Contracts.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Contracts.DTOs.OnlineBank

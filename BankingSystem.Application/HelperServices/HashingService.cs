@@ -5,16 +5,16 @@ namespace BankingSystem.Application.HelperServices
 {
     public class HashingService : IHashingService
     {
-        private readonly int _workfactory;
+        private readonly int _workFactor;
 
         public HashingService(IConfiguration configuration)
         {
-            _workfactory = configuration.GetValue<int>("BCryptSettings:WorkFactor");
+            _workFactor = configuration.GetValue<int>("BCryptSettings:WorkFactor");
         }
 
         public string HashValue(string value)
         {
-            var hashedValue = BCrypt.Net.BCrypt.EnhancedHashPassword(value, _workfactory);
+            var hashedValue = BCrypt.Net.BCrypt.EnhancedHashPassword(value, _workFactor);
             return hashedValue;
         }
 

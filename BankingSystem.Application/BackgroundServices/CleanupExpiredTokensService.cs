@@ -33,7 +33,7 @@ namespace BankingSystem.Application.BackgroundServices
                     _logger.LogError("An error occurred while cleaning up expired tokens: {message} {type}", ex.Message, ex.GetType().Name);
                 }
 
-                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
         }
     }

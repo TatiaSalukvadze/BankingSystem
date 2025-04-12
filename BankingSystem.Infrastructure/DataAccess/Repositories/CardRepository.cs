@@ -10,10 +10,10 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
 {
     public class CardRepository : ICardRepository
     {
-        private readonly SqlConnection _connection;
+        private readonly IDbConnection _connection;
         private IDbTransaction _transaction;
 
-        public CardRepository(SqlConnection connection)
+        public CardRepository(IDbConnection connection)
         {
             _connection = connection;
         }

@@ -9,7 +9,7 @@ namespace BankingSystem.Contracts.Interfaces.IServices
     {
         Task<Response<Account>> CreateAccountAsync(CreateAccountDTO createAccountDto);
         Task<Response<PagingResponseDTO<SeeAccountsDTO>>> SeeAccountsAsync(string email, int page, int perPage);
-        Task<SimpleResponse> DeleteAccountAsync(string IBAN);
+        Task<SimpleResponse> DeleteAccountAsync(DeleteAccountDTO deleteAccountDto);
         Task<Response<TransferAccountsDTO>> ValidateAccountsForOnlineTransferAsync(string fromIBAN,
             string toIBAN, string email, bool isSelfTransfer);
         Task<SimpleResponse> UpdateAccountsAmountAsync(int fromAccountId, int toAccountId,

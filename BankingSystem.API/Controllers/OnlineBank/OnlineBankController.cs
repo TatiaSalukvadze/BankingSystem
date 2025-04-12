@@ -40,9 +40,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         }
 
         [HttpDelete("Account")]
-        public async Task<IActionResult> DeleteAccount([FromForm] string IBAN)
+        public async Task<IActionResult> DeleteAccount([FromForm] DeleteAccountDTO deleteAccountDto)
         {
-            var response = await _accountService.DeleteAccountAsync(IBAN);
+            var response = await _accountService.DeleteAccountAsync(deleteAccountDto);
             return new ObjectResult(response);
         }
 
@@ -54,9 +54,9 @@ namespace BankingSystem.API.Controllers.OnlineBank
         }
 
         [HttpDelete("Card")]
-        public async Task<IActionResult> DeleteCard([FromForm] string cardNumber)
+        public async Task<IActionResult> DeleteCard([FromForm] DeleteCardDTO deleteCardDto)
         {
-            var response = await _cardService.CancelCardAsync(cardNumber);
+            var response = await _cardService.CancelCardAsync(deleteCardDto);
             return new ObjectResult(response);
         }
     }
