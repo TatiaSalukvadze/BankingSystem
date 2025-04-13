@@ -99,7 +99,7 @@ namespace BankingSystem.Infrastructure.DataAccess.Repositories
                 var sql = @"SELECT(CAST (PerformedAt AS DATE)) as [Date],  COUNT(*) AS TransactionCount 
                             FROM TransactionDetails
                             WHERE PerformedAt > CAST(DATEADD(MONTH, -1, GETDATE()) AS DATE) 
-                                AND PerformedAt < CAST(GETDATE() AS DATE)
+                                AND PerformedAt < GETDATE()
                             GROUP BY (CAST (PerformedAt AS DATE)) 
                             ORDER BY [Date]";
                 var sqlResult = await _connection.QueryAsync<(DateTime,int)>(sql);

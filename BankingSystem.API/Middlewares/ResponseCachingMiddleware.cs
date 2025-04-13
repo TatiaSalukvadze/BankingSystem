@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 
 namespace BankingSystem.API.Middlewares
@@ -18,8 +19,16 @@ namespace BankingSystem.API.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var controller = context.GetRouteData().Values["Controller"].ToString();
-            var action = context.GetRouteData().Values["Action"].ToString();
+            var routeData = context.GetRouteData();
+            if (routeData is null || routeData.Values.Count() == 0 ||
+                !routeData.Values.TryGetValue("Controller", out var controllerObj) ||
+                !routeData.Values.TryGetValue("Action", out var actionObj)) 
+            {
+                await _next(context);
+                return;
+            }
+            var controller = controllerObj.ToString();
+            var action = actionObj.ToString();
 
             if (context.Request.Method == HttpMethods.Get && controller != "Auth")
             {
