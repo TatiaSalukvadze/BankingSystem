@@ -1,4 +1,4 @@
-﻿namespace BankingSystem.Contracts.Exceptions
+﻿namespace BankingSystem.Infrastructure.Exceptions
 {
     public class CurrencyRateNotFoundException : Exception
     {

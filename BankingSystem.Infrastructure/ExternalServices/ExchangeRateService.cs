@@ -1,4 +1,4 @@
-﻿using BankingSystem.Contracts.Exceptions;
+﻿using BankingSystem.Infrastructure.Exceptions;
 using BankingSystem.Contracts.Interfaces.IExternalServices;
 using BankingSystem.Infrastructure.ExternalServices.Configuration;
 using Microsoft.Extensions.Options;
