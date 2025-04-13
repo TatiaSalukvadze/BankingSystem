@@ -171,7 +171,7 @@ namespace BankingSystem.Application.Services
         {
             var response = new Response<AtmWithdrawalCalculationDTO>();
             var accountInfo = await _unitOfWork.CardRepository.GetBalanceAndWithdrawnAmountAsync(cardNumber, pin);
-            if (accountInfo == null)
+            if (accountInfo is null)
             {
                 return response.Set(false, "Unable to retrieve account details!", null, 400);
             }
