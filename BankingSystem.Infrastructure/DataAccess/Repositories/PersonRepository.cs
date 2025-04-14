@@ -1,7 +1,6 @@
 ﻿using BankingSystem.Contracts.Interfaces.IRepositories;
 using BankingSystem.Domain.Entities;
 using Dapper;
-using Microsoft.Data.SqlClient;
 using System.Data;
 using static Dapper.SqlMapper;
 

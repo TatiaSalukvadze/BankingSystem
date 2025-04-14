@@ -191,6 +191,13 @@ namespace BankingSystem.Application.Services
                 amountToDeduct *= exchangeRate;
             }
 
+            decimal newTotalWithdrawnIn24Hours = totalWithdrawnIn24Hours + amountToDeduct;
+            decimal atmWithdrawalLimit = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalLimitForDay");
+            if (newTotalWithdrawnIn24Hours > atmWithdrawalLimit)
+            {
+                return response.Set(false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours!", null, 400);
+            }
+
             decimal feePercent = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalPercent");
             decimal bankProfit = amountToDeduct * (feePercent / 100);
             decimal totalAmountToDeduct = amountToDeduct + bankProfit;
@@ -198,13 +205,7 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, "You don't have enough money!", null, 400);
             }
-
-            decimal newTotalWithdrawnIn24Hours = totalWithdrawnIn24Hours + totalAmountToDeduct;
-            decimal atmWithdrawalLimit = _configuration.GetValue<decimal>("TransactionFees:AtmWithdrawalLimitForDay");
-            if (newTotalWithdrawnIn24Hours > atmWithdrawalLimit)
-            {
-                return response.Set(false, $"You can't withdraw more than {atmWithdrawalLimit} {accountCurrency} within 24 hours!", null, 400);
-            }
+          
 
             var withdrawalData = new AtmWithdrawalCalculationDTO
             {
