@@ -85,7 +85,6 @@ namespace BankingSystem.Application.Services
             return response.Set(true, "Bank profit count retrieved!", averageBankProfits, 200);
         }
 
-
         public async Task<Response<List<TransactionCountChartDTO>>> NumberOfTransactionsChartAsync()
         {
             var response = new Response<List<TransactionCountChartDTO>>();

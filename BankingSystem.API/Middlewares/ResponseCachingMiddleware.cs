@@ -40,6 +40,7 @@ namespace BankingSystem.API.Middlewares
                 _logger.LogInformation("Getting request response from MemoryCache!");
                 context.Response.StatusCode = retrievedStatusCode;
                 context.Response.ContentType = "application/json";
+
                 await context.Response.WriteAsync(response);
             }
             else

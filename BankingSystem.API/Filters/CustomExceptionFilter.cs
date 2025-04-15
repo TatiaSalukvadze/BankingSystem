@@ -28,6 +28,7 @@ namespace BankingSystem.API.Filters
             
             context.Result = new BadRequestObjectResult(error);
             context.ExceptionHandled = true;
+
             await Task.CompletedTask;
         }
     }
