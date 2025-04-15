@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 
-namespace BankingSystem.API.Extensions
+namespace BankingSystem.API.Configuration
 {
     public static class AuthConfiguration
     {

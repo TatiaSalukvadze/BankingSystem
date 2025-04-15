@@ -16,14 +16,13 @@ using BankingSystem.Application.BackgroundServices;
 using BankingSystem.Application.HelperServices;
 using System.Data;
 
-namespace BankingSystem.API.Extensions
+namespace BankingSystem.API.Configuration
 {
     public static class ServiceRegistration
     {
         public static IServiceCollection InjectApplicationDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(options => 
-            options.UseSqlServer(configuration.GetConnectionString("default")));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("default")));
 
             return services;
         }

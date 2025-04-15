@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 
-namespace BankingSystem.API.Extensions
+namespace BankingSystem.API.Configuration
 {
     public static class SwaggerConfiguration
     {

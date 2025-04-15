@@ -2,7 +2,7 @@
 using BankingSystem.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 
-namespace BankingSystem.API.Extensions
+namespace BankingSystem.API.Configuration
 {
     public static class IdentityConfiguration
     {

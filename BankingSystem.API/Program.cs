@@ -1,4 +1,4 @@
-using BankingSystem.API.Extensions;
+using BankingSystem.API.Configuration;
 using BankingSystem.API.Filters;
 using BankingSystem.API.Middlewares;
 using Serilog;
