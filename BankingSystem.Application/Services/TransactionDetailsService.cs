@@ -205,7 +205,6 @@ namespace BankingSystem.Application.Services
             {
                 return response.Set(false, "You don't have enough money!", null, 400);
             }
-          
 
             var withdrawalData = new AtmWithdrawalCalculationDTO
             {

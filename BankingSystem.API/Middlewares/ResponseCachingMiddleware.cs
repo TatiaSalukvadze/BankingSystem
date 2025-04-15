@@ -64,7 +64,6 @@ namespace BankingSystem.API.Middlewares
                 context.Response.Body = originalBodyStream;
                 await context.Response.Body.WriteAsync(memoryStream.ToArray());
             }
-           
         }
     }
 }
