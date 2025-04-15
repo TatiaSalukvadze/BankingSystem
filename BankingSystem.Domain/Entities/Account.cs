@@ -1,5 +1,4 @@
-﻿
-namespace BankingSystem.Domain.Entities
+﻿namespace BankingSystem.Domain.Entities
 {
     public class Account
     {

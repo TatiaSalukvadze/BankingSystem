@@ -44,7 +44,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
             return new ObjectResult(response);
         }
 
-
         [HttpPost("Refresh")]
         public async Task<IActionResult> Refresh([FromForm] RefreshTokensDTO refreshTokensDto)
         {

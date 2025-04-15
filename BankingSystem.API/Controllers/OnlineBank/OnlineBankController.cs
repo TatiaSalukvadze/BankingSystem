@@ -12,7 +12,6 @@ namespace BankingSystem.API.Controllers.OnlineBank
         private readonly IAccountService _accountService;
         private readonly ICardService _cardService;
 
-
         public OnlineBankController(IPersonService personService, IAccountService accountService, 
             ICardService cardService)
         {

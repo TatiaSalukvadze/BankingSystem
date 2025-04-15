@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BankingSystem.Contracts.DTOs.ATM
+﻿namespace BankingSystem.Contracts.DTOs.ATM
 {
     public class AtmWithdrawalCalculationDTO
     {

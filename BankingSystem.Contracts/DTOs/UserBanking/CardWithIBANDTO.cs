@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BankingSystem.Contracts.DTOs.UserBanking
+﻿namespace BankingSystem.Contracts.DTOs.UserBanking
 {
     public class CardWithIBANDTO
     {

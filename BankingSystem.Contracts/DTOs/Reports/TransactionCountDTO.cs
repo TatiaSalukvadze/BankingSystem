@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BankingSystem.Contracts.DTOs.Report
+﻿namespace BankingSystem.Contracts.DTOs.Report
 {
     public class TransactionCountDTO
     {

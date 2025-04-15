@@ -1,5 +1,4 @@
 ﻿using BankingSystem.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Contracts.DTOs.ATM
 {
